@@ -8,12 +8,18 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
+    private TextView password;
+    private Boolean hide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,5 +45,29 @@ public class LoginActivity extends AppCompatActivity {
         textView.setText(ss);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setHighlightColor(Color.TRANSPARENT);
+
+        hide = true;
+        password = (TextView)findViewById(R.id.txtv_password_ID);
+        password.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getX() >= (password.getRight() - password.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        hide = !hide;
+                        if(hide)
+                            password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        else
+                            password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+
+                    }
+                }
+                return false;
+            }
+        });
     }
 }
