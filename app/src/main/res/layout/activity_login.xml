@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".LoginActivity">
 
     <ImageView
@@ -39,6 +40,7 @@
             android:layout_height="40dp"
             android:layout_margin="10dp"
             android:background="@drawable/textview_border"
+            android:drawableStart="@drawable/ic_email_gray_24dp"
             android:ems="10"
             android:hint="Email *"
             android:inputType="textEmailAddress"
@@ -52,6 +54,7 @@
             android:layout_height="40dp"
             android:layout_margin="10dp"
             android:background="@drawable/textview_border"
+            android:drawableStart="@drawable/ic_lock_gray_24dp"
             android:drawableRight="@drawable/ic_eye_gray_24dp"
             android:ems="10"
             android:hint="Password *"
@@ -60,6 +63,15 @@
             android:paddingEnd="5dp"
             android:textColor="@color/colorBlack"
             android:textColorHint="@color/colorBlack" />
+
+        <TextView
+            android:id="@+id/forgotLink_ID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text=" Forgot your password?"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/colorBlack" />
 
         <LinearLayout
             android:layout_width="match_parent"

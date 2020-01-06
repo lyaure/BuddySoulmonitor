@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -67,6 +68,16 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
                 return false;
+            }
+        });
+
+        TextView forgot = (TextView)findViewById(R.id.forgotLink_ID);
+        forgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://www.buddynsoul.com/Account/ForgotPassword");
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
             }
         });
     }
