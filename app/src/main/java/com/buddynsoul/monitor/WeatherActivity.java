@@ -25,6 +25,8 @@ public class WeatherActivity extends AppCompatActivity{
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String localisation;
+    private static final String ACCUWEATHER_MAP_API =
+            "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
