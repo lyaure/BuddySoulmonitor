@@ -15,13 +15,11 @@ public class NetworkUtils {
     private static final String TAG = "NetworkUtils";
 
 private final static String GEOPOSITION_BASE_URL=
-            "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?";
+            "https://dataservice.accuweather.com/locations/v1/cities/geoposition/search?";
 
 private final static String FORECAST_BASE_URL=
-            "http://dataservice.accuweather.com/forecasts/v1/daily/5day";
+            "https://dataservice.accuweather.com/forecasts/v1/daily/5day";
 
-
-    private final static String METRIC_VALUE = "true";
 
     private final static String PARAM_API_KEY = "apikey";
 
@@ -29,6 +27,8 @@ private final static String FORECAST_BASE_URL=
 
     // to display units in Celsius
     private final static String PARAM_METRIC = "metric";
+
+    private final static String METRIC_VALUE = "true";
 
     // requestType:  ==> "geoposition"
     // requestType:  ==> "forecast"

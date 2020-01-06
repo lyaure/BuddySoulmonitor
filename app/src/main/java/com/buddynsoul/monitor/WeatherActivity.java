@@ -13,10 +13,24 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
+
+//import org.json.JSONException;
+import org.json.JSONObject;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.io.IOException;
 
 public class WeatherActivity extends AppCompatActivity{
     private static final long MIN_TIME_FOR_UPDATE = 0;
@@ -25,17 +39,67 @@ public class WeatherActivity extends AppCompatActivity{
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String localisation;
-    private static final String ACCUWEATHER_MAP_API =
-            "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        TextView city = (TextView)findViewById(R.id.cityName_ID);
+        URL builtUri;
+
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new
+                    StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        // get the last location
         localisation = getLastLocation();
 
-        Toast.makeText(this, "loc"+localisation, Toast.LENGTH_LONG).show();
+        // build geoposition request
+        builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
+        String response;
+
+        // url to get key value of the city
+        try {
+            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            response = "error";
+        }
+
+        String keyValue = "";
+
+        // send get request to the api
+        try {
+            keyValue = new JSONObject(response).getString("Key");
+            city.setText(new JSONObject(response).getString("EnglishName"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // build forecast request
+        builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue);
+
+        try {
+            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            response = "error";
+        }
+
+        // send get request to the api
+        try {
+            JSONObject jsnobject = new JSONObject(response);
+
+            // todo --------- HERE ------------
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //Toast.makeText(this, "hiii", Toast.LENGTH_LONG).show();
+        }
 
 
     }
@@ -115,7 +179,7 @@ public class WeatherActivity extends AppCompatActivity{
 //                locationManager.requestSingleUpdate(criteria, locationListener, null);
 
                 Log.d("GPS", "loc:" + loc.toString());
-                return loc.toString();
+                return  loc.getLatitude() + "," + loc.getLongitude();
 
             }
             else {
