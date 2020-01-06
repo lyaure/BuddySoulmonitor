@@ -87,7 +87,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/forecast1_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -117,7 +117,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView9"
+                android:id="@+id/forecast2_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -147,7 +147,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/forecast3_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -177,7 +177,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/forecast4_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -199,7 +199,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView17"
+                android:id="@+id/forecast1_day_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
@@ -214,7 +214,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/forecast1_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -229,7 +229,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView18"
+                android:id="@+id/forecast2_day_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
@@ -244,7 +244,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView9"
+                android:id="@+id/forecast2_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -259,7 +259,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView19"
+                android:id="@+id/forecast3_day_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
@@ -274,7 +274,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/forecast3_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -289,7 +289,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView20"
+                android:id="@+id/forecast4_day_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
@@ -304,7 +304,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView11"
+                android:id="@+id/forecast4_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -319,7 +319,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView21"
+                android:id="@+id/forecast5_day_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
@@ -334,7 +334,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/textView12"
+                android:id="@+id/forecast5_id"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"

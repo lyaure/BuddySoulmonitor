@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.io.IOException;
+import java.lang.Math;
 
 public class WeatherActivity extends AppCompatActivity{
     private static final long MIN_TIME_FOR_UPDATE = 0;
@@ -93,12 +94,41 @@ public class WeatherActivity extends AppCompatActivity{
         try {
             JSONObject jsnobject = new JSONObject(response);
 
+            Log.d("responseFromApi", response);
+
+            TextView forecast_1 = (TextView)findViewById(R.id.forecast1_id);
+            TextView forecast_2 = (TextView)findViewById(R.id.forecast2_id);
+            TextView forecast_3 = (TextView)findViewById(R.id.forecast3_id);
+            TextView forecast_4 = (TextView)findViewById(R.id.forecast4_id);
+            TextView forecast_5 = (TextView)findViewById(R.id.forecast5_id);
+
+            TextView[] textViewsArray = {forecast_1, forecast_2, forecast_3, forecast_4, forecast_5};
+
+            JSONObject forecastJson = new JSONObject(response);
+            JSONArray forecastArray = forecastJson.getJSONArray("DailyForecasts");
+            double minTemp, maxTemp;
+            for(int i = 0; i < forecastArray.length(); i++) {
+                JSONObject dailyForecast = forecastArray.getJSONObject(i);
+                JSONObject tempObject = dailyForecast.getJSONObject("Temperature");
+
+                minTemp = Math.round(tempObject.getJSONObject("Minimum").getDouble("Value"));
+                maxTemp = Math.round(tempObject.getJSONObject("Maximum").getDouble("Value"));
+
+                String tmpTemp = minTemp + "°\n" + maxTemp + "°";
+                textViewsArray[i].setText(tmpTemp);
+
+                Log.d("DebugReponse", tmpTemp);
+
+                //add these minTemp and maxTemp to array or the
+                //way you want to use
+            }
+
             // todo --------- HERE ------------
 
 
         } catch (JSONException e) {
             e.printStackTrace();
-            //Toast.makeText(this, "hiii", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "hiii", Toast.LENGTH_LONG).show();
         }
 
 
