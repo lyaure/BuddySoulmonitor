@@ -2,7 +2,6 @@ package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -13,7 +12,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
@@ -27,7 +25,6 @@ import org.json.JSONObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.net.URL;
 import java.io.IOException;
@@ -96,13 +93,13 @@ public class WeatherActivity extends AppCompatActivity{
 
             Log.d("responseFromApi", response);
 
-            TextView forecast_1 = (TextView)findViewById(R.id.forecast1_id);
-            TextView forecast_2 = (TextView)findViewById(R.id.forecast2_id);
-            TextView forecast_3 = (TextView)findViewById(R.id.forecast3_id);
-            TextView forecast_4 = (TextView)findViewById(R.id.forecast4_id);
-            TextView forecast_5 = (TextView)findViewById(R.id.forecast5_id);
+            TextView dForecast_1 = (TextView)findViewById(R.id.dForecast1_ID);
+            TextView dForecast_2 = (TextView)findViewById(R.id.dForecast2_ID);
+            TextView dForecast_3 = (TextView)findViewById(R.id.dForecast3_ID);
+            TextView dForecast_4 = (TextView)findViewById(R.id.dForecast4_ID);
+            TextView dForecast_5 = (TextView)findViewById(R.id.dForecast5_ID);
 
-            TextView[] textViewsArray = {forecast_1, forecast_2, forecast_3, forecast_4, forecast_5};
+            TextView[] textViewsArray = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
 
             JSONObject forecastJson = new JSONObject(response);
             JSONArray forecastArray = forecastJson.getJSONArray("DailyForecasts");
@@ -128,7 +125,7 @@ public class WeatherActivity extends AppCompatActivity{
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(this, "hiii", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
 
 

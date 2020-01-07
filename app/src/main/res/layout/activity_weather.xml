@@ -8,12 +8,21 @@
     android:padding="10dp"
     tools:context=".WeatherActivity">
 
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="end"
+        android:layout_weight="0.2"
+        android:background="#00FFFFFF"
+        app:srcCompat="@drawable/ic_place_36dp" />
+
     <TextView
         android:id="@+id/cityName_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingTop="75dp"
+        android:gravity="center"
         android:text="Ville"
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -87,7 +96,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast1_id"
+                android:id="@+id/hForecast1_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -117,7 +126,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast2_id"
+                android:id="@+id/hForecast2_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -147,7 +156,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast3_id"
+                android:id="@+id/hForecast3_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -177,7 +186,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast4_id"
+                android:id="@+id/hForecast4_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -214,7 +223,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast1_id"
+                android:id="@+id/dForecast1_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -244,7 +253,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast2_id"
+                android:id="@+id/dForecast2_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -274,7 +283,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast3_id"
+                android:id="@+id/dForecast3_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -304,7 +313,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast4_id"
+                android:id="@+id/dForecast4_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -334,7 +343,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/forecast5_id"
+                android:id="@+id/dForecast5_ID"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
