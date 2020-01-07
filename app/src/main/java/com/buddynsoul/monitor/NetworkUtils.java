@@ -20,6 +20,12 @@ private final static String GEOPOSITION_BASE_URL=
 private final static String FORECAST_BASE_URL=
             "https://dataservice.accuweather.com/forecasts/v1/daily/5day";
 
+private final static String CURRENT_CONDITIONS_BASE_URL=
+            "https://dataservice.accuweather.com/currentconditions/v1";
+
+private final static String HOURLY_FORECAST_BASE_URL=
+            "https://dataservice.accuweather.com/forecasts/v1/hourly/12hour";
+
 
     private final static String PARAM_API_KEY = "apikey";
 
@@ -30,8 +36,7 @@ private final static String FORECAST_BASE_URL=
 
     private final static String METRIC_VALUE = "true";
 
-    // requestType:  ==> "geoposition"
-    // requestType:  ==> "forecast"
+    // requestType: "geoposition" , "forecast", "currentconditions"
     public static URL buildUrlForWeather(Context context, String requestType, String params) {
 
         final String API_KEY = context.getString(R.string.accuweather_api_key);
@@ -52,6 +57,21 @@ private final static String FORECAST_BASE_URL=
         else if (requestType.equals("forecast")) {
             // here params is the "uniqueId"
             String forecastUrlBase = FORECAST_BASE_URL + "/" + params + "?";
+            builtUri = Uri.parse(forecastUrlBase).buildUpon()
+                    .appendQueryParameter(PARAM_API_KEY, API_KEY)
+                    .appendQueryParameter(PARAM_METRIC, METRIC_VALUE)
+                    .build();
+        }
+        else if (requestType.equals("currentconditions")) {
+            // here params is the "uniqueId"
+            String forecastUrlBase = CURRENT_CONDITIONS_BASE_URL + "/" + params + "?";
+            builtUri = Uri.parse(forecastUrlBase).buildUpon()
+                    .appendQueryParameter(PARAM_API_KEY, API_KEY)
+                    .build();
+        }
+        else if (requestType.equals("hourlyforecast")){
+            // here params is the "uniqueId"
+            String forecastUrlBase = HOURLY_FORECAST_BASE_URL + "/" + params + "?";
             builtUri = Uri.parse(forecastUrlBase).buildUpon()
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
                     .appendQueryParameter(PARAM_METRIC, METRIC_VALUE)

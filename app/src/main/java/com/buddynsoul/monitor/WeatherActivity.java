@@ -20,10 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import org.json.JSONException;
 import org.json.JSONObject;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -31,9 +28,14 @@ import java.net.URL;
 import java.io.IOException;
 import java.lang.Math;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class WeatherActivity extends AppCompatActivity{
     private static final long MIN_TIME_FOR_UPDATE = 0;
-    private static final float MIN_DIS_FOR_UPFATE = 0;
+    private static final float MIN_DIS_FOR_UPDATE = 0;
     final int PERMISSION_ID = 42;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -57,92 +59,240 @@ public class WeatherActivity extends AppCompatActivity{
         // get the last location
         localisation = getLastLocation();
 
+//        if (localisation.equals("")) {
+//
+//        }
+//        else {
+//
+//        }
+
         // build geoposition request
         builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
-        String response;
+        String response = "";
 
         // url to get key value of the city
+        String keyValue = "";
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+
+            // send get request to the api to get the uniqueId and the city name
+            try {
+                keyValue = new JSONObject(response).getString("Key");
+                city.setText(new JSONObject(response).getString("EnglishName"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
-            response = "error";
-        }
-
-        String keyValue = "";
-
-        // send get request to the api
-        try {
-            keyValue = new JSONObject(response).getString("Key");
-            city.setText(new JSONObject(response).getString("EnglishName"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            //response = "error";
         }
 
         // build forecast request
         builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue);
-
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
-        } catch (IOException e) {
-            e.printStackTrace();
-            response = "error";
-        }
 
-        // send get request to the api
-        try {
-            JSONObject jsnobject = new JSONObject(response);
+            // send get request to the api
+            try {
+                //JSONObject jsnobject = new JSONObject(response);
 
-            Log.d("responseFromApi", response);
+                //Log.d("responseFromApi", response);
 
-            ImageView dIconForecast_1 = (ImageView) findViewById(R.id.dIconForecast1_ID);
-            ImageView dIconForecast_2 = (ImageView)findViewById(R.id.dIconForecast2_ID);
-            ImageView dIconForecast_3 = (ImageView)findViewById(R.id.dIconForecast3_ID);
-            ImageView dIconForecast_4 = (ImageView)findViewById(R.id.dIconForecast4_ID);
-            ImageView dIconForecast_5 = (ImageView)findViewById(R.id.dIconForecast5_ID);
+                ImageView dIconForecast_1 = (ImageView) findViewById(R.id.dIconForecast1_ID);
+                ImageView dIconForecast_2 = (ImageView)findViewById(R.id.dIconForecast2_ID);
+                ImageView dIconForecast_3 = (ImageView)findViewById(R.id.dIconForecast3_ID);
+                ImageView dIconForecast_4 = (ImageView)findViewById(R.id.dIconForecast4_ID);
+                ImageView dIconForecast_5 = (ImageView)findViewById(R.id.dIconForecast5_ID);
 
-            ImageView[] dIconForecast = {dIconForecast_1, dIconForecast_2, dIconForecast_3, dIconForecast_4, dIconForecast_5};
+                ImageView[] dIconForecast = {dIconForecast_1, dIconForecast_2, dIconForecast_3, dIconForecast_4, dIconForecast_5};
 
-            TextView dForecast_1 = (TextView)findViewById(R.id.dForecast1_ID);
-            TextView dForecast_2 = (TextView)findViewById(R.id.dForecast2_ID);
-            TextView dForecast_3 = (TextView)findViewById(R.id.dForecast3_ID);
-            TextView dForecast_4 = (TextView)findViewById(R.id.dForecast4_ID);
-            TextView dForecast_5 = (TextView)findViewById(R.id.dForecast5_ID);
+                TextView dForecast_1 = (TextView)findViewById(R.id.dForecast1_ID);
+                TextView dForecast_2 = (TextView)findViewById(R.id.dForecast2_ID);
+                TextView dForecast_3 = (TextView)findViewById(R.id.dForecast3_ID);
+                TextView dForecast_4 = (TextView)findViewById(R.id.dForecast4_ID);
+                TextView dForecast_5 = (TextView)findViewById(R.id.dForecast5_ID);
 
-            TextView[] dForecast = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
+                TextView[] dForecast = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
 
-            JSONObject forecastJson = new JSONObject(response);
-            JSONArray forecastArray = forecastJson.getJSONArray("DailyForecasts");
-            double minTemp, maxTemp;
-            for(int i = 0; i < forecastArray.length(); i++) {
-                JSONObject dailyForecast = forecastArray.getJSONObject(i);
+                TextView day2 = (TextView)findViewById(R.id.day2_ID);
+                TextView day3 = (TextView)findViewById(R.id.day3_ID);
+                TextView day4 = (TextView)findViewById(R.id.day4_ID);
+                TextView day5 = (TextView)findViewById(R.id.day5_ID);
 
-                JSONObject icon = dailyForecast.getJSONObject("Day");
-                String iconName = "i" + icon.getInt("Icon");
-                int icon_id = getApplicationContext().getResources().getIdentifier(iconName, "drawable", getPackageName());
-                dIconForecast[i].setImageResource(icon_id);
+                TextView[] daysTextView = {day2, day3, day4, day5};
 
-                JSONObject temperature = dailyForecast.getJSONObject("Temperature");
+                JSONObject forecastJson = new JSONObject(response);
+                JSONArray forecastArray = forecastJson.getJSONArray("DailyForecasts");
+                int minTemp, maxTemp, currentDayIndex = -1;
+                for(int i = 0; i < forecastArray.length(); i++) {
+                    JSONObject dailyForecast = forecastArray.getJSONObject(i);
 
-                minTemp = Math.round(temperature.getJSONObject("Minimum").getDouble("Value"));
-                maxTemp = Math.round(temperature.getJSONObject("Maximum").getDouble("Value"));
+                    JSONObject icon = dailyForecast.getJSONObject("Day");
+                    String iconName = "i" + icon.getInt("Icon");
+                    int icon_id = getApplicationContext().getResources().getIdentifier(iconName, "drawable", getPackageName());
+                    dIconForecast[i].setImageResource(icon_id);
 
-                String tmpTemp = minTemp + "°\n" + maxTemp + "°";
-                dForecast[i].setText(tmpTemp);
+                    JSONObject temperature = dailyForecast.getJSONObject("Temperature");
 
-                Log.d("DebugReponse", tmpTemp);
+                    minTemp = (int)Math.round(temperature.getJSONObject("Minimum").getDouble("Value"));
+                    maxTemp = (int)Math.round(temperature.getJSONObject("Maximum").getDouble("Value"));
 
-                //add these minTemp and maxTemp to array or the
-                //way you want to use
+                    String tmpTemp = minTemp + "°\n" + maxTemp + "°";
+                    dForecast[i].setText(tmpTemp);
+
+                    // get the forecast day
+                    String[] day = {"Monday", "Tuesday" , "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
+                    if ( i == 0 ) {
+                        Calendar calendar = Calendar.getInstance();
+                        Date date = calendar.getTime();
+                        String forecastDay = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
+
+                        // get the current day index
+                        for (int j=0; j<day.length; j++) {
+                            if (day[j].equals(forecastDay)) {
+                                currentDayIndex = j;
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        int tmpIndexId = i - 1;
+                        int tmpIndexDay = (currentDayIndex + i) % 7;
+                        daysTextView[tmpIndexId].setText(day[tmpIndexDay]);
+                    }
+
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
             }
 
-            // todo --------- HERE ------------
-
-
-        } catch (JSONException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            //response = "error";
         }
+
+        // build currentconditions request
+        builtUri = NetworkUtils.buildUrlForWeather(this, "currentconditions", keyValue);
+        try {
+            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+
+            // send get request to the api
+            try {
+                final String METRIC_VALUE = "Metric";
+                final String IMPERIAL_VALUE = "Imperial";
+
+                ImageView currentIconForecast = (ImageView) findViewById(R.id.currentIconForecast_ID);
+                TextView currentForecast = (TextView)findViewById(R.id.currentForecast_ID);
+
+                JSONArray currentConditionsJsonArray = new JSONArray(response);
+                String currentConditionsIconName = "i" + currentConditionsJsonArray.getJSONObject(0).getInt("WeatherIcon");
+                String weatherText = currentConditionsJsonArray.getJSONObject(0).getString("WeatherText");
+                int icon_id = getApplicationContext().getResources().getIdentifier(currentConditionsIconName, "drawable", getPackageName());
+                currentIconForecast.setImageResource(icon_id);
+
+                JSONObject currentConditions = currentConditionsJsonArray.getJSONObject(0).getJSONObject("Temperature");
+                int currentConditionsTemp = (int)Math.round(currentConditions.getJSONObject(METRIC_VALUE).getDouble("Value"));
+
+                String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
+                currentForecast.setText(currentForecastText);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                Log.d("Debug2", response);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //response = "error";
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Log.d("Debug1", response);
+        }
+
+        // build hourly forecast request
+        builtUri = NetworkUtils.buildUrlForWeather(this, "hourlyforecast", keyValue);
+        try {
+            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+
+            // send get request to the api
+            try {
+
+                ImageView hIconForecast_1 = (ImageView) findViewById(R.id.hIconForecast1_ID);
+                ImageView hIconForecast_2 = (ImageView)findViewById(R.id.hIconForecast2_ID);
+                ImageView hIconForecast_3 = (ImageView)findViewById(R.id.hIconForecast3_ID);
+                ImageView hIconForecast_4 = (ImageView)findViewById(R.id.hIconForecast4_ID);
+
+                ImageView[] hIconForecast = {hIconForecast_1, hIconForecast_2, hIconForecast_3, hIconForecast_4};
+
+                TextView hForecast_1 = (TextView)findViewById(R.id.hForecast1_ID);
+                TextView hForecast_2 = (TextView)findViewById(R.id.hForecast2_ID);
+                TextView hForecast_3 = (TextView)findViewById(R.id.hForecast3_ID);
+                TextView hForecast_4 = (TextView)findViewById(R.id.hForecast4_ID);
+
+                TextView[] hForecast = {hForecast_1, hForecast_2, hForecast_3, hForecast_4};
+
+                TextView h_1 = (TextView)findViewById(R.id.hour1_ID);
+                TextView h_2 = (TextView)findViewById(R.id.hour2_ID);
+                TextView h_3 = (TextView)findViewById(R.id.hour3_ID);
+                TextView h_4 = (TextView)findViewById(R.id.hour4_ID);
+
+                TextView[] hours = {h_1, h_2, h_3, h_4};
+
+                JSONArray hourlyJsonArray = new JSONArray(response);
+
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                calendar.setTime(date);
+                int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+
+
+                for(int i = 0; i < 4; i++) {
+
+                    int tmpIndex = (i+1) * 2;
+                    int tmpHour = (currentHour + tmpIndex) % 24;
+
+                    String tmpHourStr = tmpHour + ":00";
+
+                    hours[i].setText(tmpHourStr);
+
+                    JSONObject hourlyJsonObject = hourlyJsonArray.getJSONObject(tmpIndex);
+
+                    //JSONObject icon = hourlyJsonObject.getJSONObject("WeatherIcon");
+                    String iconName = "i" + hourlyJsonObject.getInt("WeatherIcon");
+                    int icon_id = getApplicationContext().getResources().getIdentifier(iconName, "drawable", getPackageName());
+                    hIconForecast[i].setImageResource(icon_id);
+
+                    JSONObject temperature = hourlyJsonObject.getJSONObject("Temperature");
+
+                    int temp = (int) Math.round(temperature.getDouble("Value"));
+
+                    String tmpTemp = temp + "°";
+                    hForecast[i].setText(tmpTemp);
+                }
+
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                Log.d("Debug2", response);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //response = "error";
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Log.d("Debug1", response);
+        }
+
+
 
 
     }
@@ -214,14 +364,14 @@ public class WeatherActivity extends AppCompatActivity{
 
 
                 String best = locationManager.getBestProvider(criteria, false);
-                locationManager.requestLocationUpdates(best, MIN_TIME_FOR_UPDATE, MIN_DIS_FOR_UPFATE, locationListener);
+                locationManager.requestLocationUpdates(best, MIN_TIME_FOR_UPDATE, MIN_DIS_FOR_UPDATE, locationListener);
                 String provider =locationManager.getBestProvider(criteria, true);
                 Location loc = locationManager.getLastKnownLocation(provider);
 
 
 //                locationManager.requestSingleUpdate(criteria, locationListener, null);
 
-                Log.d("GPS", "loc:" + loc.toString());
+                //Log.d("GPS", "loc:" + loc.toString());
                 return  loc.getLatitude() + "," + loc.getLongitude();
 
             }
