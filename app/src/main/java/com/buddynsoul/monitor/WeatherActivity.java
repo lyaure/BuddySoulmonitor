@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ public class WeatherActivity extends AppCompatActivity{
         setContentView(R.layout.activity_weather);
 
         TextView city = (TextView)findViewById(R.id.cityName_ID);
+
         URL builtUri;
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -93,26 +95,40 @@ public class WeatherActivity extends AppCompatActivity{
 
             Log.d("responseFromApi", response);
 
+            ImageView dIconForecast_1 = (ImageView) findViewById(R.id.dIconForecast1_ID);
+            ImageView dIconForecast_2 = (ImageView)findViewById(R.id.dIconForecast2_ID);
+            ImageView dIconForecast_3 = (ImageView)findViewById(R.id.dIconForecast3_ID);
+            ImageView dIconForecast_4 = (ImageView)findViewById(R.id.dIconForecast4_ID);
+            ImageView dIconForecast_5 = (ImageView)findViewById(R.id.dIconForecast5_ID);
+
+            ImageView[] dIconForecast = {dIconForecast_1, dIconForecast_2, dIconForecast_3, dIconForecast_4, dIconForecast_5};
+
             TextView dForecast_1 = (TextView)findViewById(R.id.dForecast1_ID);
             TextView dForecast_2 = (TextView)findViewById(R.id.dForecast2_ID);
             TextView dForecast_3 = (TextView)findViewById(R.id.dForecast3_ID);
             TextView dForecast_4 = (TextView)findViewById(R.id.dForecast4_ID);
             TextView dForecast_5 = (TextView)findViewById(R.id.dForecast5_ID);
 
-            TextView[] textViewsArray = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
+            TextView[] dForecast = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
 
             JSONObject forecastJson = new JSONObject(response);
             JSONArray forecastArray = forecastJson.getJSONArray("DailyForecasts");
             double minTemp, maxTemp;
             for(int i = 0; i < forecastArray.length(); i++) {
                 JSONObject dailyForecast = forecastArray.getJSONObject(i);
-                JSONObject tempObject = dailyForecast.getJSONObject("Temperature");
 
-                minTemp = Math.round(tempObject.getJSONObject("Minimum").getDouble("Value"));
-                maxTemp = Math.round(tempObject.getJSONObject("Maximum").getDouble("Value"));
+                JSONObject icon = dailyForecast.getJSONObject("Day");
+                String iconName = "i" + icon.getInt("Icon");
+                int icon_id = getApplicationContext().getResources().getIdentifier(iconName, "drawable", getPackageName());
+                dIconForecast[i].setImageResource(icon_id);
+
+                JSONObject temperature = dailyForecast.getJSONObject("Temperature");
+
+                minTemp = Math.round(temperature.getJSONObject("Minimum").getDouble("Value"));
+                maxTemp = Math.round(temperature.getJSONObject("Maximum").getDouble("Value"));
 
                 String tmpTemp = minTemp + "°\n" + maxTemp + "°";
-                textViewsArray[i].setText(tmpTemp);
+                dForecast[i].setText(tmpTemp);
 
                 Log.d("DebugReponse", tmpTemp);
 
