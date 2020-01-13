@@ -2,6 +2,7 @@ package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GestureDetectorCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -16,6 +17,8 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,18 +36,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class WeatherActivity extends AppCompatActivity{
+public class WeatherActivity extends AppCompatActivity implements GestureDetector.OnGestureListener{
     private static final long MIN_TIME_FOR_UPDATE = 0;
     private static final float MIN_DIS_FOR_UPDATE = 0;
     final int PERMISSION_ID = 42;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private String localisation;
+    private GestureDetectorCompat detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        detector = new GestureDetectorCompat(this, this);
 
         TextView city = (TextView)findViewById(R.id.cityName_ID);
 
@@ -385,5 +391,46 @@ public class WeatherActivity extends AppCompatActivity{
             requestPermissions();
             return "";
         }
+    }
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if(e1.getX() < e2.getX()){
+            Intent i = new Intent(WeatherActivity.this, PedometerActivity.class);
+            startActivity(i);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        detector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 }
