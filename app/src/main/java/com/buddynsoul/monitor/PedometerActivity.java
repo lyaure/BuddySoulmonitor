@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.TextView;
 
 public class PedometerActivity extends AppCompatActivity implements GestureDetector.OnGestureListener{
     private GestureDetectorCompat detector;
@@ -17,6 +18,12 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         setContentView(R.layout.activity_pedometer);
 
         detector = new GestureDetectorCompat(this, this);
+        TextView steps = findViewById(R.id.steps_ID);
+        Database db = Database.getInstance(this);
+
+        int a = db.getSteps(Util.getToday());
+        steps.setText("" + a);
+
 
 
     }
