@@ -1,9 +1,16 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GestureDetectorCompat;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -17,16 +24,20 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pedometer);
 
+        if (Build.VERSION.SDK_INT >= 26) {
+            this.startForegroundService(new Intent(this, StepCounterListener.class));
+        } else {
+            startService(new Intent(this, StepCounterListener.class));
+        }
+
         detector = new GestureDetectorCompat(this, this);
         TextView steps = findViewById(R.id.steps_ID);
         Database db = Database.getInstance(this);
 
         int a = db.getSteps(Util.getToday());
         steps.setText("" + a);
-
-
-
     }
+
 
     @Override
     public boolean onDown(MotionEvent e) {

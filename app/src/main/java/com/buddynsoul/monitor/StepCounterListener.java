@@ -2,6 +2,7 @@ package com.buddynsoul.monitor;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -22,8 +23,7 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
-
-
+import androidx.core.app.NotificationCompat;
 
 
 /**
@@ -43,6 +43,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private static int steps;
     private static int lastSaveSteps;
     private static long lastSaveTime;
+
+    public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
     private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
 
@@ -97,15 +99,15 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
     }
 
-//    private void showNotification() {
-//        if (Build.VERSION.SDK_INT >= 26) {
-//            startForeground(NOTIFICATION_ID, getNotification(this));
-//        } else if (getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-//                .getBoolean("notification", true)) {
-//            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-//                    .notify(NOTIFICATION_ID, getNotification(this));
-//        }
-//    }
+    private void showNotification() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            startForeground(NOTIFICATION_ID, getNotification(this));
+        } else if (getSharedPreferences("pedometer", Context.MODE_PRIVATE)
+                .getBoolean("notification", true)) {
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+                    .notify(NOTIFICATION_ID, getNotification(this));
+        }
+    }
 
     @Override
     public IBinder onBind(final Intent intent) {
@@ -114,11 +116,27 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+
+//        String input = intent.getStringExtra("inputExtra");
+//        createNotificationChannel();
+//        Intent notificationIntent = new Intent(this, StepCounterListener.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+//                0, notificationIntent, 0);
+//        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setContentTitle("Foreground Service")
+//                .setContentText(input)
+//                .setSmallIcon(R.drawable.icon)
+//                .setContentIntent(pendingIntent)
+//                .build();
+//        startForeground(1, notification);
+
+
+
         reRegisterSensor();
         registerBroadcastReceiver();
-//        if (!updateIfNecessary()) {
-//            showNotification();
-//        }
+        if (!updateIfNecessary()) {
+            showNotification();
+        }
 
         // restart service every hour to save the current step count
         long nextUpdate = Math.min(Util.getTomorrow(),
@@ -168,6 +186,18 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
     }
 
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Foreground Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
 
 //    public static Notification getNotification(final Context context) {
 //        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","getNotification");
@@ -203,6 +233,21 @@ public class StepCounterListener extends Service implements SensorEventListener 
 //                .setSmallIcon(R.drawable.ic_notification).setOngoing(true);
 //        return notificationBuilder.build();
 //    }
+
+    public static Notification getNotification(final Context context) {
+        Intent notificationIntent = new Intent(context, StepCounterListener.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
+        .setContentTitle("Foreground Service")
+        //.setContentText(input)
+        .setSmallIcon(R.drawable.icon)
+        .setContentIntent(pendingIntent)
+        .build();
+        return notification;
+    }
+
 
     private void registerBroadcastReceiver() {
         if (BuildConfig.DEBUG) Log.d("DebugStepCounter","register broadcastreceiver");
