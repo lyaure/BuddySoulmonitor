@@ -44,7 +44,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private static int lastSaveSteps;
     private static long lastSaveTime;
 
-    public static final String CHANNEL_ID = "ForegroundServiceChannel";
+    public static String CHANNEL_ID;
 
     private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
 
@@ -131,7 +131,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 //        startForeground(1, notification);
 
 
-
+        createNotificationChannel();
         reRegisterSensor();
         registerBroadcastReceiver();
         if (!updateIfNecessary()) {
@@ -189,10 +189,11 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
+                    "ForegroundServiceChannel",
                     "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_DEFAULT
             );
+            CHANNEL_ID = serviceChannel.getId();
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
