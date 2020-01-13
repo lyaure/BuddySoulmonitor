@@ -236,6 +236,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 //    }
 
     public static Notification getNotification(final Context context) {
+        Database db = Database.getInstance(context);
         Intent notificationIntent = new Intent(context, StepCounterListener.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
                 notificationIntent, 0);

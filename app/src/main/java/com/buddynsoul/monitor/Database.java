@@ -62,9 +62,9 @@ public class Database extends SQLiteOpenHelper {
     /**
      * Query the 'steps' table. Remember to close the cursor!
      *
-     * @param columns       the colums
+     * @param columns       the columns
      * @param selection     the selection
-     * @param selectionArgs the selction arguments
+     * @param selectionArgs the selection arguments
      * @param groupBy       the group by statement
      * @param having        the having statement
      * @param orderBy       the order by statement
