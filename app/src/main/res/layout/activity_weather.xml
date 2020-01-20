@@ -8,20 +8,37 @@
     android:padding="10dp"
     tools:context=".WeatherActivity">
 
-    <ImageButton
-        android:id="@+id/changeCityBtn_ID"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="end"
         android:layout_weight="0.2"
-        android:background="#00FFFFFF"
-        app:srcCompat="@drawable/ic_place_36dp" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/searchCity_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:drawableLeft="@drawable/ic_search_black_24dp"
+            android:text="Search city"
+            android:textColor="@color/colorBlack" />
+
+        <ImageButton
+            android:id="@+id/actualPositionBtn_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="0.2"
+            android:background="#00FFFFFF"
+            android:foregroundGravity="right"
+            app:srcCompat="@drawable/ic_place_36dp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/cityName_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         android:gravity="center"
         android:text="Ville"
         android:textAlignment="center"

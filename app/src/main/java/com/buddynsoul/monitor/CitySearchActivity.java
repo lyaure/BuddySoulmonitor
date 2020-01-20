@@ -3,7 +3,6 @@ package com.buddynsoul.monitor;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
@@ -28,6 +27,7 @@ public class CitySearchActivity extends AppCompatActivity {
     private Button search;
     private ListView citiesList;
     private CityAdapter adapter;
+    private URL builtUri;
 
 
     @Override
@@ -41,6 +41,15 @@ public class CitySearchActivity extends AppCompatActivity {
         adapter = new CityAdapter(this, cities);
         citiesList.setAdapter(adapter);
 
+        search = (Button)findViewById(R.id.searchBtn_ID);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cities.clear();
+                buildAutoCompleteListSearch();
+            }
+        });
+
         citiesList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
@@ -53,7 +62,7 @@ public class CitySearchActivity extends AppCompatActivity {
             }
         });
 
-        URL builtUri;
+
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new
@@ -61,8 +70,11 @@ public class CitySearchActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
 
+    }
+
+    public void buildAutoCompleteListSearch(){
         // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", "jer");
+        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", cityName.getText().toString());
         String response = "";
 
         // url to get key value of the city
@@ -73,19 +85,21 @@ public class CitySearchActivity extends AppCompatActivity {
             // send get request to the api to get the uniqueId and the city name
             try {
                 JSONArray autocompleteArray = new JSONArray(response);
-                int loopSize = autocompleteArray.length() < 10 ? autocompleteArray.length() : 10;
+                if (autocompleteArray.length() == 0) {
+                    cities.add(new City());
+                }
+                else{
+                    int loopSize = autocompleteArray.length() < 10 ? autocompleteArray.length() : 10;
 
-                for(int i = 0; i < loopSize; i++) {
-                    JSONObject jObj = autocompleteArray.getJSONObject(i);
-                    String cityName = jObj.getString("LocalizedName");
-                    String countryName = jObj.getJSONObject("Country").getString("LocalizedName");
-                    keyValue = jObj.getString("Key");
-                    cities.add(new City(cityName, countryName, keyValue));
+                    for(int i = 0; i < loopSize; i++) {
+                        JSONObject jObj = autocompleteArray.getJSONObject(i);
+                        String cityName = jObj.getString("LocalizedName");
+                        String countryName = jObj.getJSONObject("Country").getString("LocalizedName");
+                        keyValue = jObj.getString("Key");
+                        cities.add(new City(cityName, countryName, keyValue));
+                    }
                 }
                 adapter.notifyDataSetChanged();
-
-
-
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -97,9 +111,5 @@ public class CitySearchActivity extends AppCompatActivity {
             //response = "error";
         }
 
-
-
     }
-
-
 }

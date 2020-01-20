@@ -8,7 +8,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -21,6 +20,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +47,9 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
     private LocationListener locationListener;
     private String localisation;
     private GestureDetectorCompat detector;
+    private URL builtUri;
+    private String response = "", keyValue = null;
+    private TextView city;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +57,10 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
         setContentView(R.layout.activity_weather);
 
         Intent intent = getIntent();
-        String keyValue = null;
-        String[] cityValues = intent.getStringArrayExtra("cityValues");
+        final String[] cityValues = intent.getStringArrayExtra("cityValues");
 //        Toast.makeText(this, keyValue, Toast.LENGTH_SHORT).show();
 
-
-
-        ImageButton changeCity = (ImageButton)findViewById(R.id.changeCityBtn_ID);
+        TextView changeCity = (TextView) findViewById(R.id.searchCity_ID);
         changeCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,11 +69,20 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             }
         });
 
+        ImageButton actualPosition = (ImageButton)findViewById(R.id.actualPositionBtn_ID);
+        actualPosition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cityNameAndKeyFromLocation();
+                forecast();
+                currentConditions();
+            }
+        });
+
         detector = new GestureDetectorCompat(this, this);
 
-        TextView city = (TextView)findViewById(R.id.cityName_ID);
+        city = (TextView)findViewById(R.id.cityName_ID);
 
-        URL builtUri;
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new
@@ -81,48 +90,55 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             StrictMode.setThreadPolicy(policy);
         }
 
-        // get the last location
-        localisation = getLastLocation();
-
 //        if (localisation.equals("")) {
 //
 //        }
 //        else {
 //
 //        }
-        String response = "";
+
 
        if(cityValues == null){
-           // build geoposition request
-           builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
-
-
-           // url to get key value of the city
-
-           try {
-               response = NetworkUtils.getResponseFromHttpUrl(builtUri);
-
-               // send get request to the api to get the uniqueId and the city name
-               try {
-                   keyValue = new JSONObject(response).getString("Key");
-                   city.setText(new JSONObject(response).getString("EnglishName"));
-               } catch (JSONException e) {
-                   e.printStackTrace();
-               }
-
-           } catch (IOException e) {
-               e.printStackTrace();
-               Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-               //response = "error";
-           }
-
+           cityNameAndKeyFromLocation();
        }
        else {
            city.setText(cityValues[0]);
            keyValue = cityValues[1];
        }
 
+       forecast();
+       currentConditions();
+    }
 
+    public void cityNameAndKeyFromLocation(){
+        // get the last location
+        localisation = getLastLocation();
+
+        // build geoposition request
+        builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
+
+
+        // url to get key value of the city
+
+        try {
+            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+
+            // send get request to the api to get the uniqueId and the city name
+            try {
+                keyValue = new JSONObject(response).getString("Key");
+                city.setText(new JSONObject(response).getString("EnglishName"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            //response = "error";
+        }
+    }
+
+    public void forecast(){
         // build forecast request
         builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue);
         try {
@@ -212,6 +228,9 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             //response = "error";
         }
 
+    }
+
+    public void currentConditions(){
         // build currentconditions request
         builtUri = NetworkUtils.buildUrlForWeather(this, "currentconditions", keyValue);
         try {
@@ -325,10 +344,6 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
             Log.d("Debug1", response);
         }
-
-
-
-
     }
 
     private boolean checkPermissions(){

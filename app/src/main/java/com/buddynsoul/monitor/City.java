@@ -10,6 +10,13 @@ public class City {
         this.keyValue = keyValue;
     }
 
+    public City(){
+        cityName = "City not found";
+        countryName = "";
+        keyValue = "";
+
+    }
+
     public String getCityName() {
         return cityName;
     }
