@@ -1,9 +1,15 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,12 +23,35 @@ import java.util.ArrayList;
 
 public class CitySearchActivity extends AppCompatActivity {
 
-    private ArrayList<City> Cities = new ArrayList<>();
+    private ArrayList<City> cities = new ArrayList<>();
+    private TextView cityName;
+    private Button search;
+    private ListView citiesList;
+    private CityAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_search);
+
+        cityName = (TextView)findViewById(R.id.autocomplete_ID);
+        citiesList = (ListView)findViewById(R.id.citiesList_ID);
+
+        adapter = new CityAdapter(this, cities);
+        citiesList.setAdapter(adapter);
+
+        citiesList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                String[] values = {cities.get(position).getCityName() ,cities.get(position).getKeyValue()};
+                Intent i = new Intent(CitySearchActivity.this, WeatherActivity.class);
+                i.putExtra("cityValues", values);
+                startActivity(i);
+            }
+        });
 
         URL builtUri;
 
@@ -33,7 +62,7 @@ public class CitySearchActivity extends AppCompatActivity {
         }
 
         // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", "Paris");
+        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", "jer");
         String response = "";
 
         // url to get key value of the city
@@ -51,8 +80,9 @@ public class CitySearchActivity extends AppCompatActivity {
                     String cityName = jObj.getString("LocalizedName");
                     String countryName = jObj.getJSONObject("Country").getString("LocalizedName");
                     keyValue = jObj.getString("Key");
-                    Cities.add(new City(cityName, countryName, keyValue));
+                    cities.add(new City(cityName, countryName, keyValue));
                 }
+                adapter.notifyDataSetChanged();
 
 
 

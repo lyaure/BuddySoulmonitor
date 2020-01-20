@@ -8,6 +8,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -19,6 +20,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +53,22 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        Intent intent = getIntent();
+        String keyValue = null;
+        String[] cityValues = intent.getStringArrayExtra("cityValues");
+//        Toast.makeText(this, keyValue, Toast.LENGTH_SHORT).show();
+
+
+
+        ImageButton changeCity = (ImageButton)findViewById(R.id.changeCityBtn_ID);
+        changeCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(WeatherActivity.this, CitySearchActivity.class);
+                startActivity(i);
+            }
+        });
+
         detector = new GestureDetectorCompat(this, this);
 
         TextView city = (TextView)findViewById(R.id.cityName_ID);
@@ -71,29 +90,38 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 //        else {
 //
 //        }
-
-        // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
         String response = "";
 
-        // url to get key value of the city
-        String keyValue = "";
-        try {
-            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+       if(cityValues == null){
+           // build geoposition request
+           builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
 
-            // send get request to the api to get the uniqueId and the city name
-            try {
-                keyValue = new JSONObject(response).getString("Key");
-                city.setText(new JSONObject(response).getString("EnglishName"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-            //response = "error";
-        }
+           // url to get key value of the city
+
+           try {
+               response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+
+               // send get request to the api to get the uniqueId and the city name
+               try {
+                   keyValue = new JSONObject(response).getString("Key");
+                   city.setText(new JSONObject(response).getString("EnglishName"));
+               } catch (JSONException e) {
+                   e.printStackTrace();
+               }
+
+           } catch (IOException e) {
+               e.printStackTrace();
+               Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+               //response = "error";
+           }
+
+       }
+       else {
+           city.setText(cityValues[0]);
+           keyValue = cityValues[1];
+       }
+
 
         // build forecast request
         builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue);
