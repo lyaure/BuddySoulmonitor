@@ -26,6 +26,9 @@ private final static String CURRENT_CONDITIONS_BASE_URL=
 private final static String HOURLY_FORECAST_BASE_URL=
             "https://dataservice.accuweather.com/forecasts/v1/hourly/12hour";
 
+private final static String AUTOCOMPLETE_BASE_URL=
+        "https://dataservice.accuweather.com/locations/v1/cities/autocomplete?";
+
 
     private final static String PARAM_API_KEY = "apikey";
 
@@ -75,6 +78,13 @@ private final static String HOURLY_FORECAST_BASE_URL=
             builtUri = Uri.parse(forecastUrlBase).buildUpon()
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
                     .appendQueryParameter(PARAM_METRIC, METRIC_VALUE)
+                    .build();
+        }
+        else if (requestType.equals("autocomplete")){
+            // here params is the "autocomplete" search field
+            builtUri = Uri.parse(AUTOCOMPLETE_BASE_URL).buildUpon()
+                    .appendQueryParameter(PARAM_API_KEY, API_KEY)
+                    .appendQueryParameter(PARAM_LOCATION, params)
                     .build();
         }
 
