@@ -42,10 +42,10 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
 
         detector = new GestureDetectorCompat(this, this);
         steps = findViewById(R.id.steps_ID);
-        Database db = Database.getInstance(this);
-
-        int a = db.getSteps(Util.getToday());
-        steps.setText("" + a);
+//        Database db = Database.getInstance(this);
+//
+//        int a = db.getSteps(Util.getToday());
+//        steps.setText("" + a);
     }
 
 
@@ -90,32 +90,46 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
     }
 
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.d("DebugOnSensor", "change");
-        if (sensorEvent.values[0] > Integer.MAX_VALUE || sensorEvent.values[0] == 0) {
+    public void onSensorChanged(SensorEvent event) {
+//        Log.d("DebugOnSensor", "change");
+//        if (sensorEvent.values[0] > Integer.MAX_VALUE || sensorEvent.values[0] == 0) {
+//            return;
+//        }
+//        Database db = Database.getInstance(this);
+//
+//        if (todayOffset == Integer.MIN_VALUE) {
+//            // no values for today
+//            // we dont know when the reboot was, so set todays steps to 0 by
+//            // initializing them with -STEPS_SINCE_BOOT
+//            todayOffset = -(int) sensorEvent.values[0];
+//            //db.insertNewDay(Util.getToday(), (int) sensorEvent.values[0]);
+//            db.insertNewDay(Util.getToday(), todayOffset);
+//
+//
+//        }
+//        since_boot = (int) sensorEvent.values[0];
+//        int a = todayOffset + (int)sensorEvent.values[0];
+//        steps.setText("" + a);
+//
+//        db.close();
+
+        if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
             return;
         }
-        Database db = Database.getInstance(this);
-
         if (todayOffset == Integer.MIN_VALUE) {
             // no values for today
             // we dont know when the reboot was, so set todays steps to 0 by
             // initializing them with -STEPS_SINCE_BOOT
-            todayOffset = -(int) sensorEvent.values[0];
-            //db.insertNewDay(Util.getToday(), (int) sensorEvent.values[0]);
-            db.insertNewDay(Util.getToday(), todayOffset);
-
-
+            todayOffset = -(int) event.values[0];
+            Database db = Database.getInstance(this);
+            db.insertNewDay(Util.getToday(), (int) event.values[0]);
+            db.close();
         }
-        since_boot = (int) sensorEvent.values[0];
+        since_boot = (int) event.values[0];
         //updatePie();
+        int steps_today = Math.max(todayOffset + since_boot, 0);
+        steps.setText(String.valueOf(steps_today));
 
-//        int a = db.getSteps(Util.getToday());
-//        Log.d("DebugOnSensorValue", ""+a);
-        int a = todayOffset + (int)sensorEvent.values[0];
-        steps.setText("" + a);
-
-        db.close();
 
     }
 
@@ -189,4 +203,5 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         db.saveCurrentSteps(since_boot);
         db.close();
     }
+
 }

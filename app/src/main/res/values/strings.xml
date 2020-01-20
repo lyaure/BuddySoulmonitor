@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">Buddy&amp;Soul monitor</string>
 <!--        <string name="accuweather_api_key">sQ4Urdjd2y0wIofeyDZDUKzwK4FMxQEk</string>-->
-    <string name="accuweather_api_key">GAS3M6snacxHxsvVjOZftAqoG0vgtIk3</string>
+<!--    <string name="accuweather_api_key">GAS3M6snacxHxsvVjOZftAqoG0vgtIk3</string>-->
 <!--        <string name="accuweather_api_key">6OZfZ3afTcnRYeMH2fMSfAQobw5s2Z3a</string>-->
+    <string name="accuweather_api_key">VcAh1nr3hzI7AzFseqTi4D6OoS2qkKGf</string>
     <string name="no_sensor">Sensor not found</string>
     <string name="no_sensor_explain">This app requires a dedicated hardware step sensor - which your device does not have. This app won\'t run on your device.</string>
+    <string name="goal_reached_notification">Goal reached! %s steps and counting</string>
+    <string name="notification_text">%s steps to go</string>
+    <string name="steps">steps</string>
+    <string name="your_progress_will_be_shown_here_soon">Your progress will be shown here soon</string>
+    <string name="notification_title">Pedometer is counting</string>
+
 </resources>
