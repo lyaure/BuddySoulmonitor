@@ -18,6 +18,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 
 import java.text.NumberFormat;
@@ -40,6 +41,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
+    private PowerManager.WakeLock wakeLock = null;
 
     private static int steps;
     private static int lastSaveSteps;
@@ -108,6 +110,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
                     .notify(NOTIFICATION_ID, getNotification(this));
         }
+
+        // we need this lock so our service gets not affected by Doze Mode
+//        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+//        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+//                "StepCounterListener::lock");
+//        wakeLock.acquire();
     }
 
     @Override
@@ -117,22 +125,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-
-//        String input = intent.getStringExtra("inputExtra");
-//        createNotificationChannel();
-//        Intent notificationIntent = new Intent(this, StepCounterListener.class);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-//                0, notificationIntent, 0);
-//        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setContentTitle("Foreground Service")
-//                .setContentText(input)
-//                .setSmallIcon(R.drawable.icon)
-//                .setContentIntent(pendingIntent)
-//                .build();
-//        startForeground(1, notification);
-
-
-        //createNotificationChannel();
         reRegisterSensor();
         registerBroadcastReceiver();
         if (!updateIfNecessary()) {
@@ -146,7 +138,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         AlarmManager am =
                 (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         PendingIntent pi = PendingIntent
-                .getService(getApplicationContext(), 2, new Intent(this, SensorEventListener.class),
+                .getService(getApplicationContext(), 2, new Intent(this, StepCounterListener.class),
                         PendingIntent.FLAG_UPDATE_CURRENT);
         if (Build.VERSION.SDK_INT >= 23) {
             am.setAndAllowWhileIdle(AlarmManager.RTC, nextUpdate, pi);
@@ -170,7 +162,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         // Restart service in 500 ms
         ((AlarmManager) getSystemService(Context.ALARM_SERVICE))
                 .set(AlarmManager.RTC, System.currentTimeMillis() + 500, PendingIntent
-                        .getService(this, 3, new Intent(this, SensorEventListener.class), 0));
+                        .getService(this, 3, new Intent(this, StepCounterListener.class), 0));
     }
 
     @Override
@@ -185,6 +177,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             if (BuildConfig.DEBUG) Log.d("error", e.toString());
             e.printStackTrace();
         }
+        //wakeLock.release();
     }
 
     private void createNotificationChannel() {
@@ -232,7 +225,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 .setContentIntent(PendingIntent
                         .getActivity(context, 0, new Intent(context, PedometerActivity.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT))
-                .setSmallIcon(R.drawable.icon).setOngoing(true);
+                .setSmallIcon(R.drawable.icon)
+                .setOngoing(true);
         return notificationBuilder.build();
     }
 
