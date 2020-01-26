@@ -70,18 +70,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="°F"
-                android:textColorHighlight="@color/colorGreen"
-                android:textColorLink="@color/colorGreen" />
+                android:shadowColor="@color/colorGreen"
+                android:text="°F" />
 
             <RadioButton
                 android:id="@+id/radioButtonC_ID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="°C"
-                android:textColorHighlight="@color/colorGreen"
-                android:textColorLink="@color/colorGreen" />
+                android:text="°C" />
 
         </RadioGroup>
 
@@ -93,8 +90,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
-        android:text="apply"
-        android:textColorHighlight="@color/colorOrange"
-        android:textColorLink="@color/colorOrange" />
+        android:background="@drawable/rounded_button"
+        android:text="apply" />
 
 </LinearLayout>
