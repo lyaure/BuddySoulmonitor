@@ -19,6 +19,8 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -113,6 +115,27 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 
        forecast();
        currentConditions();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // menu creation
+        super.onCreateOptionsMenu(menu);
+        MenuItem settings = menu.add("Settings");
+
+        settings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                Intent i = new Intent(WeatherActivity.this, SettingActivity.class);
+                startActivity(i); // open rules activity
+                return true;
+            }
+        });
+
+        return true;
     }
 
     public void cityNameAndKeyFromLocation(){
