@@ -19,6 +19,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.text.NumberFormat;
@@ -41,7 +42,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
-    private PowerManager.WakeLock wakeLock = null;
+    //private PowerManager.WakeLock wakeLock = null;
 
     private static int steps;
     private static int lastSaveSteps;
@@ -155,14 +156,33 @@ public class StepCounterListener extends Service implements SensorEventListener 
         if (BuildConfig.DEBUG) Log.d("DebugStepCounter","SensorListener onCreate");
     }
 
+//    @Override
+//    public void onTaskRemoved(final Intent rootIntent) {
+//        super.onTaskRemoved(rootIntent);
+//        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","sensor service task removed");
+//        // Restart service in 500 ms
+//        ((AlarmManager) getSystemService(Context.ALARM_SERVICE))
+//                .set(AlarmManager.RTC, System.currentTimeMillis() + 500, PendingIntent
+//                        .getService(this, 3, new Intent(this, StepCounterListener.class), 0));
+//    }
+
     @Override
-    public void onTaskRemoved(final Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
+    public void onTaskRemoved(Intent rootIntent){
         if (BuildConfig.DEBUG) Log.d("DebugStepCounter","sensor service task removed");
-        // Restart service in 500 ms
-        ((AlarmManager) getSystemService(Context.ALARM_SERVICE))
-                .set(AlarmManager.RTC, System.currentTimeMillis() + 500, PendingIntent
-                        .getService(this, 3, new Intent(this, StepCounterListener.class), 0));
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+//        alarmService.set(
+//                AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000, restartServicePendingIntent);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            alarmService.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000, restartServicePendingIntent);
+        } else {
+            alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000, restartServicePendingIntent);
+        }
+
+        super.onTaskRemoved(rootIntent);
     }
 
     @Override
@@ -230,21 +250,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
         return notificationBuilder.build();
     }
 
-//    public static Notification getNotification(final Context context) {
-//        Database db = Database.getInstance(context);
-//        Intent notificationIntent = new Intent(context, StepCounterListener.class);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-//                notificationIntent, 0);
-//
-//        Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-//        .setContentTitle("Foreground Service")
-//        //.setContentText(input)
-//        .setSmallIcon(R.drawable.icon)
-//        .setContentIntent(pendingIntent)
-//        .build();
-//        return notification;
-//    }
-
 
     private void registerBroadcastReceiver() {
         if (BuildConfig.DEBUG) Log.d("DebugStepCounter","register broadcastreceiver");
@@ -281,8 +286,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel channel =
                 new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_ID,
-                        NotificationManager.IMPORTANCE_NONE);
-        channel.setImportance(NotificationManager.IMPORTANCE_MIN); // ignored by Android O ...
+                        NotificationManager.IMPORTANCE_LOW);
+        channel.setImportance(NotificationManager.IMPORTANCE_LOW); // ignored by Android O ...
         channel.enableLights(false);
         channel.enableVibration(false);
         channel.setBypassDnd(false);

@@ -1,9 +1,12 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -13,6 +16,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,16 +27,39 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PedometerActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, SensorEventListener {
     private GestureDetectorCompat detector;
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
+    final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pedometer);
+
+
+        if (Build.VERSION.SDK_INT >= 29) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                boolean isGranted = false;
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
+                        MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Turn on Activity Recognition to enable steps counter", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    isGranted = true;
+                }
+
+            }
+        }
+
 
         if (Build.VERSION.SDK_INT >= 26) {
             this.startForegroundService(new Intent(this, StepCounterListener.class));
