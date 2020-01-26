@@ -4,35 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     tools:context=".PedometerActivity">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pedometer"
-        android:textAlignment="center"
-        android:textSize="36sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/steps_ID"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="200dp"
+        android:background="@drawable/pedometer_logo">
+
+        <ProgressBar
+            android:id="@+id/stepProgress_ID"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="302dp"
+            android:layout_height="274dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circular_shape"
+            android:indeterminate="false"
+            android:max="100"
+            android:progressDrawable="@drawable/circular_progress_bar" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/stepTxtv_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="0"
         android:textAlignment="center"
-        android:textSize="36sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="match_parent"
-        android:layout_height="59dp"
-        android:gravity="center_horizontal|center_vertical"
-        android:text="Steps"
-        android:textAlignment="center"
-        android:textSize="18sp"
+        android:textColor="@color/colorGreen"
+        android:textSize="24sp"
         android:textStyle="bold" />
 </LinearLayout>

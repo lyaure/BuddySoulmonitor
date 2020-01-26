@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
+    private ProgressBar progSteps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +70,9 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         }
 
         detector = new GestureDetectorCompat(this, this);
-        steps = findViewById(R.id.steps_ID);
+        steps = findViewById(R.id.stepTxtv_ID);
+        progSteps = findViewById(R.id.stepProgress_ID);
+
 //        Database db = Database.getInstance(this);
 //
 //        int a = db.getSteps(Util.getToday());
@@ -155,7 +159,11 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         since_boot = (int) event.values[0];
         //updatePie();
         int steps_today = Math.max(todayOffset + since_boot, 0);
-        steps.setText(String.valueOf(steps_today));
+        if(Build.VERSION.SDK_INT >= 24)
+            progSteps.setProgress(steps_today, true);
+        else
+            progSteps.setProgress(steps_today);
+        steps.setText(String.valueOf(steps_today) + "\nsteps");
 
 
     }
