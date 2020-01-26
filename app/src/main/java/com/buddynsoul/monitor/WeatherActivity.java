@@ -8,6 +8,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -50,11 +51,15 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
     private URL builtUri;
     private String response = "", keyValue = null;
     private TextView city;
+    private String metricValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        SharedPreferences prefs = this.getSharedPreferences("metricValue", Context.MODE_PRIVATE);
+        metricValue = prefs.getString("metricValue", "true");
 
         Intent intent = getIntent();
         final String[] cityValues = intent.getStringArrayExtra("cityValues");
@@ -115,7 +120,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
         localisation = getLastLocation();
 
         // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation);
+        builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation, metricValue);
 
 
         // url to get key value of the city
@@ -140,7 +145,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 
     public void forecast(){
         // build forecast request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue);
+        builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue, metricValue);
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
 
@@ -232,7 +237,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 
     public void currentConditions(){
         // build currentconditions request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "currentconditions", keyValue);
+        builtUri = NetworkUtils.buildUrlForWeather(this, "currentconditions", keyValue, metricValue);
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
 
@@ -270,7 +275,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
         }
 
         // build hourly forecast request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "hourlyforecast", keyValue);
+        builtUri = NetworkUtils.buildUrlForWeather(this, "hourlyforecast", keyValue, metricValue);
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
 

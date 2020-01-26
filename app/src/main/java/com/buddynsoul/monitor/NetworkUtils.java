@@ -37,10 +37,10 @@ private final static String AUTOCOMPLETE_BASE_URL=
     // to display units in Celsius
     private final static String PARAM_METRIC = "metric";
 
-    private final static String METRIC_VALUE = "true";
+    //private final static String METRIC_VALUE = "true";
 
     // requestType: "geoposition" , "forecast", "currentconditions"
-    public static URL buildUrlForWeather(Context context, String requestType, String params) {
+    public static URL buildUrlForWeather(Context context, String requestType, String params, String metricValue) {
 
         final String API_KEY = context.getString(R.string.accuweather_api_key);
 
@@ -62,7 +62,7 @@ private final static String AUTOCOMPLETE_BASE_URL=
             String forecastUrlBase = FORECAST_BASE_URL + "/" + params + "?";
             builtUri = Uri.parse(forecastUrlBase).buildUpon()
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
-                    .appendQueryParameter(PARAM_METRIC, METRIC_VALUE)
+                    .appendQueryParameter(PARAM_METRIC, metricValue)
                     .build();
         }
         else if (requestType.equals("currentconditions")) {
@@ -77,7 +77,7 @@ private final static String AUTOCOMPLETE_BASE_URL=
             String forecastUrlBase = HOURLY_FORECAST_BASE_URL + "/" + params + "?";
             builtUri = Uri.parse(forecastUrlBase).buildUpon()
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
-                    .appendQueryParameter(PARAM_METRIC, METRIC_VALUE)
+                    .appendQueryParameter(PARAM_METRIC, metricValue)
                     .build();
         }
         else if (requestType.equals("autocomplete")){
