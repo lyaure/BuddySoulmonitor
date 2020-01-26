@@ -18,15 +18,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
 
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import androidx.core.app.NotificationCompat;
 
 
 /**
@@ -42,7 +39,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
-    //private PowerManager.WakeLock wakeLock = null;
 
     private static int steps;
     private static int lastSaveSteps;
@@ -111,12 +107,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
                     .notify(NOTIFICATION_ID, getNotification(this));
         }
-
-        // we need this lock so our service gets not affected by Doze Mode
-//        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-//        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-//                "StepCounterListener::lock");
-//        wakeLock.acquire();
     }
 
     @Override
@@ -197,7 +187,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
             if (BuildConfig.DEBUG) Log.d("error", e.toString());
             e.printStackTrace();
         }
-        //wakeLock.release();
     }
 
     private void createNotificationChannel() {
