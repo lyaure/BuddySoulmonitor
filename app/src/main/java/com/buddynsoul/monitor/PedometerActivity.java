@@ -23,9 +23,13 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +40,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
     private TextView steps;
     final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +78,38 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         steps = findViewById(R.id.stepTxtv_ID);
         progSteps = findViewById(R.id.stepProgress_ID);
 
+        SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+        String  goal = sp.getString("stepGoal", "10000");
+
+        progSteps.setMax(Integer.parseInt(goal.trim()));
+
+
+
 //        Database db = Database.getInstance(this);
 //
 //        int a = db.getSteps(Util.getToday());
 //        steps.setText("" + a);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // menu creation
+        super.onCreateOptionsMenu(menu);
+        MenuItem settings = menu.add("Settings");
+
+        settings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                Intent i = new Intent(PedometerActivity.this, SettingActivity.class);
+                startActivity(i); // open rules activity
+                return true;
+            }
+        });
+
+        return true;
     }
 
 
