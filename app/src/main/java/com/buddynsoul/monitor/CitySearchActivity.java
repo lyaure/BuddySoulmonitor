@@ -74,7 +74,7 @@ public class CitySearchActivity extends AppCompatActivity {
 
     public void buildAutoCompleteListSearch(){
         // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", cityName.getText().toString());
+        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", cityName.getText().toString(), "true");
         String response = "";
 
         // url to get key value of the city

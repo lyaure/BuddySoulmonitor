@@ -61,7 +61,7 @@ public class SettingActivity extends AppCompatActivity {
                 }
 
                 if(temperature.getCheckedRadioButtonId() != oldButton.getId()){
-                    String temp = boolTemp ? "true" : "false";
+                    String temp = boolTemp ? "false" : "true";
 
                     editor.putString("metricValue", temp);
                     editor.commit();

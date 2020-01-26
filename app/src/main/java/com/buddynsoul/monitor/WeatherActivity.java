@@ -60,7 +60,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
-        SharedPreferences prefs = this.getSharedPreferences("metricValue", Context.MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         metricValue = prefs.getString("metricValue", "true");
 
         Intent intent = getIntent();
@@ -280,6 +280,10 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 
                 JSONObject currentConditions = currentConditionsJsonArray.getJSONObject(0).getJSONObject("Temperature");
                 int currentConditionsTemp = (int)Math.round(currentConditions.getJSONObject(METRIC_VALUE).getDouble("Value"));
+
+                if (metricValue.equals("false")) {
+                    currentConditionsTemp = ((9/5) * currentConditionsTemp) + 32;
+                }
 
                 String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
                 currentForecast.setText(currentForecastText);
