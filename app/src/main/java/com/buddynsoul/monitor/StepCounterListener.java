@@ -302,8 +302,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
 
         Calendar calendarEnd = Calendar.getInstance();
-        //calendarEnd.setTimeInMillis(System.currentTimeMillis());
-        calendarEnd.setTimeInMillis(Util.getTomorrow());
+        calendarEnd.setTimeInMillis(System.currentTimeMillis());
+        //calendarEnd.setTimeInMillis(Util.getTomorrow());
         calendarEnd.set(Calendar.HOUR_OF_DAY, 8);
         calendarEnd.set(Calendar.MINUTE, 00);
         calendarEnd.set(Calendar.SECOND, 00);
@@ -316,7 +316,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         //Log.d("DebugTime", "tmp time: " + new Date(calendarTomorrow.getTimeInMillis()).toLocaleString());
 
 
-        if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() && System.currentTimeMillis() < calendarEnd.getTimeInMillis()) {
+        if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() || System.currentTimeMillis() < calendarEnd.getTimeInMillis()) {
             // enable light sensor
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
                     SensorManager.SENSOR_DELAY_NORMAL);
