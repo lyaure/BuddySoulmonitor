@@ -43,9 +43,11 @@ public class ScreenReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(ACTION_CHARGING)) {
             Toast.makeText(context, "IsCharging", Toast.LENGTH_LONG).show();
+            if (BuildConfig.DEBUG) Log.d("DebugStepCounter","IsCharging");
         }
         else if (intent.getAction().equals(ACTION_DISCHARGING)) {
             Toast.makeText(context, "Discharging", Toast.LENGTH_LONG).show();
+            if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Discharging");
         }
 
 

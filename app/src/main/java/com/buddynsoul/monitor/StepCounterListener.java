@@ -73,7 +73,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             }
             else {
                 float luxVal = event.values[0];
-                if (luxVal < 70) {
+                if (luxVal == 0) {
                     Toast.makeText(this, "Dark room", Toast.LENGTH_LONG).show();
                 }
             }
@@ -296,71 +296,60 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         Calendar calendarStart = Calendar.getInstance();
         calendarStart.setTimeInMillis(System.currentTimeMillis());
-        calendarStart.set(Calendar.HOUR_OF_DAY, 18);
-        calendarStart.set(Calendar.MINUTE, 52);
-        calendarStart.set(Calendar.SECOND, 0);
+        calendarStart.set(Calendar.HOUR_OF_DAY, 20);
+        calendarStart.set(Calendar.MINUTE, 00);
+        calendarStart.set(Calendar.SECOND, 00);
 
 
         Calendar calendarEnd = Calendar.getInstance();
-        calendarEnd.setTimeInMillis(System.currentTimeMillis());
-//        calendarEnd.setTimeInMillis(Util.getTomorrow());
-        calendarEnd.set(Calendar.HOUR_OF_DAY, 18);
-        calendarEnd.set(Calendar.MINUTE, 53);
-        calendarEnd.set(Calendar.SECOND, 0);
+        //calendarEnd.setTimeInMillis(System.currentTimeMillis());
+        calendarEnd.setTimeInMillis(Util.getTomorrow());
+        calendarEnd.set(Calendar.HOUR_OF_DAY, 8);
+        calendarEnd.set(Calendar.MINUTE, 00);
+        calendarEnd.set(Calendar.SECOND, 00);
 
-//        Calendar calendarTomorrow = Calendar.getInstance();
-////        calendarStart.setTimeInMillis(System.currentTimeMillis());
-//        calendarTomorrow.setTimeInMillis(Util.getTomorrow());
-//        calendarTomorrow.set(Calendar.HOUR_OF_DAY, 18);
-//        calendarTomorrow.set(Calendar.MINUTE, 27);
-//        calendarTomorrow.set(Calendar.SECOND, 0);
 
-//        long diffTime = calendar.getTimeInMillis() - System.currentTimeMillis();
-//        Log.d("DebugStepCounter", " diffTime: " + diffTime);
-//
-
-        // alarm manager to restart the service at this time
-
-        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-
-        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 3, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
-        PendingIntent restartServicePendingIntent2 = PendingIntent.getService(getApplicationContext(), 4, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Log.d("DebugStepCounter", "light register: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
+        Log.d("DebugTime", "current time: " + new Date(System.currentTimeMillis()).toLocaleString());
+        Log.d("DebugTime", "start time: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
+        Log.d("DebugTime", "end time: " + new Date(calendarEnd.getTimeInMillis()).toLocaleString());
+        //Log.d("DebugTime", "tmp time: " + new Date(calendarTomorrow.getTimeInMillis()).toLocaleString());
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
-            //alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent2);
 
-        }
-        else {
-            alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
-            //alarmService.set(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent2);
-
-        }
-
-        // set alarm manager to start light sensor at desired time
-//        if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() && System.currentTimeMillis() < Util.getTomorrow()) {
         if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() && System.currentTimeMillis() < calendarEnd.getTimeInMillis()) {
-            Log.d("DebugTime", "current time: " + new Date(System.currentTimeMillis()).toLocaleString());
-            Log.d("DebugTime", "start time: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
-            Log.d("DebugTime", "end time: " + new Date(calendarEnd.getTimeInMillis()).toLocaleString());
-            //Log.d("DebugTime", "tmp time: " + new Date(calendarTomorrow.getTimeInMillis()).toLocaleString());
             // enable light sensor
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
                     SensorManager.SENSOR_DELAY_NORMAL);
             Toast.makeText(getApplicationContext(), "Light Sensor On", Toast.LENGTH_LONG).show();
-        }
-//        else if (System.currentTimeMillis() >= calendarEnd.getTimeInMillis() && System.currentTimeMillis() < calendarTomorrow.getTimeInMillis()) {
-//            try {
-//                sm.unregisterListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT));
-//            } catch (Exception e) {
-//                if (BuildConfig.DEBUG) Log.d("error",e.toString());
-//                e.printStackTrace();
-//            }
-//        }
 
+            // set alarm to disable the light sensor at upper bound sleeping time
+            Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+            restartServiceIntent.setPackage(getPackageName());
+            PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 3, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+            AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
+            }
+            else {
+                alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+            }
+
+        }
+        else {
+            // set alarm to enable the light sensor at lower bound sleeping time
+            Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+            restartServiceIntent.setPackage(getPackageName());
+            PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 4, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+            AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+            }
+            else {
+                alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+            }
+        }
 
 
     }
