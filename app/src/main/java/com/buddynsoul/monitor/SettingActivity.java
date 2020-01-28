@@ -17,12 +17,17 @@ public class SettingActivity extends AppCompatActivity {
     private String oldGoal;
     private RadioGroup temperature;
     private Boolean boolTemp;
+    private int val;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        Intent intent = getIntent();
+        val = intent.getIntExtra("activity", 0);
+
 
         SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
         oldGoal = sp.getString("stepGoal", "10000");
@@ -67,7 +72,13 @@ public class SettingActivity extends AppCompatActivity {
                     editor.commit();
                 }
 
-                Intent i = new Intent(SettingActivity.this, PedometerActivity.class);
+                Intent i;
+
+                if(val == 2)
+                    i = new Intent(SettingActivity.this, WeatherActivity.class);
+                else
+                    i = new Intent(SettingActivity.this, PedometerActivity.class);
+
                 startActivity(i);
             }
         });

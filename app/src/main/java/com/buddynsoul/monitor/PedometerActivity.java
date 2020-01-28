@@ -104,6 +104,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
             public boolean onMenuItemClick(MenuItem item)
             {
                 Intent i = new Intent(PedometerActivity.this, SettingActivity.class);
+                i.putExtra("activity", 1);
                 startActivity(i); // open rules activity
                 return true;
             }

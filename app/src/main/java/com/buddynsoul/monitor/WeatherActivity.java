@@ -130,6 +130,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             public boolean onMenuItemClick(MenuItem item)
             {
                 Intent i = new Intent(WeatherActivity.this, SettingActivity.class);
+                i.putExtra("activity", 2);
                 startActivity(i); // open rules activity
                 return true;
             }
