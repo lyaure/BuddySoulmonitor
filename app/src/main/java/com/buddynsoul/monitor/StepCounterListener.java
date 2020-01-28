@@ -20,8 +20,10 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -35,6 +37,9 @@ import java.util.Locale;
  */
 public class StepCounterListener extends Service implements SensorEventListener {
 
+    public static final String ACTION_CHARGING = "android.os.action.CHARGING";
+    public static final String ACTION_DISCHARGING = "android.os.action.DISCHARGING";
+
     public final static int NOTIFICATION_ID = 1;
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
@@ -46,17 +51,34 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     public static String CHANNEL_ID;
 
-    private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
+    private final BroadcastReceiver shutdownReceiver = new ShutdownReceiver();
+    private final BroadcastReceiver screenReceiver = new ScreenReceiver();
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[0] > Integer.MAX_VALUE) {
-            if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
-            return;
-        } else {
-            steps = (int) event.values[0];
-            updateIfNecessary();
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            if (event.values[0] > Integer.MAX_VALUE) {
+                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
+                return;
+            } else {
+                steps = (int) event.values[0];
+                updateIfNecessary();
+            }
         }
+
+        if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+            if (event.values[0] > Integer.MAX_VALUE) {
+                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
+                return;
+            }
+            else {
+                float luxVal = event.values[0];
+                if (luxVal < 70) {
+                    Toast.makeText(this, "Dark room", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
     }
 
     @Override
@@ -183,22 +205,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             sm.unregisterListener(this);
             this.unregisterReceiver(shutdownReceiver);
+            this.unregisterReceiver(screenReceiver);
         } catch (Exception e) {
             if (BuildConfig.DEBUG) Log.d("error", e.toString());
             e.printStackTrace();
-        }
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    "ForegroundServiceChannel",
-                    "Foreground Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            CHANNEL_ID = serviceChannel.getId();
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
         }
     }
 
@@ -245,6 +255,22 @@ public class StepCounterListener extends Service implements SensorEventListener 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SHUTDOWN);
         registerReceiver(shutdownReceiver, filter);
+
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenReceiver, filter);
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            filter.addAction(ACTION_CHARGING);
+            registerReceiver(screenReceiver, filter);
+
+            filter.addAction(ACTION_DISCHARGING);
+            registerReceiver(screenReceiver, filter);
+        }
+
+
+
+
     }
 
     private void reRegisterSensor() {
@@ -261,11 +287,82 @@ public class StepCounterListener extends Service implements SensorEventListener 
             Log.d("DebugStepCounter","step sensors: " + sm.getSensorList(Sensor.TYPE_STEP_COUNTER).size());
             if (sm.getSensorList(Sensor.TYPE_STEP_COUNTER).size() < 1) return; // emulator
             Log.d("DebugStepCounter","default: " + sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER).getName());
+            if (sm.getSensorList(Sensor.TYPE_LIGHT).size() < 1) return; // emulator
         }
 
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
+
+        Calendar calendarStart = Calendar.getInstance();
+        calendarStart.setTimeInMillis(System.currentTimeMillis());
+        calendarStart.set(Calendar.HOUR_OF_DAY, 18);
+        calendarStart.set(Calendar.MINUTE, 52);
+        calendarStart.set(Calendar.SECOND, 0);
+
+
+        Calendar calendarEnd = Calendar.getInstance();
+        calendarEnd.setTimeInMillis(System.currentTimeMillis());
+//        calendarEnd.setTimeInMillis(Util.getTomorrow());
+        calendarEnd.set(Calendar.HOUR_OF_DAY, 18);
+        calendarEnd.set(Calendar.MINUTE, 53);
+        calendarEnd.set(Calendar.SECOND, 0);
+
+//        Calendar calendarTomorrow = Calendar.getInstance();
+////        calendarStart.setTimeInMillis(System.currentTimeMillis());
+//        calendarTomorrow.setTimeInMillis(Util.getTomorrow());
+//        calendarTomorrow.set(Calendar.HOUR_OF_DAY, 18);
+//        calendarTomorrow.set(Calendar.MINUTE, 27);
+//        calendarTomorrow.set(Calendar.SECOND, 0);
+
+//        long diffTime = calendar.getTimeInMillis() - System.currentTimeMillis();
+//        Log.d("DebugStepCounter", " diffTime: " + diffTime);
+//
+
+        // alarm manager to restart the service at this time
+
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 3, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent restartServicePendingIntent2 = PendingIntent.getService(getApplicationContext(), 4, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Log.d("DebugStepCounter", "light register: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+            //alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent2);
+
+        }
+        else {
+            alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+            //alarmService.set(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent2);
+
+        }
+
+        // set alarm manager to start light sensor at desired time
+//        if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() && System.currentTimeMillis() < Util.getTomorrow()) {
+        if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() && System.currentTimeMillis() < calendarEnd.getTimeInMillis()) {
+            Log.d("DebugTime", "current time: " + new Date(System.currentTimeMillis()).toLocaleString());
+            Log.d("DebugTime", "start time: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
+            Log.d("DebugTime", "end time: " + new Date(calendarEnd.getTimeInMillis()).toLocaleString());
+            //Log.d("DebugTime", "tmp time: " + new Date(calendarTomorrow.getTimeInMillis()).toLocaleString());
+            // enable light sensor
+            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
+                    SensorManager.SENSOR_DELAY_NORMAL);
+            Toast.makeText(getApplicationContext(), "Light Sensor On", Toast.LENGTH_LONG).show();
+        }
+//        else if (System.currentTimeMillis() >= calendarEnd.getTimeInMillis() && System.currentTimeMillis() < calendarTomorrow.getTimeInMillis()) {
+//            try {
+//                sm.unregisterListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT));
+//            } catch (Exception e) {
+//                if (BuildConfig.DEBUG) Log.d("error",e.toString());
+//                e.printStackTrace();
+//            }
+//        }
+
+
+
     }
 
     @TargetApi(Build.VERSION_CODES.O)

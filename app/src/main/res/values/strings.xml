@@ -5,7 +5,8 @@
     <!--        <string name="accuweather_api_key">6OZfZ3afTcnRYeMH2fMSfAQobw5s2Z3a</string>-->
 <!--    <string name="accuweather_api_key">VcAh1nr3hzI7AzFseqTi4D6OoS2qkKGf</string>-->
     <string name="no_sensor">Sensor not found</string>
-    <string name="no_sensor_explain">This app requires a dedicated hardware step sensor - which your device does not have. This app won\'t run on your device.</string>
+    <string name="no_step_sensor_explain">This app requires a dedicated hardware step sensor - which your device does not have. This app won\'t run on your device.</string>
+    <string name="no_light_sensor_explain">This app requires a dedicated hardware light sensor - which your device does not have. This app won\'t run on your device.</string>
     <string name="goal_reached_notification">Goal reached! %s steps and counting</string>
     <string name="notification_text">%s steps to go</string>
     <string name="steps">steps</string>

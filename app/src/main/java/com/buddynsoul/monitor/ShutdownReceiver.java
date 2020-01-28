@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 
-public class ShutdownRecevier extends BroadcastReceiver {
+public class ShutdownReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {

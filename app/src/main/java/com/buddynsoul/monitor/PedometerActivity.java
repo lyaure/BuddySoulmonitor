@@ -232,7 +232,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         if (sensor == null) {
             new AlertDialog.Builder(this).setTitle(R.string.no_sensor)
-                    .setMessage(R.string.no_sensor_explain)
+                    .setMessage(R.string.no_step_sensor_explain)
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(final DialogInterface dialogInterface) {
@@ -247,6 +247,25 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         } else {
             sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
         }
+
+//        sensor = sm.getDefaultSensor(Sensor.TYPE_LIGHT);
+//        if (sensor == null) {
+//            new AlertDialog.Builder(this).setTitle(R.string.no_sensor)
+//                    .setMessage(R.string.no_light_sensor_explain)
+//                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                        @Override
+//                        public void onDismiss(final DialogInterface dialogInterface) {
+//                            finish();
+//                        }
+//                    }).setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(final DialogInterface dialogInterface, int i) {
+//                    dialogInterface.dismiss();
+//                }
+//            }).create().show();
+//        } else {
+//            sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
+//        }
 
         since_boot -= pauseDifference;
 

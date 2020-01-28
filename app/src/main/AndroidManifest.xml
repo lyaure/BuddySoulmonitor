@@ -44,7 +44,8 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".StepCounterListener" />
+        <service android:name=".StepCounterListener"/>
+<!--            android:process=":StepCounter"/>-->
     </application>
 
 </manifest>
