@@ -294,29 +294,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
 
-        Calendar calendarStart = Calendar.getInstance();
-        calendarStart.setTimeInMillis(System.currentTimeMillis());
-        calendarStart.set(Calendar.HOUR_OF_DAY, 20);
-        calendarStart.set(Calendar.MINUTE, 00);
-        calendarStart.set(Calendar.SECOND, 00);
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(System.currentTimeMillis());
 
-
-        Calendar calendarEnd = Calendar.getInstance();
-        calendarEnd.setTimeInMillis(System.currentTimeMillis());
-        //calendarEnd.setTimeInMillis(Util.getTomorrow());
-        calendarEnd.set(Calendar.HOUR_OF_DAY, 8);
-        calendarEnd.set(Calendar.MINUTE, 00);
-        calendarEnd.set(Calendar.SECOND, 00);
-
-
-        Log.d("DebugStepCounter", "light register: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
-        Log.d("DebugTime", "current time: " + new Date(System.currentTimeMillis()).toLocaleString());
-        Log.d("DebugTime", "start time: " + new Date(calendarStart.getTimeInMillis()).toLocaleString());
-        Log.d("DebugTime", "end time: " + new Date(calendarEnd.getTimeInMillis()).toLocaleString());
-        //Log.d("DebugTime", "tmp time: " + new Date(calendarTomorrow.getTimeInMillis()).toLocaleString());
-
-
-        if (System.currentTimeMillis() >= calendarStart.getTimeInMillis() || System.currentTimeMillis() < calendarEnd.getTimeInMillis()) {
+        if (isTimeBetweenTwoHours(20, 8, now)) {
             // enable light sensor
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -328,11 +309,28 @@ public class StepCounterListener extends Service implements SensorEventListener 
             PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 3, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
             AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
+            Calendar calendarEnd = Calendar.getInstance();
+
+            calendarEnd.setTimeInMillis(System.currentTimeMillis());
+
+            // if it's after or equal 9 am schedule for next day
+            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 8) {
+                calendarEnd.add(Calendar.DAY_OF_YEAR, 1); // add, not set!
+                Log.d("DebugTime", "Alarm will schedule for next day at 8!");
+            }
+            else{
+                Log.d("DebugTime", "Alarm will schedule for today!");
+            }
+            calendarEnd.set(Calendar.HOUR_OF_DAY, 8);
+            calendarEnd.set(Calendar.MINUTE, 0);
+            calendarEnd.set(Calendar.SECOND, 0);
+
+
             if (Build.VERSION.SDK_INT >= 23) {
                 alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
             }
             else {
-                alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+                alarmService.set(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
             }
 
         }
@@ -342,6 +340,18 @@ public class StepCounterListener extends Service implements SensorEventListener 
             restartServiceIntent.setPackage(getPackageName());
             PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 4, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
             AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+
+            Calendar calendarStart = Calendar.getInstance();
+
+            calendarStart.setTimeInMillis(System.currentTimeMillis());
+
+            // if it's after or equal 9 am schedule for next day
+            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 20) {
+                calendarStart.add(Calendar.DAY_OF_YEAR, 1); // add, not set!
+            }
+            calendarStart.set(Calendar.HOUR_OF_DAY, 20);
+            calendarStart.set(Calendar.MINUTE, 0);
+            calendarStart.set(Calendar.SECOND, 0);
 
             if (Build.VERSION.SDK_INT >= 23) {
                 alarmService.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
@@ -370,6 +380,29 @@ public class StepCounterListener extends Service implements SensorEventListener 
         manager.createNotificationChannel(channel);
         Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
         return builder;
+    }
+
+    /**
+     * @param fromHour Start Time
+     * @param toHour Stop Time
+     * @param now Current Time
+     * @return true if Current Time is between fromHour and toHour
+     */
+    private boolean isTimeBetweenTwoHours(int fromHour, int toHour, Calendar now) {
+        //Start Time
+        Calendar from = Calendar.getInstance();
+        from.set(Calendar.HOUR_OF_DAY, fromHour);
+        from.set(Calendar.MINUTE, 0);
+        //Stop Time
+        Calendar to = Calendar.getInstance();
+        to.set(Calendar.HOUR_OF_DAY, toHour);
+        to.set(Calendar.MINUTE, 0);
+
+        if(to.before(from)) {
+            if (now.after(to)) to.add(Calendar.DATE, 1);
+            else from.add(Calendar.DATE, -1);
+        }
+        return now.after(from) && now.before(to);
     }
 
 }
