@@ -54,6 +54,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final BroadcastReceiver shutdownReceiver = new ShutdownReceiver();
     private final BroadcastReceiver screenReceiver = new ScreenReceiver();
 
+    private float oldPitch, oldRoll, oldAzimuth;
+    private boolean flagAccStart;
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -74,9 +77,27 @@ public class StepCounterListener extends Service implements SensorEventListener 
             else {
                 float luxVal = event.values[0];
                 if (luxVal == 0) {
-                    Toast.makeText(this, "Dark room", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
                 }
             }
+        }
+
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            if(flagAccStart){
+                float tempX = oldPitch - event.values[0];
+                float tempY = oldRoll - event.values[1];
+                float tempZ = oldAzimuth - event.values[2];
+
+                if(tempX > Math.abs(3) || tempY > Math.abs(3) || tempZ > Math.abs(3))
+                    Toast.makeText(this, "phone is moving\n x=" + tempX + "\ny=" + tempY + "\nz=" + tempZ, Toast.LENGTH_LONG).show();
+
+            }
+
+            oldPitch = event.values[0];
+            oldRoll = event.values[1];
+            oldAzimuth = event.values[2];
+
+
         }
 
     }
@@ -204,6 +225,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         try {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             sm.unregisterListener(this);
+            flagAccStart = false;
             this.unregisterReceiver(shutdownReceiver);
             this.unregisterReceiver(screenReceiver);
         } catch (Exception e) {
@@ -267,10 +289,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
             filter.addAction(ACTION_DISCHARGING);
             registerReceiver(screenReceiver, filter);
         }
-
-
-
-
     }
 
     private void reRegisterSensor() {
@@ -290,6 +308,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
             if (sm.getSensorList(Sensor.TYPE_LIGHT).size() < 1) return; // emulator
         }
 
+        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
+        flagAccStart = true;
+
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
@@ -302,6 +324,11 @@ public class StepCounterListener extends Service implements SensorEventListener 
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
                     SensorManager.SENSOR_DELAY_NORMAL);
             Toast.makeText(getApplicationContext(), "Light Sensor On", Toast.LENGTH_LONG).show();
+
+//            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+//            Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
+//            flagAccStart = true;
+
 
             // set alarm to disable the light sensor at upper bound sleeping time
             Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
