@@ -22,14 +22,21 @@ public class ScreenReceiver extends BroadcastReceiver {
         SharedPreferences sp = context.getSharedPreferences("TempData", MODE_PRIVATE);
 
 
-        if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-            if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Screen On");
+        if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
+            if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Screen Off");
 
-            long screenOff = sp.getLong("screenOff", System.currentTimeMillis());
+            long tmpScreenOff = sp.getLong("tmpScreenOff", System.currentTimeMillis());
 
-            long durationScreenOff = System.currentTimeMillis() - screenOff;
+            long durationScreenOff = System.currentTimeMillis() - tmpScreenOff;
             durationScreenOff /= 1000; // convert time to sec
-            String str = "Duration screen off: " + durationScreenOff + " sec";
+//            String str = "Duration screen on: " + durationScreenOn + " sec";
+
+            SharedPreferences.Editor editor = sp.edit();
+            long screenOff = sp.getLong("screenOff", System.currentTimeMillis()) + durationScreenOff;
+            editor.putLong("screenOff", screenOff);
+            editor.commit();
+            String str = "Duration screen off: " + screenOff + " sec";
+
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
         }
         else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
@@ -37,17 +44,37 @@ public class ScreenReceiver extends BroadcastReceiver {
 
             SharedPreferences.Editor editor = sp.edit();
             long screenOff = System.currentTimeMillis();
-            editor.putLong("screenOff", screenOff);
+            editor.putLong("tmpScreenOff", screenOff);
             editor.commit();
         }
 
         if (intent.getAction().equals(ACTION_CHARGING)) {
             Toast.makeText(context, "IsCharging", Toast.LENGTH_LONG).show();
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","IsCharging");
+
+            SharedPreferences.Editor editor = sp.edit();
+            long charge = System.currentTimeMillis();
+            editor.putLong("tmpCharge", charge);
+            editor.commit();
         }
         else if (intent.getAction().equals(ACTION_DISCHARGING)) {
             Toast.makeText(context, "Discharging", Toast.LENGTH_LONG).show();
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Discharging");
+
+            long tmpCharge = sp.getLong("tmpCharge", System.currentTimeMillis());
+
+            long durationCharge = System.currentTimeMillis() - tmpCharge;
+            durationCharge /= 1000; // convert time to sec
+//            String str = "Duration screen on: " + durationScreenOn + " sec";
+
+
+            SharedPreferences.Editor editor = sp.edit();
+            long charge = sp.getLong("charge", System.currentTimeMillis()) + durationCharge;
+            editor.putLong("charge", charge);
+            editor.commit();
+            String str = "Duration charge: " + charge + " sec";
+
+            if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
         }
 
 

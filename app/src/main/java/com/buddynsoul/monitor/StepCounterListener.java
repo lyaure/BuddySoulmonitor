@@ -54,6 +54,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final BroadcastReceiver shutdownReceiver = new ShutdownReceiver();
     private final BroadcastReceiver screenReceiver = new ScreenReceiver();
 
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+
     private float oldPitch, oldRoll, oldAzimuth;
     private boolean flagAccStart;
 
@@ -78,6 +81,21 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float luxVal = event.values[0];
                 if (luxVal == 0) {
                     Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
+
+                    long tmpDarkRoom = sp.getLong("tmpDarkRoom", System.currentTimeMillis());
+
+                    long durationDarkRoom = System.currentTimeMillis() - tmpDarkRoom;
+                    durationDarkRoom /= 1000; // convert time to sec
+
+                    SharedPreferences.Editor editor = sp.edit();
+                    long darkRoom = System.currentTimeMillis();
+                    editor.putLong("tmpDarkRoom", darkRoom);
+                    darkRoom = sp.getLong("darkRoom", 0) + durationDarkRoom;
+                    editor.putLong("darkRoom", darkRoom);
+                    editor.commit();
+
+                    String str = "Duration darkRoom: " + darkRoom + " sec";
+                    if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
                 }
             }
         }
@@ -88,8 +106,26 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float tempY = oldRoll - event.values[1];
                 float tempZ = oldAzimuth - event.values[2];
 
-                if(tempX > Math.abs(3) || tempY > Math.abs(3) || tempZ > Math.abs(3))
+                if(tempX > Math.abs(1) || tempY > Math.abs(1) || tempZ > Math.abs(1)) {
                     Toast.makeText(this, "phone is moving\n x=" + tempX + "\ny=" + tempY + "\nz=" + tempZ, Toast.LENGTH_LONG).show();
+
+                    long tmpStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
+
+                    long durationStationary = System.currentTimeMillis() - tmpStationary;
+                    durationStationary /= 1000; // convert time to sec
+
+//                    long screenOff = sp.getLong("screenOff", System.currentTimeMillis()) + durationScreenOff;
+                    SharedPreferences.Editor editor = sp.edit();
+                    long stationary = System.currentTimeMillis();
+                    editor.putLong("tmpStationary", stationary);
+                    stationary = sp.getLong("stationary", 0) + durationStationary;
+                    editor.putLong("stationary", stationary);
+                    editor.commit();
+
+                    String str = "Duration stationary: " + stationary + " sec";
+
+                    if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
+                }
 
             }
 
@@ -159,6 +195,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+
+        sp = this.getSharedPreferences("TempData", MODE_PRIVATE);
+
         reRegisterSensor();
         registerBroadcastReceiver();
         if (!updateIfNecessary()) {
@@ -308,10 +347,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
             if (sm.getSensorList(Sensor.TYPE_LIGHT).size() < 1) return; // emulator
         }
 
-        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
-        flagAccStart = true;
-
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
@@ -319,15 +354,20 @@ public class StepCounterListener extends Service implements SensorEventListener 
         Calendar now = Calendar.getInstance();
         now.setTimeInMillis(System.currentTimeMillis());
 
+        //================= REMOVE ====================
+        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
+        Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
+//        flagAccStart = true;
+
         if (isTimeBetweenTwoHours(20, 8, now)) {
             // enable light sensor
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
                     SensorManager.SENSOR_DELAY_NORMAL);
             Toast.makeText(getApplicationContext(), "Light Sensor On", Toast.LENGTH_LONG).show();
 
-//            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-//            Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
-//            flagAccStart = true;
+            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+            Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
+            flagAccStart = true;
 
 
             // set alarm to disable the light sensor at upper bound sleeping time
@@ -359,9 +399,20 @@ public class StepCounterListener extends Service implements SensorEventListener 
             else {
                 alarmService.set(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
             }
-
         }
         else {
+            sp = this.getSharedPreferences("TempData", MODE_PRIVATE);
+            editor = sp.edit();
+            editor.putLong("screenOff", 0);
+            editor.putLong("tmpScreenOff", System.currentTimeMillis());
+            editor.putLong("stationary", 0);
+            editor.putLong("tmpStationary", System.currentTimeMillis());
+            editor.putLong("light", 0);
+            editor.putLong("tmpLight", System.currentTimeMillis());
+            editor.putLong("charge", 0);
+            editor.putLong("tmpCharge", System.currentTimeMillis());
+            editor.commit();
+
             // set alarm to enable the light sensor at lower bound sleeping time
             Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
             restartServiceIntent.setPackage(getPackageName());
@@ -431,5 +482,4 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
         return now.after(from) && now.before(to);
     }
-
 }
