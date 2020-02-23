@@ -4,366 +4,129 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.util.Pair;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+public class Database {
+    private SQLiteDatabase db;
+    private final String DB_NAME = "monitor";
 
+    public Database(Context context){
+        db = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
 
-
-public class Database extends SQLiteOpenHelper {
-
-    private final static String DB_NAME = "steps";
-    private final static int DB_VERSION = 2;
-
-    private static Database instance;
-    private static final AtomicInteger openCounter = new AtomicInteger();
-
-    private Database(final Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
+        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "( date INTEGER, steps INTEGER, sleepingTime DOUBLE)";
+        db.execSQL(query);
     }
 
-    public static synchronized Database getInstance(final Context c) {
-        if (instance == null) {
-            instance = new Database(c.getApplicationContext());
-        }
-        openCounter.incrementAndGet();
-        return instance;
-    }
+    public void insertNewDay(long date, int steps){
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
-    @Override
-    public void close() {
-        if (openCounter.decrementAndGet() == 0) {
-            super.close();
-        }
-    }
+        if(!cursor.moveToFirst() && steps >= 0){
+            addToLastEntry(steps);
 
-    @Override
-    public void onCreate(final SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + DB_NAME + " (date INTEGER, steps INTEGER)");
-    }
+            ContentValues cv = new ContentValues();
+            cv.put("date", date);
+            cv.put("steps", -steps);
+            cv.put("sleepingTime", 0.0);
 
-    @Override
-    public void onUpgrade(final SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 1) {
-            // drop PRIMARY KEY constraint
-            db.execSQL("CREATE TABLE " + DB_NAME + "2 (date INTEGER, steps INTEGER)");
-            db.execSQL("INSERT INTO " + DB_NAME + "2 (date, steps) SELECT date, steps FROM " +
-                    DB_NAME);
-            db.execSQL("DROP TABLE " + DB_NAME);
-            db.execSQL("ALTER TABLE " + DB_NAME + "2 RENAME TO " + DB_NAME + "");
-        }
-    }
+            db.insert(DB_NAME, null, cv);
 
-    /**
-     * Query the 'steps' table. Remember to close the cursor!
-     *
-     * @param columns       the columns
-     * @param selection     the selection
-     * @param selectionArgs the selection arguments
-     * @param groupBy       the group by statement
-     * @param having        the having statement
-     * @param orderBy       the order by statement
-     * @return the cursor
-     */
-    public Cursor query(final String[] columns, final String selection,
-                        final String[] selectionArgs, final String groupBy, final String having,
-                        final String orderBy, final String limit) {
-        return getReadableDatabase()
-                .query(DB_NAME, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
-    }
+            cursor.close();
 
-    /**
-     * Inserts a new entry in the database, if there is no entry for the given
-     * date yet. Steps should be the current number of steps and it's negative
-     * value will be used as offset for the new date. Also adds 'steps' steps to
-     * the previous day, if there is an entry for that date.
-     * <p/>
-     * This method does nothing if there is already an entry for 'date' - use
-     * {@link //#updateSteps} in this case.
-     * <p/>
-     * To restore data from a backup, use {@link #insertDayFromBackup}
-     *
-     * @param date  the date in ms since 1970
-     * @param steps the current step value to be used as negative offset for the
-     *              new day; must be >= 0
-     */
-    public void insertNewDay(long date, int steps) {
-        getWritableDatabase().beginTransaction();
-        try {
-            Cursor c = getReadableDatabase().query(DB_NAME, new String[]{"date"}, "date = ?",
-                    new String[]{String.valueOf(date)}, null, null, null);
-            if (c.getCount() == 0 && steps >= 0) {
-
-                // add 'steps' to yesterdays count
-                addToLastEntry(steps);
-
-                // add today
-                ContentValues values = new ContentValues();
-                values.put("date", date);
-                // use the negative steps as offset
-                values.put("steps", -steps);
-                getWritableDatabase().insert(DB_NAME, null, values);
-            }
-            c.close();
             if (BuildConfig.DEBUG) {
                 Log.d("debug","insertDay " + date + " / " + steps);
-                logState();
             }
-            getWritableDatabase().setTransactionSuccessful();
-        } finally {
-            getWritableDatabase().endTransaction();
         }
     }
 
-    /**
-     * Adds the given number of steps to the last entry in the database
-     *
-     * @param steps the number of steps to add
-     */
-    public void addToLastEntry(int steps) {
-        getWritableDatabase().execSQL("UPDATE " + DB_NAME + " SET steps = steps + " + steps +
-                " WHERE date = (SELECT MAX(date) FROM " + DB_NAME + ")");
-    }
+    public void insertSleepingTime(long date, double sleepingTime){
+        Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
-    /**
-     * Inserts a new entry in the database, overwriting any existing entry for the given date.
-     * Use this method for restoring data from a backup.
-     *
-     * @param date  the date in ms since 1970
-     * @param steps the step value for 'date'; must be >= 0
-     * @return true if a new entry was created, false if there was already an
-     * entry for 'date' (and it was overwritten)
-     */
-    public boolean insertDayFromBackup(long date, int steps) {
-        getWritableDatabase().beginTransaction();
-        boolean newEntryCreated = false;
-        try {
-            ContentValues values = new ContentValues();
-            values.put("steps", steps);
-            int updatedRows = getWritableDatabase()
-                    .update(DB_NAME, values, "date = ?", new String[]{String.valueOf(date)});
-            if (updatedRows == 0) {
-                values.put("date", date);
-                getWritableDatabase().insert(DB_NAME, null, values);
-                newEntryCreated = true;
+        if(cursor.moveToFirst()){
+            double tmpSleepingTime = cursor.getDouble(cursor.getColumnIndex("sleepingTime"));
+            if(sleepingTime > tmpSleepingTime){
+                ContentValues cv = new ContentValues();
+                cv.put("sleepingTime", sleepingTime);
+                db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
             }
-            getWritableDatabase().setTransactionSuccessful();
-        } finally {
-            getWritableDatabase().endTransaction();
         }
-        return newEntryCreated;
-    }
 
-    /**
-     * Writes the current steps database to the log
-     */
-    public void logState() {
         if (BuildConfig.DEBUG) {
-            Cursor c = getReadableDatabase()
-                    .query(DB_NAME, null, null, null, null, null, "date DESC", "5");
-            Log.d("error",c.toString());
-            c.close();
+            Log.d("debug","insertSleepingTime " + date + " / " + sleepingTime);
         }
     }
 
-    /**
-     * Get the total of steps taken without today's value
-     *
-     * @return number of steps taken, ignoring today
-     */
-    public int getTotalWithoutToday() {
-        Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"SUM(steps)"}, "steps > 0 AND date > 0 AND date < ?",
-                        new String[]{String.valueOf(Util.getToday())}, null, null, null);
-        c.moveToFirst();
-        int re = c.getInt(0);
-        c.close();
-        return re;
-    }
+    public void addToLastEntry(int steps){
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " ORDER BY date DESC", null );
 
-    /**
-     * Get the maximum of steps walked in one day
-     *
-     * @return the maximum number of steps walked in one day
-     */
-    public int getRecord() {
-        Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"MAX(steps)"}, "date > 0", null, null, null, null);
-        c.moveToFirst();
-        int re = c.getInt(0);
-        c.close();
-        return re;
-    }
+        if(cursor.moveToFirst()){
+            ContentValues cv = new ContentValues();
+            cv.put("steps", steps);
 
-    /**
-     * Get the maximum of steps walked in one day and the date that happend
-     *
-     * @return a pair containing the date (Date) in millis since 1970 and the
-     * step value (Integer)
-     */
-    public Pair<Date, Integer> getRecordData() {
-        Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"date, steps"}, "date > 0", null, null, null,
-                        "steps DESC", "1");
-        c.moveToFirst();
-        Pair<Date, Integer> p = new Pair<Date, Integer>(new Date(c.getLong(0)), c.getInt(1));
-        c.close();
-        return p;
-    }
+            int date = cursor.getInt(cursor.getColumnIndex("date"));
 
-    /**
-     * Get the number of steps taken for a specific date.
-     * <p/>
-     * If date is Util.getToday(), this method returns the offset which needs to
-     * be added to the value returned by getCurrentSteps() to get todays steps.
-     *
-     * @param date the date in millis since 1970
-     * @return the steps taken on this date or Integer.MIN_VALUE if date doesn't
-     * exist in the database
-     */
-    public int getSteps(final long date) {
-        Cursor c = getReadableDatabase().query(DB_NAME, new String[]{"steps"}, "date = ?",
-                new String[]{String.valueOf(date)}, null, null, null);
-        c.moveToFirst();
-        int re;
-        if (c.getCount() == 0) re = Integer.MIN_VALUE;
-        else re = c.getInt(0);
-        c.close();
-        return re;
-    }
+            db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
 
-    /**
-     * Gets the last num entries in descending order of date (newest first)
-     *
-     * @param num the number of entries to get
-     * @return a list of long,integer pair - the first being the date, the second the number of steps
-     */
-    public List<Pair<Long, Integer>> getLastEntries(int num) {
-        Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"date", "steps"}, "date > 0", null, null, null,
-                        "date DESC", String.valueOf(num));
-        int max = c.getCount();
-        List<Pair<Long, Integer>> result = new ArrayList<>(max);
-        if (c.moveToFirst()) {
-            do {
-                result.add(new Pair<>(c.getLong(0), c.getInt(1)));
-            } while (c.moveToNext());
+            cursor.close();
         }
-        return result;
     }
 
-    /**
-     * Get the number of steps taken between 'start' and 'end' date
-     * <p/>
-     * Note that todays entry might have a negative value, so take care of that
-     * if 'end' >= Util.getToday()!
-     *
-     * @param start start date in ms since 1970 (steps for this date included)
-     * @param end   end date in ms since 1970 (steps for this date included)
-     * @return the number of steps from 'start' to 'end'. Can be < 0 as todays
-     * entry might have negative value
-     */
-    public int getSteps(final long start, final long end) {
-        Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"SUM(steps)"}, "date >= ? AND date <= ?",
-                        new String[]{String.valueOf(start), String.valueOf(end)}, null, null, null);
-        int re;
-        if (c.getCount() == 0) {
-            re = 0;
-        } else {
-            c.moveToFirst();
-            re = c.getInt(0);
+    public int getTotalWithoutToday(){
+        Cursor cursor = db.rawQuery("SELECT SUM(steps) FROM " + DB_NAME + " WHERE steps > 0 AND date > 0 AND date < " + Util.getToday(), null);
+
+        cursor.moveToFirst();
+        int res = cursor.getInt(0);
+        cursor.close();
+
+        return res;
+    }
+
+    public int getSteps(final long date){
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        int res = Integer.MIN_VALUE;
+
+        if(cursor.moveToFirst())
+            res = cursor.getInt(cursor.getColumnIndex("steps"));
+
+        cursor.close();
+        return res;
+    }
+
+    public void removeNegativeEntries(){
+        db.delete(DB_NAME, "steps < ?", new String[]{"0"});
+    }
+
+    public int getDaysWithoutToday(){
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE steps > 0 AND date > 0 AND date < " + Util.getToday(), null);
+        cursor.moveToFirst();
+
+        int res = cursor.getInt(0);
+        cursor.close();
+
+        return res < 0 ? 0 : res;
+    }
+
+    public int getDays(){
+        return getDaysWithoutToday() + 1;
+    }
+
+    public void saveCurrentSteps(int steps){
+        ContentValues cv = new ContentValues();
+        cv.put("steps", steps);
+
+        if(db.update(DB_NAME, cv, "date = ?", new String[]{"-1"}) == 0){
+            cv.put("date", -1);
+            db.insert(DB_NAME, null, cv);
         }
-        c.close();
-        return re;
-    }
 
-    /**
-     * Removes all entries with negative values.
-     * <p/>
-     * Only call this directly after boot, otherwise it might remove the current
-     * day as the current offset is likely to be negative
-     */
-    void removeNegativeEntries() {
-        getWritableDatabase().delete(DB_NAME, "steps < ?", new String[]{"0"});
-    }
-
-    /**
-     * Removes invalid entries from the database.
-     * <p/>
-     * Currently, an invalid input is such with steps >= 200,000
-     */
-    public void removeInvalidEntries() {
-        getWritableDatabase().delete(DB_NAME, "steps >= ?", new String[]{"200000"});
-    }
-
-    /**
-     * Get the number of 'valid' days (= days with a step value > 0).
-     * <p/>
-     * The current day is not added to this number.
-     *
-     * @return the number of days with a step value > 0, return will be >= 0
-     */
-    public int getDaysWithoutToday() {
-        Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"COUNT(*)"}, "steps > ? AND date < ? AND date > 0",
-                        new String[]{String.valueOf(0), String.valueOf(Util.getToday())}, null,
-                        null, null);
-        c.moveToFirst();
-        int re = c.getInt(0);
-        c.close();
-        return re < 0 ? 0 : re;
-    }
-
-    /**
-     * Get the number of 'valid' days (= days with a step value > 0).
-     * <p/>
-     * The current day is also added to this number, even if the value in the
-     * database might still be < 0.
-     * <p/>
-     * It is safe to divide by the return value as this will be at least 1 (and
-     * not 0).
-     *
-     * @return the number of days with a step value > 0, return will be >= 1
-     */
-    public int getDays() {
-        // todays is not counted yet
-        int re = this.getDaysWithoutToday() + 1;
-        return re;
-    }
-
-    /**
-     * Saves the current 'steps since boot' sensor value in the database.
-     *
-     * @param steps since boot
-     */
-    public void saveCurrentSteps(int steps) {
-        ContentValues values = new ContentValues();
-        values.put("steps", steps);
-        if (getWritableDatabase().update(DB_NAME, values, "date = -1", null) == 0) {
-            values.put("date", -1);
-            getWritableDatabase().insert(DB_NAME, null, values);
-        }
         if (BuildConfig.DEBUG) {
             Log.d("debug", "saving steps in db: " + steps);
         }
     }
 
-    /**
-     * Reads the latest saved value for the 'steps since boot' sensor value.
-     *
-     * @return the current number of steps saved in the database or 0 if there
-     * is no entry
-     */
     public int getCurrentSteps() {
-        int re = getSteps(-1);
-        return re == Integer.MIN_VALUE ? 0 : re;
+        int res = getSteps(-1);
+        return res == Integer.MIN_VALUE ? 0 : res;
     }
 }
-
-

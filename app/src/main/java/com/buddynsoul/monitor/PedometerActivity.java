@@ -2,16 +2,11 @@ package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,13 +18,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -186,9 +178,10 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
             // we dont know when the reboot was, so set todays steps to 0 by
             // initializing them with -STEPS_SINCE_BOOT
             todayOffset = -(int) event.values[0];
-            Database db = Database.getInstance(this);
+            //Database db = Database.getInstance(this);
+            Database db = new Database(this);
             db.insertNewDay(Util.getToday(), (int) event.values[0]);
-            db.close();
+            //db.close();
         }
         since_boot = (int) event.values[0];
         //updatePie();
@@ -198,8 +191,6 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         else
             progSteps.setProgress(steps_today);
         steps.setText(String.valueOf(steps_today) + "\nsteps");
-
-
     }
 
     @Override
@@ -213,7 +204,8 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
 
        // this.getActionBar().setDisplayHomeAsUpEnabled(false);
 
-        Database db = Database.getInstance(this);
+        //Database db = Database.getInstance(this);
+        Database db = new Database(this);
 
         //if (BuildConfig.DEBUG) db.logState();
         // read todays offset
@@ -272,7 +264,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         total_start = db.getTotalWithoutToday();
         total_days = db.getDays();
 
-        db.close();
+        //db.close();
 
         //stepsDistanceChanged();
     }
@@ -287,9 +279,10 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         } catch (Exception e) {
             //if (BuildConfig.DEBUG) Logger.log(e);
         }
-        Database db = Database.getInstance(this);
+        //Database db = Database.getInstance(this);
+        Database db = new Database(this);
         db.saveCurrentSteps(since_boot);
-        db.close();
+        //db.close();
     }
 
 }

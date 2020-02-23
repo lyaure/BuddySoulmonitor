@@ -4,9 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.SensorEventListener;
 import android.os.Build;
-import android.telephony.ServiceState;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {
@@ -18,7 +16,8 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
 
-            Database db = Database.getInstance(context);
+            //Database db = Database.getInstance(context);
+            Database db = new Database(context);
 
             if (!prefs.getBoolean("correctShutdown", false)) {
                 if (BuildConfig.DEBUG) Log.d("debug","Incorrect shutdown");
@@ -31,7 +30,7 @@ public class BootReceiver extends BroadcastReceiver {
             // row if that's the case
             db.removeNegativeEntries();
             db.saveCurrentSteps(0);
-            db.close();
+           // db.close();
             prefs.edit().remove("correctShutdown").apply();
 
             if (Build.VERSION.SDK_INT >= 26) {
