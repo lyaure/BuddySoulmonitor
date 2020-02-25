@@ -39,7 +39,7 @@
             android:layout_marginBottom="10dp"
             android:ems="10"
             android:hint="Enter your goal here"
-            android:inputType="none|numberDecimal"
+            android:inputType="numberSigned"
             android:textColorLink="@color/colorGreen" />
     </LinearLayout>
 

@@ -93,6 +93,18 @@ public class Database {
         return res;
     }
 
+    public double getSleepingTime(final long date){
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        double res = 0.0;
+
+        if(cursor.moveToFirst())
+            res = cursor.getDouble(cursor.getColumnIndex("sleepingTime"));
+
+        cursor.close();
+        return res;
+    }
+
     public void removeNegativeEntries(){
         db.delete(DB_NAME, "steps < ?", new String[]{"0"});
     }

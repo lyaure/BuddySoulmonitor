@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class SettingActivity extends AppCompatActivity {
     private TextView goal;
     private RadioButton oldButton;
-    private String oldGoal;
+    private int oldGoal;
     private RadioGroup temperature;
     private Boolean boolTemp;
     private int val;
@@ -29,15 +29,17 @@ public class SettingActivity extends AppCompatActivity {
         val = intent.getIntExtra("activity", 0);
 
 
-        SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
-        oldGoal = sp.getString("stepGoal", "10000");
+        SharedPreferences sp = getSharedPreferences("pedometer", MODE_PRIVATE);
+        oldGoal = sp.getInt("goal", 10000);
 
         goal = findViewById(R.id.goalTxtv_ID);
-        goal.setText(sp.getString("stepGoal", "10000"));
+        goal.setText(Integer.toString(sp.getInt("goal", 10000)));
 
-        final RadioGroup temperature = findViewById(R.id.radioGroupTemp_ID);
+        final RadioGroup unitTemperature = findViewById(R.id.radioGroupTemp_ID);
         RadioButton c = findViewById(R.id.radioButtonC_ID);
         RadioButton f = findViewById(R.id.radioButtonF_ID);
+
+        sp = getSharedPreferences("Settings", MODE_PRIVATE);
         final String oldTemperature = sp.getString("metricValue", "true");
         if(oldTemperature.equals("true")) {
             c.setChecked(true);
@@ -57,17 +59,20 @@ public class SettingActivity extends AppCompatActivity {
         apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
 
-                if (!oldGoal.equals(goal.getText().toString()) && !goal.getText().toString().equals("")){
-                    editor.putString("stepGoal", goal.getText().toString());
+                String oldGoalStr = "" + oldGoal;
+                if (!oldGoalStr.equals(goal.getText().toString()) && !goal.getText().toString().equals("")){
+                    SharedPreferences sp = getSharedPreferences("pedometer", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putInt("goal", Integer.parseInt(goal.getText().toString()));
                     editor.commit();
                 }
 
-                if(temperature.getCheckedRadioButtonId() != oldButton.getId()){
+                if(unitTemperature.getCheckedRadioButtonId() != oldButton.getId()){
                     String temp = boolTemp ? "false" : "true";
 
+                    SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
                     editor.putString("metricValue", temp);
                     editor.commit();
                 }

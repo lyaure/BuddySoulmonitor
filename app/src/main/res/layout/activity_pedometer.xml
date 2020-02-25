@@ -34,4 +34,26 @@
         android:textColor="@color/colorGreen"
         android:textSize="24sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/sleepingTimeTxtv_ID"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/sleepingTimeBtn_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Sleeping time" />
+
+    <TextView
+        android:id="@+id/sleepingTimeDbTxtv_ID"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textAlignment="center" />
 </LinearLayout>

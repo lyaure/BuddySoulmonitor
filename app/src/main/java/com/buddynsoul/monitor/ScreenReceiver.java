@@ -32,7 +32,8 @@ public class ScreenReceiver extends BroadcastReceiver {
 //            String str = "Duration screen on: " + durationScreenOn + " sec";
 
             SharedPreferences.Editor editor = sp.edit();
-            long screenOff = sp.getLong("screenOff", System.currentTimeMillis()) + durationScreenOff;
+//            long screenOff = sp.getLong("screenOff", System.currentTimeMillis()) + durationScreenOff;
+            long screenOff = sp.getLong("screenOff", 0) + durationScreenOff;
             editor.putLong("screenOff", screenOff);
             editor.commit();
             String str = "Duration screen off: " + screenOff + " sec";
