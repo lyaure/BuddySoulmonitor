@@ -235,22 +235,37 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
 
         // calculate sleeping time and add to the db
-        Calendar now = Calendar.getInstance();
-        now.setTimeInMillis(System.currentTimeMillis());
-        now.set(Calendar.HOUR_OF_DAY, debugHour);
-        now.set(Calendar.MINUTE, debugMinute);
-        now.set(Calendar.SECOND, 0);
-        Log.d("DebugStepCounter", "TimeWhenRestart: " + new Date(Calendar.getInstance().getTimeInMillis()));
-        Log.d("DebugStepCounter", "Time1: " + (int)(Calendar.getInstance().getTimeInMillis()/1000));
-        Log.d("DebugStepCounter", "Time2: " + (int)(now.getTimeInMillis()/1000));
-        if ((int)(Calendar.getInstance().getTimeInMillis())/1000 == (int)(now.getTimeInMillis())/1000) {
+//        Calendar now = Calendar.getInstance();
+//        now.setTimeInMillis(System.currentTimeMillis());
+//        now.set(Calendar.HOUR_OF_DAY, debugHour);
+//        now.set(Calendar.MINUTE, debugMinute);
+//        now.set(Calendar.SECOND, 0);
+        // need to add fix, because if we are not been restarted at 8:00 AM the sleeping time of the current day
+        // won't be save in the db
+        if (isTimeBetweenTwoHours(8, 20, debugMinute) && !sp.getBoolean("saveInDb", false)) {
             double sleepingTime = calculateSleepingTime();
             Log.d("DebugStepCounter", "SleepingTime: " + sleepingTime);
             Database db = new Database(this);
             //Database db = Database.getInstance(this);
             db.insertSleepingTime(Util.getToday(), sleepingTime);
+            editor.putBoolean("saveInDb", true);
+            editor.commit();
             //db.close();
         }
+
+
+
+//        Log.d("DebugStepCounter", "TimeWhenRestart: " + new Date(Calendar.getInstance().getTimeInMillis()));
+//        Log.d("DebugStepCounter", "Time1: " + (int)(Calendar.getInstance().getTimeInMillis()/1000));
+//        Log.d("DebugStepCounter", "Time2: " + (int)(now.getTimeInMillis()/1000));
+//        if ((int)(Calendar.getInstance().getTimeInMillis())/1000 == (int)(now.getTimeInMillis())/1000) {
+//            double sleepingTime = calculateSleepingTime();
+//            Log.d("DebugStepCounter", "SleepingTime: " + sleepingTime);
+//            Database db = new Database(this);
+//            //Database db = Database.getInstance(this);
+//            db.insertSleepingTime(Util.getToday(), sleepingTime);
+//            //db.close();
+//        }
 
         return START_STICKY;
     }
@@ -375,10 +390,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
 //        filter.addAction(Intent.ACTION_SCREEN_OFF);
 //        registerReceiver(screenReceiver, filter);
 
-        Calendar now = Calendar.getInstance();
-        now.setTimeInMillis(System.currentTimeMillis());
+//        Calendar now = Calendar.getInstance();
+//        now.setTimeInMillis(System.currentTimeMillis());
 
-        if (isTimeBetweenTwoHours(20, debugHour, debugMinute, now)) {
+        if (isTimeBetweenTwoHours(20, debugHour, debugMinute)) {
             if (Build.VERSION.SDK_INT >= 23) {
                 filter = new IntentFilter();
                 filter.addAction(ACTION_CHARGING);
@@ -411,15 +426,21 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
 
-        Calendar now = Calendar.getInstance();
-        now.setTimeInMillis(System.currentTimeMillis());
+//        Calendar now = Calendar.getInstance();
+//        now.setTimeInMillis(System.currentTimeMillis());
 
         //================= REMOVE ====================
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
         //Toast.makeText(getApplicationContext(), "Accelerometer Sensor On", Toast.LENGTH_LONG).show();
 //        flagAccStart = true;
 
-        if (isTimeBetweenTwoHours(20, debugHour, debugMinute, now)) {
+        sp = this.getSharedPreferences("TempData", MODE_PRIVATE);
+        editor = sp.edit();
+
+        if (isTimeBetweenTwoHours(20, debugHour, debugMinute)) {
+
+            editor.putBoolean("saveInDb", true);
+
             // enable light sensor
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_LIGHT),
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -470,8 +491,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
             }
         }
         else {
-            sp = this.getSharedPreferences("TempData", MODE_PRIVATE);
-            editor = sp.edit();
+//            sp = this.getSharedPreferences("TempData", MODE_PRIVATE);
+//            editor = sp.edit();
             editor.putLong("screenOff", 0);
             editor.putLong("tmpScreenOff", System.currentTimeMillis());
             editor.putLong("stationary", 0);
@@ -480,7 +501,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             editor.putLong("tmpLight", System.currentTimeMillis());
             editor.putLong("charge", 0);
             editor.putLong("tmpCharge", System.currentTimeMillis());
-            editor.commit();
+           //editor.commit();
 
             // set alarm to enable the light sensor at lower bound sleeping time
             Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
@@ -509,8 +530,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
             }
         }
-
-
+        editor.commit();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -534,10 +554,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
     /**
      * @param fromHour Start Time
      * @param toHour Stop Time
-     * @param now Current Time
      * @return true if Current Time is between fromHour and toHour
      */
-    private boolean isTimeBetweenTwoHours(int fromHour, int toHour, int toMinute, Calendar now) {
+    private boolean isTimeBetweenTwoHours(int fromHour, int toHour, int toMinute) {
         //Start Time
         Calendar from = Calendar.getInstance();
         from.set(Calendar.HOUR_OF_DAY, fromHour);
@@ -546,6 +565,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
         Calendar to = Calendar.getInstance();
         to.set(Calendar.HOUR_OF_DAY, toHour);
         to.set(Calendar.MINUTE, toMinute);
+
+        Calendar now = Calendar.getInstance();
+        now.getTimeInMillis();
+        //now.setTimeInMillis(System.currentTimeMillis());
 
         if(to.before(from)) {
             if (now.after(to)){
