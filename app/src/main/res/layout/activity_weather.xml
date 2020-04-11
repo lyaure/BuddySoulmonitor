@@ -27,10 +27,9 @@
             android:id="@+id/actualPositionBtn_ID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
             android:layout_weight="0.2"
             android:background="#00FFFFFF"
-            android:foregroundGravity="right"
+            android:scaleType="fitEnd"
             app:srcCompat="@drawable/ic_place_36dp" />
     </LinearLayout>
 

@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -37,6 +39,24 @@ public class CitySearchActivity extends AppCompatActivity {
 
         cityName = (TextView)findViewById(R.id.autocomplete_ID);
         citiesList = (ListView)findViewById(R.id.citiesList_ID);
+
+        cityName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                cities.clear();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                buildAutoCompleteListSearch();
+
+            }
+        });
 
         adapter = new CityAdapter(this, cities);
         citiesList.setAdapter(adapter);
