@@ -13,7 +13,8 @@ public class Database {
     public Database(Context context){
         db = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
 
-        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "( date INTEGER, steps INTEGER, sleepingTime DOUBLE)";
+        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "( date INTEGER, steps INTEGER, sleepingTime DOUBLE," +
+                "morning_location STRING, night_location STRING)";
         db.execSQL(query);
     }
 
@@ -27,6 +28,9 @@ public class Database {
             cv.put("date", date);
             cv.put("steps", -steps);
             cv.put("sleepingTime", 0.0);
+            cv.put("morning_location", "");
+            cv.put("night_location", "");
+
 
             db.insert(DB_NAME, null, cv);
 
@@ -53,6 +57,24 @@ public class Database {
 
         if (BuildConfig.DEBUG) {
             Log.d("debug","insertSleepingTime " + date + " / " + sleepingTime);
+        }
+    }
+
+    public void insertLocation(long date, String location, String params){
+        Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
+
+        if(cursor.moveToFirst()){
+            String tmpSleepingTime = cursor.getString(cursor.getColumnIndex(params));
+            if(!location.equals(tmpSleepingTime)){
+                ContentValues cv = new ContentValues();
+                cv.put(params, location);
+                db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
+            }
+        }
+
+        if (BuildConfig.DEBUG) {
+            Log.d("debug","insertLocation " + date + " / " + location);
         }
     }
 
