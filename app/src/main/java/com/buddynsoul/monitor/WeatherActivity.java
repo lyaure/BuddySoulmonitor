@@ -14,6 +14,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
@@ -89,6 +90,17 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
                 currentConditions();
             }
         });
+
+        ImageButton AWLink = (ImageButton)findViewById(R.id.AWLink_imgButton);
+        AWLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://www.accuweather.com/");
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
 
         city = (TextView)findViewById(R.id.cityName_ID);
 
