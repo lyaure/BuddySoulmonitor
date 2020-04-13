@@ -19,7 +19,7 @@ public class ScreenReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         //if (BuildConfig.DEBUG) Log.d("debug","shutting down");
 
-        SharedPreferences sp = context.getSharedPreferences("TempData", MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences("tempData", MODE_PRIVATE);
 
 
         if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
@@ -50,7 +50,7 @@ public class ScreenReceiver extends BroadcastReceiver {
         }
 
         if (intent.getAction().equals(ACTION_CHARGING)) {
-            Toast.makeText(context, "IsCharging", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "IsCharging", Toast.LENGTH_LONG).show();
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","IsCharging");
 
             SharedPreferences.Editor editor = sp.edit();
@@ -59,7 +59,7 @@ public class ScreenReceiver extends BroadcastReceiver {
             editor.commit();
         }
         else if (intent.getAction().equals(ACTION_DISCHARGING)) {
-            Toast.makeText(context, "Discharging", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "Discharging", Toast.LENGTH_LONG).show();
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Discharging");
 
             long tmpCharge = sp.getLong("tmpCharge", System.currentTimeMillis());

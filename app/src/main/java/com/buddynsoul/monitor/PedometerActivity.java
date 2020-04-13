@@ -92,7 +92,6 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
                 int sleepingMinutes = (sleepingTime % 3600) / 60;
                 int sleepingSeconds = sleepingTime % 60;
 
-                //String sleepingTimeStr = String.format("%02d:%02d:%02d", sleepingHours, sleepingMinutes, sleepingSeconds);
                 String sleepingTimeStr = sleepingHours + " Hour(s) " + sleepingMinutes + " Minute(s) " + sleepingSeconds + " Second(s)";
                 sleepingTimeTxtv.setText(sleepingTimeStr);
 
