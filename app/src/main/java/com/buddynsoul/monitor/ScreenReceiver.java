@@ -54,8 +54,8 @@ public class ScreenReceiver extends BroadcastReceiver {
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","IsCharging");
 
             SharedPreferences.Editor editor = sp.edit();
-            long charge = System.currentTimeMillis();
-            editor.putLong("tmpCharge", charge);
+            long tmpCharge = System.currentTimeMillis();
+            editor.putLong("tmpCharge", tmpCharge);
             editor.commit();
         }
         else if (intent.getAction().equals(ACTION_DISCHARGING)) {
@@ -65,15 +65,17 @@ public class ScreenReceiver extends BroadcastReceiver {
             long tmpCharge = sp.getLong("tmpCharge", System.currentTimeMillis());
 
             long durationCharge = System.currentTimeMillis() - tmpCharge;
+            if (BuildConfig.DEBUG) Log.d("DebugStepCounter","System.currentTimeMillis(): "
+                    + System.currentTimeMillis() + " tmpCharge: " + tmpCharge);
             durationCharge /= 1000; // convert time to sec
 //            String str = "Duration screen on: " + durationScreenOn + " sec";
 
 
             SharedPreferences.Editor editor = sp.edit();
-            long charge = sp.getLong("charge", System.currentTimeMillis()) + durationCharge;
-            editor.putLong("charge", charge);
+            durationCharge += sp.getLong("charge", 0);
+            editor.putLong("charge", durationCharge);
             editor.commit();
-            String str = "Duration charge: " + charge + " sec";
+            String str = "Duration charge: " + durationCharge + " sec";
 
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
         }
