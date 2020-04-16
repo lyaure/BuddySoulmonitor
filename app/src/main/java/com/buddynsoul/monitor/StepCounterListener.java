@@ -209,10 +209,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
         editor = sp.edit();
 
-        if (isTimeBetweenTwoHours(7, 59,19, 59)) {
+        if (isTimeBetweenTwoHours(7, 59,20, 0)) {
             // calculate sleeping time and add it to the db
             boolean check = sp.getBoolean("sleepingTimeSavedInDb", false);
-            Log.d("DebugStepCounter", "Check: "+ check);
+
+            //Log.d("DebugStepCounter", "Check: "+ check);
+
             if (!sp.getBoolean("sleepingTimeSavedInDb", false)) {
                 double sleepingTime = calculateSleepingTime();
                 Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
@@ -241,7 +243,17 @@ public class StepCounterListener extends Service implements SensorEventListener 
             String lastLocation = getLocation.getLastLocation(null, this);
             if (!sp.getBoolean("nightLocationSavedInDb", false) && !lastLocation.equals("")) {
                 Database db = new Database(this);
-                db.insertLocation(Util.getToday(), lastLocation, "night_location");
+
+                // if it's after or equal to midnight, we need to select the date of the day before
+                long update_date = -1;
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 8) {
+                    update_date = Util.getYesterday();
+                }
+                else {
+                    update_date = Util.getToday();
+                }
+
+                db.insertLocation(update_date, lastLocation, "night_location");
 
                 editor.putBoolean("nightLocationSavedInDb", true);
                 editor.commit();
@@ -389,7 +401,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         filter.addAction(Intent.ACTION_SHUTDOWN);
         registerReceiver(shutdownReceiver, filter);
 
-        if (isTimeBetweenTwoHours(19, 59, 7, 59)) {
+        if (isTimeBetweenTwoHours(19, 59, 8, 0)) {
             if (Build.VERSION.SDK_INT >= 23) {
                 filter = new IntentFilter();
                 filter.addAction(ACTION_CHARGING);
@@ -430,15 +442,16 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
 
 
-        if (isTimeBetweenTwoHours(20, 0, 8, 0)) {
+//        if (isTimeBetweenTwoHours(20, 0, 8, 0)) {
+        if (isTimeBetweenTwoHours(19, 59, 8, 0)) {
 
             flagAccStart = true;
 
             // in this hour interval we enable the light and the accelerometer sensor
 
             editor.putBoolean("sleepingTimeSavedInDb", false);
-            editor.putBoolean("morningLocationSavedInDb", true);
-            editor.putBoolean("nightLocationSavedInDb", false);
+            editor.putBoolean("morningLocationSavedInDb", false);
+            //editor.putBoolean("nightLocationSavedInDb", false);
 
             if (BuildConfig.DEBUG) {
                 if (sm.getSensorList(Sensor.TYPE_LIGHT).size() < 1) return; // emulator
@@ -490,8 +503,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
         else {
 
-            editor.putBoolean("morningLocationSavedInDb", false);
-            editor.putBoolean("nightLocationSavedInDb", true);
+            //editor.putBoolean("morningLocationSavedInDb", false);
+            //editor.putBoolean("nightLocationSavedInDb", true);
+            editor.putBoolean("nightLocationSavedInDb", false);
 
             if (flagAccStart) {
                 editor.putLong("screenOff", 0);

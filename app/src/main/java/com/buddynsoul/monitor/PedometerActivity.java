@@ -203,27 +203,29 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
 //
 //        db.close();
 
-        if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
-            return;
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
+                return;
+            }
+            if (todayOffset == Integer.MIN_VALUE) {
+                // no values for today
+                // we dont know when the reboot was, so set todays steps to 0 by
+                // initializing them with -STEPS_SINCE_BOOT
+                todayOffset = -(int) event.values[0];
+                //Database db = Database.getInstance(this);
+                Database db = new Database(this);
+                db.insertNewDay(Util.getToday(), (int) event.values[0]);
+                //db.close();
+            }
+            since_boot = (int) event.values[0];
+            //updatePie();
+            int steps_today = Math.max(todayOffset + since_boot, 0);
+            if(Build.VERSION.SDK_INT >= 24)
+                progSteps.setProgress(steps_today, true);
+            else
+                progSteps.setProgress(steps_today);
+            steps.setText(String.valueOf(steps_today) + "\nsteps");
         }
-        if (todayOffset == Integer.MIN_VALUE) {
-            // no values for today
-            // we dont know when the reboot was, so set todays steps to 0 by
-            // initializing them with -STEPS_SINCE_BOOT
-            todayOffset = -(int) event.values[0];
-            //Database db = Database.getInstance(this);
-            Database db = new Database(this);
-            db.insertNewDay(Util.getToday(), (int) event.values[0]);
-            //db.close();
-        }
-        since_boot = (int) event.values[0];
-        //updatePie();
-        int steps_today = Math.max(todayOffset + since_boot, 0);
-        if(Build.VERSION.SDK_INT >= 24)
-            progSteps.setProgress(steps_today, true);
-        else
-            progSteps.setProgress(steps_today);
-        steps.setText(String.valueOf(steps_today) + "\nsteps");
     }
 
     @Override
