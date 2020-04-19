@@ -1,7 +1,14 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -9,6 +16,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -20,23 +28,46 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+
 public class LoginActivity extends AppCompatActivity {
+    private TextView email;
     private TextView password;
     private Boolean hide;
+
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    IMyService iMyService;
+
+    @Override
+    protected void onStop() {
+        compositeDisposable.clear();
+        super.onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Init Service
+        Retrofit retrofitClient = RetrofitClient.getInstance();
+        iMyService = retrofitClient.create(IMyService.class);
+
+        // Init view
+        email = (TextView)findViewById(R.id.txtv_email_ID);
+        password = (TextView)findViewById(R.id.txtv_password_ID);
+
         Button login = (Button)findViewById(R.id.loginBtn_ID);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
-                startActivity(i);
+                loginUser(email.getText().toString(), password.getText().toString());
+//                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
+//                startActivity(i);
             }
         });
+
 
         SpannableString ss = new SpannableString("Not a Buddy&Soul member yet? Sign up here");
         ClickableSpan clickableSpan = new ClickableSpan() {
@@ -59,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
         textView.setHighlightColor(Color.TRANSPARENT);
 
         hide = true;
-        password = (TextView)findViewById(R.id.txtv_password_ID);
         password.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -91,5 +121,31 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(launchBrowser);
             }
         });
+    }
+
+    private void loginUser(String email, String password) {
+        final Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
+
+        if(TextUtils.isEmpty(email))
+        {
+            Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
+        }
+
+        if(TextUtils.isEmpty(password))
+        {
+            Toast.makeText(this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
+        }
+
+        compositeDisposable.add(iMyService.loginUser(email, password)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Consumer<String>() {
+            @Override
+            public void accept(String response) throws Exception {
+                Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                if (response.equals("\"Login success\""))
+                    startActivity(i);
+            }
+        }));
     }
 }

@@ -35,7 +35,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/editText6"
+            android:id="@+id/txtv_email_ID"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_margin="10dp"
