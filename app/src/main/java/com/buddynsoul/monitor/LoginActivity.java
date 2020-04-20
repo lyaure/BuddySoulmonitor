@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginUser(email.getText().toString(), password.getText().toString());
+                loginUser(email.getText().toString().trim(), password.getText().toString().trim());
 //                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
 //                startActivity(i);
             }

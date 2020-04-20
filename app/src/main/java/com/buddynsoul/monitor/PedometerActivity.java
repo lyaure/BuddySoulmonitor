@@ -146,6 +146,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
                 SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("logged", false);
+                editor.commit();
 
                 stopService(myService);
 

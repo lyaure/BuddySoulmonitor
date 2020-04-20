@@ -89,9 +89,9 @@ public class SignupActivity extends AppCompatActivity {
                     return;
                 }
 
-                String name = firstName.getText().toString() + " " + lastName.getText().toString();
+                String name = firstName.getText().toString().trim() + " " + lastName.getText().toString().trim();
 
-                registerUser(name, email.getText().toString(), password.getText().toString());
+                registerUser(name, email.getText().toString().trim(), password.getText().toString().trim());
             }
         });
 

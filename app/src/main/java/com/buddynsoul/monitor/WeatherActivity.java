@@ -155,6 +155,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
                 SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("logged", false);
+                editor.commit();
 
                 stopService(myService);
 
