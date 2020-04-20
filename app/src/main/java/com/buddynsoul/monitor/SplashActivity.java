@@ -2,7 +2,9 @@ package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +19,17 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+                SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                boolean remember = sp.getBoolean("logged", false);
+                Class activityToLaunch;
+
+                if (remember) {
+                    activityToLaunch = PedometerActivity.class;
+                }
+                else {
+                    activityToLaunch = LoginActivity.class;
+                }
+                Intent i = new Intent(SplashActivity.this, activityToLaunch);
                 startActivity(i);
                 finish();
             }

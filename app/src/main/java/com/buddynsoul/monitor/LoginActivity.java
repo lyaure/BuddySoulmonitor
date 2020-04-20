@@ -10,6 +10,7 @@ import retrofit2.Retrofit;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -143,8 +144,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void accept(String response) throws Exception {
                 Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-                if (response.equals("\"Login success\""))
+                if (response.equals("\"Login success\"")) {
+                    SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putBoolean("logged", true);
+                    editor.commit();
+
                     startActivity(i);
+                }
+
             }
         }));
     }

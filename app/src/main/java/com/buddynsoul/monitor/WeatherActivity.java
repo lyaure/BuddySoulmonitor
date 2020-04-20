@@ -144,6 +144,26 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             }
         });
 
+        MenuItem logout = menu.add("Logout");
+        final Intent myService = new Intent(this, StepCounterListener.class);
+
+        logout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean("logged", false);
+
+                stopService(myService);
+
+                Intent i = new Intent(WeatherActivity.this, LoginActivity.class);
+                startActivity(i); // open rules activity
+                return true;
+            }
+        });
+
         return true;
     }
 
