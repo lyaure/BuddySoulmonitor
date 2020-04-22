@@ -148,7 +148,7 @@ public class SignupActivity extends AppCompatActivity {
     private void registerUser(String name, String email,
                               String password) {
 
-        final Intent i = new Intent(SignupActivity.this, PedometerActivity.class);
+        final Intent i = new Intent(SignupActivity.this, LoginActivity.class);
 
         compositeDisposable.add(iMyService.registerUser(email, name, password)
                 .subscribeOn(Schedulers.io())
@@ -156,8 +156,8 @@ public class SignupActivity extends AppCompatActivity {
                 .subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String response) throws Exception {
-                        Toast.makeText(SignupActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-                        if (response.equals("\"Registration success\""))
+                        Toast.makeText(SignupActivity.this, ""+response, Toast.LENGTH_LONG).show();
+                        //if (response.equals("\"Registration success\""))
                             startActivity(i);
                     }
                 }));

@@ -111,39 +111,40 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     //Insert data
                     db.collection('user')
                         .insertOne(insertJson, function (error, res) {
-                            response.json('Registration success');
-                            console.log('Registration success');
+                            if(error) {
+                                response.json('Error occurs during registration');
+                                console.log(error);
+                            }
+                            else {
+                                //send confirmation mail
+                                // async email
+                                jwt.sign(
+                                    {
+                                        userId: res.insertedId,
+                                        // userId: user._id,
+                                        //email: email,
+                                    },
+                                    EMAIL_SECRET,
+                                    {
+                                        expiresIn: '1d',
+                                    },
+                                    (err, emailToken) => {
+                                        //const url = `http://localhost:3000/confirmation/${emailToken}`;
+                                        //const url = `http://192.168.14.183:3000/confirmation/${emailToken}`;
+                                        const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
+
+                                        var subject = 'Confirm you registration to Buddy&Soul Monitor';
+                                        var html = `Please click on the link to confirm your email:<br> <a href="${url}">${url}</a>`;
+
+                                        sendMail(email, subject, html);
+
+                                        response.json('Please check your email and follow the ' +
+                                            'link to complete the registration');
+                                        console.log('Confirmation mail have been sent');
+                                    },
+                                );
+                            }
                         })
-
-                    //send confirmation mail
-                    db.collection('user').findOne({'email': email}, function (err, user) {
-                        if (err) {
-                            console.log(err)
-                            response.json(err);
-                        } else {
-                            // async email
-                            jwt.sign(
-                                {
-                                    userId: user._id,
-                                    //email: email,
-                                },
-                                EMAIL_SECRET,
-                                {
-                                    expiresIn: '1d',
-                                },
-                                (err, emailToken) => {
-                                    //const url = `http://localhost:3000/confirmation/${emailToken}`;
-                                    //const url = `http://192.168.14.183:3000/confirmation/${emailToken}`;
-                                    const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
-
-                                    var subject = 'Confirm you registration to Buddy&Soul Monitor';
-                                    var html = `Please click this email to confirm your email: <a href="${url}">${url}</a>`;
-
-                                    sendMail(email, subject, html);
-                                },
-                            );
-                        }
-                    })
                 }
             })
         });
@@ -161,22 +162,27 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             db.collection('user')
                 .find({'email': email}).count(function (err, number) {
                 if (number == 0) {
-                    response.json('Email not exists');
-                    console.log('Email not exists');
+                    response.json('Your account doesn\'t exist');
+                    console.log('Your account doesn\'t exist');
                 } else {
                     //Insert data
                     db.collection('user')
                         .findOne({'email': email}, function (err, user) {
-                            var salt = user.salt; // Get salt from user
-                            var hashed_password = checkHashPassword(userPassword, salt).passwordHash; // Get password from user
-                            var encrypted_password = user.password;
-                            if (hashed_password == encrypted_password) {
-                                response.json('Login success');
-                                console.log('Login success');
-                            } else {
-                                response.json('Wrong password');
-                                console.log('Wrong password');
-
+                            if(user.confirmed == false) {
+                                response.json('Please confirm your email');
+                                console.log('Please confirm your email');
+                            }
+                            else {
+                                var salt = user.salt; // Get salt from user
+                                var hashed_password = checkHashPassword(userPassword, salt).passwordHash; // Get password from user
+                                var encrypted_password = user.password;
+                                if (hashed_password == encrypted_password) {
+                                    response.json('Login success');
+                                    console.log('Login success');
+                                } else {
+                                    response.json('Wrong password');
+                                    console.log('Wrong password');
+                                }
                             }
                         })
                 }
@@ -189,7 +195,6 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             try {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
                 var userId = decoded.userId
-                console.log('userId:' + userId);
 
                 var db = client.db('buddy&soulmonitor');
 
@@ -197,7 +202,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     .findOne({'_id': ObjectId(userId)}, function (err, user) {
                         if (err) {
                             console.log(err);
-                            response.json('Error in mail confirmation');
+                            response.json('Error in confirmation mail');
                         } else {
                             if (user.confirmed) {
                                 console.log('Mail has been already confirmed');

@@ -117,11 +117,15 @@ public class LoginActivity extends AppCompatActivity {
         forgot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uriUrl = Uri.parse("https://www.buddynsoul.com/Account/ForgotPassword");
-                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
-                startActivity(launchBrowser);
+//                Uri uriUrl = Uri.parse("https://www.buddynsoul.com/Account/ForgotPassword");
+//                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+//                startActivity(launchBrowser);
+
+                Intent i = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+                startActivity(i);
             }
         });
+
     }
 
     private void loginUser(String email, String password) {
@@ -130,11 +134,13 @@ public class LoginActivity extends AppCompatActivity {
         if(TextUtils.isEmpty(email))
         {
             Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         if(TextUtils.isEmpty(password))
         {
             Toast.makeText(this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         compositeDisposable.add(iMyService.loginUser(email, password)

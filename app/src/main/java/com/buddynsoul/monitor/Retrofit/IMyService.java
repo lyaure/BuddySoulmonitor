@@ -16,4 +16,8 @@ public interface IMyService {
     @FormUrlEncoded
     Observable<String> loginUser(@Field("email") String email,
                                     @Field("password") String password);
+
+    @POST("sendresetmail")
+    @FormUrlEncoded
+    Observable<String> resetUserPassword(@Field("email") String email);
 }
