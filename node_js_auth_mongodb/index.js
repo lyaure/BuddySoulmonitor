@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var jwt = require('jsonwebtoken');
 var ObjectId = require('mongodb').ObjectID;
+var path = require('path');
+
 require("dotenv").config();
 
 const IP_ADDRESS = '192.168.14.183'
@@ -226,6 +228,136 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
             //return res.redirect('http://localhost:3001/login');
         });
+
+        //Send the Reset password (the user enters his mail and receives a reset link)
+        app.post('/sendresetmail', (request, response, next) => {
+            var post_data = request.body;
+
+            var email = post_data.email;
+
+            var db = client.db('buddy&soulmonitor');
+
+            //Check exists email
+            db.collection('user')
+                .find({'email': email}).count(function (err, number) {
+                if (number != 0) {
+
+                    //check reset field (if true not send again)
+
+                    //send reset password mail
+                    db.collection('user').findOne({'email': email}, function (err, user) {
+                        if (err) {
+                            console.log(err)
+                            response.json(err);
+                        } else {
+                            // async email
+                            jwt.sign(
+                                {
+                                    userId: user._id,
+                                    //email: email,
+                                },
+                                EMAIL_SECRET,
+                                {
+                                    expiresIn: '1d',
+                                },
+                                (err, emailToken) => {
+                                    //const url = `http://localhost:3000/confirmation/${emailToken}`;
+                                    //const url = `http://192.168.14.183:3000/confirmation/${emailToken}`;
+                                    const url = `http://${IP_ADDRESS}:3000/enterpassword/${emailToken}`;
+
+                                    var subject = 'Password Reset Buddy&Soul Monitor';
+                                    var html = 'You are receiving this because you (or someone else) have requested' +
+                                        ' the reset of the password for your account.\n\n' +
+                                        ' Please click on the following link, or paste this' +
+                                        ' into your browser to complete the process:\n\n' +
+                                        url +
+                                        ' If you did not request this, please ignore this email' +
+                                        ' and your password will remain unchanged.\n';
+
+                                    sendMail(email, subject, html);
+                                },
+                            );
+                        }
+                    })
+                }
+                var msg = 'If a matching account was found an email was sent to '
+                    + email + ' to allow you to reset your password.'
+                console.log(msg)
+                response.json(msg);
+            })
+        });
+
+        //Redirect to Reset password page (the user click on the reset link and is been redirecting
+        // to the reset html restet page)
+        app.get('/enterpassword/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var userId = decoded.userId
+                console.log('userId:' + userId);
+
+                //response.sendFile('/resetPassword.html');
+                response.sendFile(path.join(__dirname + '/resetPassword.html'));
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
+        //Change password (the user enters a new password and the password is updated in the db)
+        app.post('/enterpassword/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var userId = decoded.userId
+
+                var db = client.db('buddy&soulmonitor');
+
+                db.collection('user')
+                    .findOne({'_id': ObjectId(userId)}, function (err, user) {
+                        if (err) {
+                            console.log('An error occurred during resetting password');
+                            response.json('An error occurred during resetting password');
+                        } else {
+
+                            var post_data = request.body;
+                            var new_password = post_data.password;
+
+                            var hash_data = saltHashPassword(new_password);
+
+                            new_password = hash_data.passwordHash; // Save password hash
+                            var salt = hash_data.salt;
+
+                            db.collection('user')
+                                .updateOne({'_id': ObjectId(userId)}, //filter
+                                    {
+                                        $set:
+                                            {
+                                                'password': new_password,
+                                                'salt': salt
+                                            }
+                                    }).then(() => {
+                                console.log("Password has been changed");
+                                response.json({
+                                    status : 'success',
+                                    message : 'Success! Your password has been changed.'
+                                });
+                            })
+                                .catch((err) => {
+                                    console.log(err);
+                                    response.json('An error occurred during resetting password');
+                                })
+                        }
+                    })
+
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
 
         //Start Web Server
         app.listen(3000, () => {
