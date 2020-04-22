@@ -16,19 +16,13 @@ public class GraphChartView extends View {
     private int canvasHeight, canvasWidth;
     private int screenWidth, screenHeight;
     private int scrollPosition;
-    private ArrayList<Point> points;
     private ArrayList<MyObject> objects;
     private int width, height, graphHeight, barWidth, space;
     private boolean bars;
     private int goal;
 
-
-
-
     public GraphChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        points = new ArrayList<Point>();
         objects = new ArrayList<MyObject>();
 
         bars = true;
@@ -41,7 +35,6 @@ public class GraphChartView extends View {
 
         barWidth = 50;
         space = 250;
-
 
         pRED = new Paint();
         pRED.setColor(Color.RED);
@@ -61,7 +54,6 @@ public class GraphChartView extends View {
 
         pPrimary = new Paint();
         pPrimary.setColor(Color.parseColor("#3eabb8"));
-
     }
 
     @Override
@@ -89,7 +81,7 @@ public class GraphChartView extends View {
             if(i%20 == 0)
                 canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
         }
-        
+
         if(!objects.isEmpty()){
            if(bars)
                drawBars(canvas);
@@ -120,9 +112,7 @@ public class GraphChartView extends View {
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) +(graphHeight - o.getPoint().y),
                         o.getPoint().x + barWidth, canvasHeight - (canvasHeight / 10) * 2, pWhite);
                 canvas.drawText(o.getDate(), o.getPoint().x, canvasHeight - (canvasHeight / 30), pWhite);
-//                canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) - 5, pBlack);
             }
-
         }
     }
 
