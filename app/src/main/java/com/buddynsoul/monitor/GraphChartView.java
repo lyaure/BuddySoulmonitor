@@ -1,7 +1,6 @@
 package com.buddynsoul.monitor;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,13 +12,13 @@ import java.util.ArrayList;
 
 
 public class GraphChartView extends View {
-    private final Paint pGray, pRED, pWhite, pPrimary, pBlack;
+    private final Paint pWhite, pRED, pPrimary, pBlack;
     private int canvasHeight, canvasWidth;
     private int screenWidth, screenHeight;
-    private double scrollPosition;
+    private int scrollPosition;
     private ArrayList<Point> points;
     private ArrayList<MyObject> objects;
-    private int graphHeight, barWidth, space;
+    private int width, height, graphHeight, barWidth, space;
     private boolean bars;
     private int goal;
 
@@ -43,10 +42,6 @@ public class GraphChartView extends View {
         barWidth = 50;
         space = 250;
 
-        pGray = new Paint();
-        pGray.setColor(Color.LTGRAY);
-        pGray.setTextAlign(Paint.Align.CENTER);
-        pGray.setStrokeWidth(5);
 
         pRED = new Paint();
         pRED.setColor(Color.RED);
@@ -57,13 +52,12 @@ public class GraphChartView extends View {
         pWhite.setColor(Color.WHITE);
         pWhite.setTextAlign(Paint.Align.CENTER);
         pWhite.setTextSize(50);
+        pWhite.setStrokeWidth(5);
 
         pBlack = new Paint();
         pBlack.setColor(Color.BLACK);
         pBlack.setTextAlign(Paint.Align.CENTER);
         pBlack.setTextSize(50);
-
-
 
         pPrimary = new Paint();
         pPrimary.setColor(Color.parseColor("#3eabb8"));
@@ -72,23 +66,11 @@ public class GraphChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas){
-        pGray.setTextAlign(Paint.Align.CENTER);
+        canvas.drawColor(Color.parseColor("#9ed4d5"));
+        pWhite.setTextAlign(Paint.Align.CENTER);
         int x = screenWidth/2, y = canvasHeight / 2;
-//        canvas.drawText("hiii", x, y, pText);
 
         graphHeight = canvasHeight - (canvasHeight/10) * 3;
-
-//        for(Point p: points) {
-//            int pos = (int)Math.round(scrollPosition/300);
-//
-//            if(pos == points.indexOf(p))
-////                canvas.drawCircle(p.x, p.y, 50, pText2);
-//                canvas.drawRect(p.x -50, 0, p.x + 50, canvasHeight - (canvasHeight/10) * 2, pRED);
-//            else
-//
-////                canvas.drawCircle(p.x, p.y, 50, pText);
-//                canvas.drawRect(p.x -50, 0, p.x + 50, canvasHeight - (canvasHeight/10) * 2, pGray);
-//        }
 
         int index = 0;
 
@@ -103,6 +85,11 @@ public class GraphChartView extends View {
 
         canvas.drawRect(0, canvasHeight - (canvasHeight/10), canvasWidth, canvasHeight, pPrimary);
 
+        for(int i=0; i<width; i++){
+            if(i%20 == 0)
+                canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
+        }
+        
         if(!objects.isEmpty()){
            if(bars)
                drawBars(canvas);
@@ -111,6 +98,10 @@ public class GraphChartView extends View {
         }
         else
             canvas.drawText("No data yet", canvasWidth/2, canvasHeight/2, pBlack);
+
+        pWhite.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText("Goal: " + goal, scrollPosition + screenWidth - 50, canvasHeight/15, pWhite);
+        pWhite.setTextAlign(Paint.Align.CENTER);
 
         invalidate();
     }
@@ -127,7 +118,7 @@ public class GraphChartView extends View {
             }
             else {
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) +(graphHeight - o.getPoint().y),
-                        o.getPoint().x + barWidth, canvasHeight - (canvasHeight / 10) * 2, pGray);
+                        o.getPoint().x + barWidth, canvasHeight - (canvasHeight / 10) * 2, pWhite);
                 canvas.drawText(o.getDate(), o.getPoint().x, canvasHeight - (canvasHeight / 30), pWhite);
 //                canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) - 5, pBlack);
             }
@@ -144,7 +135,7 @@ public class GraphChartView extends View {
 
         for(int i=0; i<points.length; i++){
             if(i != 0)
-                canvas.drawLine(points[i-1].x, points[i-1].y, points[i].x, points[i].y, pGray);
+                canvas.drawLine(points[i-1].x, points[i-1].y, points[i].x, points[i].y, pWhite);
         }
 
         for(int i=0; i<points.length; i++){
@@ -156,31 +147,10 @@ public class GraphChartView extends View {
                 canvas.drawText(Integer.toString((int)objects.get(i).getData()), points[i].x, points[i].y + canvasHeight/10, pBlack);
             }
             else {
-                canvas.drawCircle(points[i].x, points[i].y, 25, pGray);
+                canvas.drawCircle(points[i].x, points[i].y, 25, pWhite);
                 canvas.drawText(objects.get(i).getDate(), points[i].x, canvasHeight - (canvasHeight / 30), pWhite);
             }
         }
-
-//        for(MyObject o : objects) {
-//            int pos = (int) Math.round(scrollPosition / space);
-//
-//            if (pos == objects.indexOf(o)) {
-//                if (objects.indexOf(o) != 0 && objects.indexOf(o) != objects.size())
-//                    canvas.drawLine(prev.x, prev.y, o.getPoint().x, (canvasHeight / 10) + (graphHeight - o.getPoint().y), pGray);
-//                canvas.drawCircle(o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y), 25, pRED);
-//                canvas.drawText(o.getDate(), o.getPoint().x, canvasHeight - (canvasHeight / 30), pRED);
-//                canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) + canvasHeight/10, pBlack);
-//            }
-//            else {
-//                if (objects.indexOf(o) != 0 && objects.indexOf(o) != objects.size())
-//                    canvas.drawLine(prev.x, prev.y, o.getPoint().x, (canvasHeight / 10) + (graphHeight - o.getPoint().y), pGray);
-//                canvas.drawCircle(o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y), 25, pGray);
-//                canvas.drawText(o.getDate(), o.getPoint().x, canvasHeight - (canvasHeight / 30), pWhite);
-////                canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) + canvasHeight/10, pBlack);
-//            }
-//
-//            prev.set(o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y));
-//        }
     }
 
     @Override
@@ -192,8 +162,8 @@ public class GraphChartView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
-        int height = (screenHeight - 350)/3;
-        int width = screenWidth + barWidth*(objects.size()-1) + space * (objects.size()-2);
+        height = (screenHeight - 350)/3;
+        width = screenWidth + barWidth*(objects.size()-1) + space * (objects.size()-2);
 
         if(width < screenWidth)
             width = screenWidth;
