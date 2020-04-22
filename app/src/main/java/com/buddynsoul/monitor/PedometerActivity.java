@@ -18,14 +18,19 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +40,9 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
     private TextView steps;
     final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
+    private GraphChartView graph;
+    private HorizontalScrollView hs;
+    double tmp;
 
 
     @Override
@@ -79,42 +87,69 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         progSteps.setMax(goal);
 
         Database db = new Database(this);
-        final int sleepingTimeDb = (int)db.getSleepingTime(Util.getToday());
+//        final int sleepingTimeDb = (int)db.getSleepingTime(Util.getToday());
+//
+//        Button sleepingTimeBtn = findViewById(R.id.sleepingTimeBtn_ID);
+//        sleepingTimeBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                TextView sleepingTimeTxtv = findViewById(R.id.sleepingTimeTxtv_ID);
+//                final int sleepingTime = (int)StepCounterListener.calculateSleepingTime();
+//                Log.d("DebugStepCounter", "SleepingTime2: " + sleepingTime);
+//                int sleepingHours = sleepingTime / 3600;
+//                int sleepingMinutes = (sleepingTime % 3600) / 60;
+//                int sleepingSeconds = sleepingTime % 60;
+//
+//                String sleepingTimeStr = sleepingHours + " Hour(s) " + sleepingMinutes + " Minute(s) " + sleepingSeconds + " Second(s)";
+//                sleepingTimeTxtv.setText(sleepingTimeStr);
+//
+//
+//                int sleepingDbHours = sleepingTimeDb / 3600;
+//                int sleepingDbMinutes = (sleepingTimeDb % 3600) / 60;
+//                int sleepingDbSeconds = sleepingTimeDb % 60;
+//
+//                TextView sleepingTimeDb = findViewById(R.id.sleepingTimeDbTxtv_ID);
+//                String sleepingTimeDbStr = sleepingDbHours + " Hour(s) " + sleepingDbMinutes + " Minute(s) " + sleepingDbSeconds + " Second(s)";
+//                sleepingTimeDb.setText(sleepingTimeDbStr);
+//            }
+//        });
 
-        Button sleepingTimeBtn = findViewById(R.id.sleepingTimeBtn_ID);
-        sleepingTimeBtn.setOnClickListener(new View.OnClickListener() {
+        hs = (HorizontalScrollView) findViewById(R.id.horizontal_scrollview_ID);
+        hs.setHorizontalScrollBarEnabled(false);
+
+        DisplayMetrics dm = new DisplayMetrics();
+
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels, height = dm.heightPixels;
+        graph = (GraphChartView)findViewById(R.id.graph_ID);
+        graph.setScreenDimensions(width, height);
+        graph.setGoal(goal);
+
+        hs.post(new Runnable() {
             @Override
-            public void onClick(View v) {
-                TextView sleepingTimeTxtv = findViewById(R.id.sleepingTimeTxtv_ID);
-                final int sleepingTime = (int)StepCounterListener.calculateSleepingTime();
-                Log.d("DebugStepCounter", "SleepingTime2: " + sleepingTime);
-                int sleepingHours = sleepingTime / 3600;
-                int sleepingMinutes = (sleepingTime % 3600) / 60;
-                int sleepingSeconds = sleepingTime % 60;
-
-                String sleepingTimeStr = sleepingHours + " Hour(s) " + sleepingMinutes + " Minute(s) " + sleepingSeconds + " Second(s)";
-                sleepingTimeTxtv.setText(sleepingTimeStr);
-
-
-                int sleepingDbHours = sleepingTimeDb / 3600;
-                int sleepingDbMinutes = (sleepingTimeDb % 3600) / 60;
-                int sleepingDbSeconds = sleepingTimeDb % 60;
-
-                TextView sleepingTimeDb = findViewById(R.id.sleepingTimeDbTxtv_ID);
-                String sleepingTimeDbStr = sleepingDbHours + " Hour(s) " + sleepingDbMinutes + " Minute(s) " + sleepingDbSeconds + " Second(s)";
-                sleepingTimeDb.setText(sleepingTimeDbStr);
+            public void run() {
+                ViewTreeObserver observer = hs.getViewTreeObserver();
+                observer.addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                    @Override
+                    public void onScrollChanged() {
+                        graph.setScrollPosition(hs.getScrollX());
+                        tmp = hs.getScrollX();
+                    }
+                });
             }
         });
 
-
-
-
-
-//        Database db = Database.getInstance(this);
+        Button changeGraph = (Button)findViewById(R.id.change_graph_btn_ID);
+        changeGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                graph.changeGraph();
+                hs.fullScroll(View.FOCUS_LEFT);
+            }
+        });
 //
-//        int a = db.getSteps(Util.getToday());
-//        steps.setText("" + a);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -236,6 +271,8 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
     @Override
     public void onResume() {
         super.onResume();
+
+
 
        // this.getActionBar().setDisplayHomeAsUpEnabled(false);
 

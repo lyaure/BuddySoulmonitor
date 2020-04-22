@@ -163,4 +163,29 @@ public class Database {
         int res = getSteps(-1);
         return res == Integer.MIN_VALUE ? 0 : res;
     }
+
+    public long[] getDates(){
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE steps < 0", null);
+        cursor.moveToFirst();
+
+        int t = cursor.getInt(0);
+
+        cursor = db.rawQuery("SELECT * FROM " + DB_NAME, null);
+        long[] dates = new long[t];
+        int index = 0;
+
+        if(cursor.moveToFirst()){
+            do{
+                long date = cursor.getLong(cursor.getColumnIndex("date"));
+                if(date != -1){
+                    dates[index] = date;
+                    index++;
+                }
+
+            }while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return dates;
+    }
 }

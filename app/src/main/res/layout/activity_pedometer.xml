@@ -10,7 +10,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
         android:background="@drawable/pedometer_logo">
 
         <ProgressBar
@@ -28,32 +29,34 @@
     <TextView
         android:id="@+id/stepTxtv_ID"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.3"
         android:text="0"
         android:textAlignment="center"
         android:textColor="@color/colorGreen"
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/sleepingTimeTxtv_ID"
+    <HorizontalScrollView
+        android:id="@+id/horizontal_scrollview_ID"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:text="TextView"
-        android:textAlignment="center" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.buddynsoul.monitor.GraphChartView
+            android:id="@+id/graph_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+    </HorizontalScrollView>
 
     <Button
-        android:id="@+id/sleepingTimeBtn_ID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Get Sleeping time" />
+        android:id="@+id/change_graph_btn_ID"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="end"
+        android:layout_weight="0.2"
+        android:drawableStart="@drawable/bars"
+        android:text="  Change graph" />
 
-    <TextView
-        android:id="@+id/sleepingTimeDbTxtv_ID"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:gravity="center_vertical"
-        android:text="TextView"
-        android:textAlignment="center" />
 </LinearLayout>
