@@ -204,6 +204,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         if(e1.getX() > e2.getX()){
             Intent i = new Intent(PedometerActivity.this, WeatherActivity.class);
             startActivity(i);
+            finish();
         }
         return true;
     }
@@ -357,9 +358,9 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         //db.close();
     }
 
-    @Override
-    protected void onStop(){
-        super.onStop();
-        finish();
-    }
+//    @Override
+//    protected void onStop(){
+//        super.onStop();
+//        finish();
+//    }
 }
