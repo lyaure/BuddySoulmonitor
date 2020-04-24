@@ -521,4 +521,10 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
         detector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        finish();
+    }
 }
