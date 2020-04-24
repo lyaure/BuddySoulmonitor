@@ -356,5 +356,4 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         db.saveCurrentSteps(since_boot);
         //db.close();
     }
-
 }

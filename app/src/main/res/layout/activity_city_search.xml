@@ -15,12 +15,6 @@
         android:hint="Enter city"
         android:inputType="textPersonName" />
 
-    <Button
-        android:id="@+id/searchBtn_ID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Search" />
-
     <ListView
         android:id="@+id/citiesList_ID"
         android:layout_width="match_parent"

@@ -53,7 +53,16 @@ public class CitySearchActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                buildAutoCompleteListSearch();
+                if(!cityName.getText().toString().equals("")) {
+                    buildAutoCompleteListSearch();
+                    if(citiesList.getVisibility() == View.INVISIBLE)
+                        citiesList.setVisibility(View.VISIBLE);
+                }
+                else {
+                    if(citiesList.getVisibility() == View.VISIBLE)
+                        citiesList.setVisibility(View.INVISIBLE);
+                    cities.clear();
+                }
 
             }
         });
@@ -61,14 +70,14 @@ public class CitySearchActivity extends AppCompatActivity {
         adapter = new CityAdapter(this, cities);
         citiesList.setAdapter(adapter);
 
-        search = (Button)findViewById(R.id.searchBtn_ID);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cities.clear();
-                buildAutoCompleteListSearch();
-            }
-        });
+//        search = (Button)findViewById(R.id.searchBtn_ID);
+//        search.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                cities.clear();
+//                buildAutoCompleteListSearch();
+//            }
+//        });
 
         citiesList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
