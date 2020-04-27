@@ -9,18 +9,19 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SettingActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     private TextView goal;
     private RadioButton oldButton, c, f;
     private int oldGoal;
     private RadioGroup temperature;
     private Boolean boolTemp;
-    private int val;
+    private String val;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
 
@@ -31,7 +32,7 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
 
         Intent intent = getIntent();
-        val = intent.getIntExtra("activity", 0);
+        val = intent.getStringExtra("from");
 
 
         sp = getSharedPreferences("pedometer", MODE_PRIVATE);
@@ -104,10 +105,11 @@ public class SettingActivity extends AppCompatActivity {
 
                 Intent i;
 
-                if(val == 2)
-                    i = new Intent(SettingActivity.this, WeatherActivity.class);
+                if(val.equals("pedometer"))
+                    i = new Intent(SettingsActivity.this, PedometerActivity.class);
                 else
-                    i = new Intent(SettingActivity.this, PedometerActivity.class);
+                    i = new Intent(SettingsActivity.this, WeatherActivity.class);
+
 
                 startActivity(i);
             }
@@ -134,5 +136,37 @@ public class SettingActivity extends AppCompatActivity {
                 boolTemp = true;
             }
         });
+
+        ImageButton pedometer_btn = (ImageButton)findViewById(R.id.pedometer_btn_ID);
+        pedometer_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(SettingsActivity.this, PedometerActivity.class);
+                startActivity(i);
+            }
+        });
+
+        ImageButton weather_btn = (ImageButton)findViewById(R.id.weather_btn_ID);
+        weather_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(SettingsActivity.this, WeatherActivity.class);
+                startActivity(i);
+            }
+        });
+
+        ImageButton sleep_btn = (ImageButton)findViewById(R.id.sleep_btn_ID);
+        sleep_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        finish();
     }
 }

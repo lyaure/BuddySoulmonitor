@@ -19,22 +19,16 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PedometerActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, SensorEventListener {
+public class PedometerActivity extends AppCompatActivity implements SensorEventListener {
     private GestureDetectorCompat detector;
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
@@ -77,7 +71,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
             startService(new Intent(this, StepCounterListener.class));
         }
 
-        detector = new GestureDetectorCompat(this, this);
+//        detector = new GestureDetectorCompat(this, this);
         steps = findViewById(R.id.stepTxtv_ID);
         progSteps = findViewById(R.id.stepProgress_ID);
 
@@ -147,72 +141,34 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
                 hs.fullScroll(View.FOCUS_LEFT);
             }
         });
-//
-    }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // menu creation
-        super.onCreateOptionsMenu(menu);
-        MenuItem settings = menu.add("Settings");
-
-        settings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
+        ImageButton weather_btn = (ImageButton)findViewById(R.id.weather_btn_ID);
+        weather_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                Intent i = new Intent(PedometerActivity.this, SettingActivity.class);
-                i.putExtra("activity", 1);
-                startActivity(i); // open rules activity
-                return true;
+            public void onClick(View v) {
+                Intent i = new Intent(PedometerActivity.this, WeatherActivity.class);
+                startActivity(i);
             }
         });
 
-        return true;
-    }
+        ImageButton sleep_btn = (ImageButton)findViewById(R.id.sleep_btn_ID);
+        sleep_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+            }
+        });
 
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if(e1.getX() > e2.getX()){
-            Intent i = new Intent(PedometerActivity.this, WeatherActivity.class);
-            startActivity(i);
-            finish();
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        detector.onTouchEvent(event);
-        return super.onTouchEvent(event);
+        ImageButton settings_btn = (ImageButton)findViewById(R.id.settings_btn_ID);
+        settings_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(PedometerActivity.this, SettingsActivity.class);
+                i.putExtra("from", "pedometer");
+                startActivity(i);
+            }
+        });
     }
 
     @Override

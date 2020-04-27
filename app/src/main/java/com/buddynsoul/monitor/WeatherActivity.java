@@ -1,30 +1,20 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.view.GestureDetectorCompat;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.provider.Settings;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,7 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class WeatherActivity extends AppCompatActivity implements GestureDetector.OnGestureListener{
+public class WeatherActivity extends AppCompatActivity{
     private static final long MIN_TIME_FOR_UPDATE = 0;
     private static final float MIN_DIS_FOR_UPDATE = 0;
     final int PERMISSION_ID = 42;
@@ -76,8 +66,6 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
                 startActivity(i);
             }
         });
-
-        detector = new GestureDetectorCompat(this, this);
 
         ImageButton actualPosition = (ImageButton)findViewById(R.id.actualPositionBtn_ID);
         actualPosition.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +111,34 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 
        forecast();
        currentConditions();
+
+
+        ImageButton pedometer_btn = (ImageButton)findViewById(R.id.pedometer_btn_ID);
+        pedometer_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(WeatherActivity.this, PedometerActivity.class);
+                startActivity(i);
+            }
+        });
+
+        ImageButton sleep_btn = (ImageButton)findViewById(R.id.sleep_btn_ID);
+        sleep_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        ImageButton settings_btn = (ImageButton)findViewById(R.id.settings_btn_ID);
+        settings_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(WeatherActivity.this, SettingsActivity.class);
+                i.putExtra("from", "weather");
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -137,7 +153,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                Intent i = new Intent(WeatherActivity.this, SettingActivity.class);
+                Intent i = new Intent(WeatherActivity.this, SettingsActivity.class);
                 i.putExtra("activity", 2);
                 startActivity(i); // open rules activity
                 return true;
@@ -480,47 +496,6 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
 //            return "";
 //        }
 //    }
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if(e1.getX() < e2.getX()){
-            Intent i = new Intent(WeatherActivity.this, PedometerActivity.class);
-            startActivity(i);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        detector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
 
     @Override
     protected void onStop(){
