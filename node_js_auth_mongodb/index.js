@@ -92,11 +92,14 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             var name = post_data.name;
             var email = post_data.email;
 
+            var registration_date = Date.now()
+
             var insertJson = {
                 'email': email,
                 'password': password,
                 'salt': salt,
                 'name': name,
+                'registration_date': registration_date,
                 'confirmed': false
             };
             var db = client.db('buddy&soulmonitor');
@@ -111,11 +114,10 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     //Insert data
                     db.collection('user')
                         .insertOne(insertJson, function (error, res) {
-                            if(error) {
+                            if (error) {
                                 response.json('Error occurs during registration');
                                 console.log(error);
-                            }
-                            else {
+                            } else {
                                 //send confirmation mail
                                 // async email
                                 jwt.sign(
@@ -168,17 +170,30 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     //Insert data
                     db.collection('user')
                         .findOne({'email': email}, function (err, user) {
-                            if(user.confirmed == false) {
+                            if (user.confirmed == false) {
                                 response.json('Please confirm your email');
                                 console.log('Please confirm your email');
-                            }
-                            else {
+                            } else {
                                 var salt = user.salt; // Get salt from user
                                 var hashed_password = checkHashPassword(userPassword, salt).passwordHash; // Get password from user
                                 var encrypted_password = user.password;
+
                                 if (hashed_password == encrypted_password) {
-                                    response.json('Login success');
-                                    console.log('Login success');
+
+                                    // async email
+                                    jwt.sign(
+                                        {
+                                            //userId: user._id,
+                                            email: email,
+                                        },
+                                        EMAIL_SECRET,
+                                        (err, refreshToken) => {
+                                            //response.json('Login success');
+                                            response.json(refreshToken);
+                                            console.log('Login success');
+                                        },
+                                    );
+
                                 } else {
                                     response.json('Wrong password');
                                     console.log('Wrong password');
@@ -212,6 +227,13 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     .updateOne({'_id': ObjectId(userId)}, //filter
                                         {$set: {'confirmed': true}}
                                     ).then(() => {
+                                    db.collection('monitor')
+                                        .insertOne({'email': user.email}, function (error, res) {
+                                            if (err) {
+                                                console.log(err)
+                                                response.json("Error new user in monitor")
+                                            }
+                                        })
                                     console.log("Db updated");
                                 })
                                     .catch((err) => {
@@ -322,8 +344,8 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                 db.collection('user')
                     .findOne({'_id': ObjectId(userId)}, function (err, user) {
                         if (err) {
-                            console.log('An error occurred during resetting password');
-                            response.json('An error occurred during resetting password');
+                            console.log('An error occurred when resetting password');
+                            response.json('An error occurred when resetting password');
                         } else {
 
                             var post_data = request.body;
@@ -345,13 +367,56 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     }).then(() => {
                                 console.log("Password has been changed");
                                 response.json({
-                                    status : 'success',
-                                    message : 'Success! Your password has been changed.'
+                                    //status: 'success',
+                                    message: 'Success! Your password has been changed.'
                                 });
                             })
                                 .catch((err) => {
                                     console.log(err);
                                     response.json('An error occurred during resetting password');
+                                })
+                        }
+                    })
+
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
+        //Change password (the user enters a new password and the password is updated in the db)
+        app.post('/senddata/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var email = decoded.email
+
+                var post_data = request.body;
+                var data = post_data.data;
+
+                var db = client.db('buddy&soulmonitor');
+
+                //db.collection('user')
+                db.collection('monitor')
+                    .findOne({'email': email}, function (err, user) {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            db.collection('monitor').updateOne(
+                                {email: email},
+                                {
+                                    $push: {
+                                        data: JSON.parse(data)
+                                    }
+                                }
+                            ).then(() => {
+                                console.log('Added in monitor dB');
+                                response.json('Good');
+                            })
+                                .catch(() => {
+                                    console.log("Error")
+                                    response.json('Error');
                                 })
                         }
                     })
