@@ -4,6 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.Cookie;
+import retrofit2.Retrofit;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -29,12 +35,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class PedometerActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, SensorEventListener {
     private GestureDetectorCompat detector;
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
+
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    IMyService iMyService;
 
 
     @Override
@@ -106,6 +121,19 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
             }
         });
 
+        Button sendDataBtn = findViewById(R.id.sendDataBtn_ID);
+        sendDataBtn.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                   try {
+                       sendData();
+                   } catch (JSONException e) {
+                       e.printStackTrace();
+                   }
+               }
+                                       }
+        );
+
 
 
 
@@ -143,7 +171,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("logged", false);
                 editor.commit();
@@ -339,6 +367,66 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         Database db = new Database(this);
         db.saveCurrentSteps(since_boot);
         //db.close();
+    }
+
+    private void sendData() throws JSONException {
+
+        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+        String refreshToken = sp.getString("refreshToken", "");
+        refreshToken = refreshToken.substring(1, refreshToken.length()-1);
+
+
+
+
+        // Init Service
+        Retrofit retrofitClient = RetrofitClient.getInstance();
+        iMyService = retrofitClient.create(IMyService.class);
+
+        String dataToSend = preprocessData();
+
+        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String response) throws Exception {
+                        if (!response.equals("\"Wrong password\"")) {
+                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putBoolean("sendToServer", true);
+                            editor.commit();
+
+                        }
+                        else {
+                            Toast.makeText(PedometerActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }));
+    }
+
+    private String preprocessData() throws JSONException {
+
+        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+
+        String timestamp = "" + Util.getToday();
+        //String email = sp.getString("email", "");
+        Database db = new Database(this);
+        String steps = ""+ db.getSteps(Util.getToday());
+        String sleepingTime = "" + db.getSleepingTime(Util.getToday());
+        String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");
+        String night_location = "" + db.getLocation(Util.getToday(), "night_location");
+
+
+        JSONObject json = new JSONObject();
+        json.put("timestamp", timestamp);
+        //json.put("email", email);
+        json.put("steps", steps);
+        json.put("sleeping time", sleepingTime);
+        json.put("morning location", morning_location);
+        json.put("night", night_location);
+
+        return json.toString();
     }
 
 }

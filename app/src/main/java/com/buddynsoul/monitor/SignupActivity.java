@@ -8,6 +8,9 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
@@ -21,6 +24,9 @@ import android.widget.Toast;
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SignupActivity extends AppCompatActivity {
     private TextView firstName;
     private TextView lastName;
@@ -30,8 +36,17 @@ public class SignupActivity extends AppCompatActivity {
     private boolean hideP;
     private boolean hideC;
 
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+//    private static final String PASSWORD_PATTERN = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])" +
+//            "(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+
     CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
+
+    private Button singnup;
 
     @Override
     protected void onStop() {
@@ -48,7 +63,8 @@ public class SignupActivity extends AppCompatActivity {
         Retrofit retrofitClient = RetrofitClient.getInstance();
         iMyService = retrofitClient.create(IMyService.class);
 
-        Button singnup = (Button)findViewById(R.id.signupBtn_ID);
+        //Button singnup = (Button)findViewById(R.id.signupBtn_ID);
+        singnup = (Button)findViewById(R.id.signupBtn_ID);
         singnup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,37 +75,55 @@ public class SignupActivity extends AppCompatActivity {
                 password = (TextView)findViewById(R.id.txtv_password_ID);
                 confirmPassword = (TextView)findViewById(R.id.txtv_confirmPassword_ID);
 
-                if(TextUtils.isEmpty(firstName.getText().toString())) {
-                    Toast.makeText(SignupActivity.this, "First name cannot be null or empty", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(firstName.getText().toString().trim())) {
+                    //Toast.makeText(SignupActivity.this, "First name cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    email.setError("First name required");
+                    email.requestFocus();
                     return;
                 }
 
-                if(TextUtils.isEmpty(lastName.getText().toString())) {
-                    Toast.makeText(SignupActivity.this, "Last name cannot be null or empty", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(lastName.getText().toString().trim())) {
+                    //Toast.makeText(SignupActivity.this, "Last name cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    email.setError("Last name required");
+                    email.requestFocus();
                     return;
                 }
 
-                if(TextUtils.isEmpty(email.getText().toString())) {
-                    Toast.makeText(SignupActivity.this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(email.getText().toString().trim())) {
+                    //Toast.makeText(SignupActivity.this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    email.setError("Email required");
+                    email.requestFocus();
+                    return;
+                }
+
+                if (!email.getText().toString().matches(EMAIL_PATTERN)) {
+                    email.setError("Email is not valid");
+                    email.requestFocus();
                     return;
                 }
 
                 if(TextUtils.isEmpty(password.getText().toString())) {
-                    Toast.makeText(SignupActivity.this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SignupActivity.this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    password.setError("Password required");
+                    password.requestFocus();
                     return;
                 }
 
                 if(TextUtils.isEmpty(confirmPassword.getText().toString())) {
-                    Toast.makeText(SignupActivity.this, "Confirmed password cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SignupActivity.this, "Confirmed password cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    confirmPassword.setError("Password required");
+                    confirmPassword.requestFocus();
                     return;
                 }
 
                 if(!password.getText().toString().equals(confirmPassword.getText().toString())) {
-                    Toast.makeText(SignupActivity.this, "Passwords do no match", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SignupActivity.this, "Passwords do no match", Toast.LENGTH_SHORT).show();
+                    password.setError("Passwords do no match");
+                    password.requestFocus();
                     return;
                 }
 
-                String name = firstName.getText().toString().trim() + " " + lastName.getText().toString().trim();
+                final String name = firstName.getText().toString().trim() + " " + lastName.getText().toString().trim();
 
                 registerUser(name, email.getText().toString().trim(), password.getText().toString().trim());
             }

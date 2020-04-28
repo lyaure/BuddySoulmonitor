@@ -6,6 +6,10 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import android.app.ProgressDialog;
@@ -31,6 +35,8 @@ import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+
+import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
     private TextView email;
@@ -63,6 +69,23 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(TextUtils.isEmpty(email.getText().toString().trim()))
+                {
+                    //Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    email.setError("Email required");
+                    email.requestFocus();
+                    return;
+                }
+
+                if(TextUtils.isEmpty(password.getText().toString().trim()))
+                {
+                    //Toast.makeText(this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    email.setError("Password required");
+                    email.requestFocus();
+                    return;
+                }
+
                 loginUser(email.getText().toString().trim(), password.getText().toString().trim());
 //                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
 //                startActivity(i);
@@ -128,20 +151,8 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void loginUser(String email, String password) {
+    private void loginUser(final String email, String password) {
         final Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
-
-        if(TextUtils.isEmpty(email))
-        {
-            Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if(TextUtils.isEmpty(password))
-        {
-            Toast.makeText(this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         compositeDisposable.add(iMyService.loginUser(email, password)
         .subscribeOn(Schedulers.io())
@@ -149,17 +160,52 @@ public class LoginActivity extends AppCompatActivity {
         .subscribe(new Consumer<String>() {
             @Override
             public void accept(String response) throws Exception {
-                Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-                if (response.equals("\"Login success\"")) {
-                    SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                //Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                //Log.d("Response", response);
+                Log.d("Response", response);
+                if (!response.equals("\"Wrong password\"") && !response.equals("\"Your account doesn\'t exist\"")) {
+                    SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("email", email);
+                    editor.putString("refreshToken", response);
+
+                    response = response.substring(1, response.length()-1);
+                    Log.d("Response", "After substring:" + response);
+
                     editor.putBoolean("logged", true);
                     editor.commit();
 
                     startActivity(i);
                 }
+                else {
+                    Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                }
 
             }
         }));
+
+//        Call<ResponseBody<ResponseData>> call = (Call<ResponseBody>) RetrofitClient
+//                .getInstance()
+//                .getImyService()
+//                .loginUser(email, password);
+//
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                try {
+//                    if(response.)
+//                    String s = response.body().string();
+//                    Toast.makeText(LoginActivity.this, s, Toast.LENGTH_LONG).show();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+//            }
+//        });
+
     }
 }

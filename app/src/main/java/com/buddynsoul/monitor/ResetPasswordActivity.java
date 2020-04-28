@@ -43,6 +43,15 @@ public class ResetPasswordActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(TextUtils.isEmpty(email.getText().toString().trim()))
+                {
+                    //Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
+                    email.setError("Email required");
+                    email.requestFocus();
+                    return;
+                }
+
                 resetUserPassword(email.getText().toString().trim());
 //                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
 //                startActivity(i);
@@ -52,12 +61,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
     private void resetUserPassword(final String email) {
         final Intent i = new Intent(ResetPasswordActivity.this, LoginActivity.class);
-
-        if(TextUtils.isEmpty(email))
-        {
-            Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         compositeDisposable.add(iMyService.resetUserPassword(email)
                 .subscribeOn(Schedulers.io())

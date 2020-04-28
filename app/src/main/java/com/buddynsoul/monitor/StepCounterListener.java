@@ -22,10 +22,22 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
 
 
 /**
@@ -57,6 +69,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private float oldPitch, oldRoll, oldAzimuth;
     private boolean flagAccStart;
+
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    IMyService iMyService;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -238,6 +253,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                 Log.d("DebugStepCounter", "Location morning: " + lastLocation);
             }
+
+            // send data to the server
+
         }
         else {
             String lastLocation = getLocation.getLastLocation(null, this);
@@ -599,5 +617,40 @@ public class StepCounterListener extends Service implements SensorEventListener 
             }
         }
         return now.after(from) && now.before(to);
+    }
+
+    private void preprocessData(String email, String steps, String sleepingTime,
+                                      String morning_location, String night_location) {
+
+//        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//        String refreshToken = sp.getString("refreshToken", "");
+//
+//        // Init Service
+//        Retrofit retrofitClient = RetrofitClient.getInstance();
+//        iMyService = retrofitClient.create(IMyService.class);
+//
+//        String dataToSend = "Test 1, Test 2, Test 3";
+//
+//        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String response) throws Exception {
+//                        if (!response.equals("\"Wrong password\"")) {
+//                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//                            SharedPreferences.Editor editor = sp.edit();
+//                            editor.putBoolean("sendToServer", true);
+//                            editor.commit();
+//
+//                        }
+//                        else {
+//
+//                        }
+//
+//                    }
+//                }));
+
+        //return null;
     }
 }

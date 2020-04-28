@@ -127,6 +127,18 @@ public class Database {
         return res;
     }
 
+    public double getLocation(final long date, String columnName){
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        double res = 0.0;
+
+        if(cursor.moveToFirst())
+            res = cursor.getDouble(cursor.getColumnIndex(columnName));
+
+        cursor.close();
+        return res;
+    }
+
     public void removeNegativeEntries(){
         db.delete(DB_NAME, "steps < ?", new String[]{"0"});
     }

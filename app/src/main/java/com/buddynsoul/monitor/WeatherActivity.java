@@ -152,7 +152,7 @@ public class WeatherActivity extends AppCompatActivity implements GestureDetecto
             @Override
             public boolean onMenuItemClick(MenuItem item)
             {
-                SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("logged", false);
                 editor.commit();
