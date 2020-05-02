@@ -20,7 +20,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -385,7 +384,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
         notificationBuilder.setPriority(Notification.PRIORITY_MIN).setShowWhen(false)
                 .setContentIntent(PendingIntent
-                        .getActivity(context, 0, new Intent(context, PedometerActivity.class),
+                        .getActivity(context, 0, new Intent(context, PedometerFragment.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT))
                 .setSmallIcon(R.drawable.icon)
                 .setOngoing(true);

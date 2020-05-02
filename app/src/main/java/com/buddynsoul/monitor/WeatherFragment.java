@@ -2,6 +2,7 @@ package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.fragment.app.Fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +13,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,7 +36,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class WeatherActivity extends AppCompatActivity{
+public class WeatherFragment extends Fragment {
     private static final long MIN_TIME_FOR_UPDATE = 0;
     private static final float MIN_DIS_FOR_UPDATE = 0;
     final int PERMISSION_ID = 42;
@@ -45,29 +48,34 @@ public class WeatherActivity extends AppCompatActivity{
     private String response = "", keyValue = null;
     private TextView city;
     private String metricValue;
+    private View v;
+
+    public WeatherFragment(){
+
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        v = inflater.inflate(R.layout.fragment_weather, container, false);
 
-        SharedPreferences prefs = getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences("Settings", getActivity().MODE_PRIVATE);
         metricValue = prefs.getString("metricValue", "true");
 
-        Intent intent = getIntent();
-        final String[] cityValues = intent.getStringArrayExtra("cityValues");
+//        Intent intent = getIntent();
+        final String[] cityValues = null;
+//        final String[] cityValues = intent.getStringArrayExtra("cityValues");
 //        Toast.makeText(this, keyValue, Toast.LENGTH_SHORT).show();
 
-        TextView changeCity = (TextView) findViewById(R.id.searchCity_ID);
+        TextView changeCity = (TextView) v.findViewById(R.id.searchCity_ID);
         changeCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(WeatherActivity.this, CitySearchActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(WeatherFragment.this, CitySearchActivity.class);
+//                startActivity(i);
             }
         });
 
-        ImageButton actualPosition = (ImageButton)findViewById(R.id.actualPositionBtn_ID);
+        ImageButton actualPosition = (ImageButton)v.findViewById(R.id.actualPositionBtn_ID);
         actualPosition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,7 +87,7 @@ public class WeatherActivity extends AppCompatActivity{
             }
         });
 
-        ImageButton AWLink = (ImageButton)findViewById(R.id.AWLink_imgButton);
+        ImageButton AWLink = (ImageButton)v.findViewById(R.id.AWLink_imgButton);
         AWLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +98,7 @@ public class WeatherActivity extends AppCompatActivity{
         });
 
 
-        city = (TextView)findViewById(R.id.cityName_ID);
+        city = (TextView)v.findViewById(R.id.cityName_ID);
 
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -101,7 +109,7 @@ public class WeatherActivity extends AppCompatActivity{
 
        if(cityValues == null){
            if (!cityNameAndKeyFromLocation()) {
-               return;
+               return v;
            }
        }
        else {
@@ -113,66 +121,68 @@ public class WeatherActivity extends AppCompatActivity{
        currentConditions();
 
 
-        ImageButton pedometer_btn = (ImageButton)findViewById(R.id.pedometer_btn_ID);
-        pedometer_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(WeatherActivity.this, PedometerActivity.class);
-                startActivity(i);
-            }
-        });
+//        ImageButton pedometer_btn = (ImageButton)v.findViewById(R.id.pedometer_btn_ID);
+//        pedometer_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                Intent i = new Intent(WeatherFragment.this, PedometerFragment.class);
+////                startActivity(i);
+//            }
+//        });
+//
+//        ImageButton sleep_btn = (ImageButton)v.findViewById(R.id.sleep_btn_ID);
+//        sleep_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//
+//        ImageButton settings_btn = (ImageButton)findViewById(R.id.settings_btn_ID);
+//        settings_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent i = new Intent(WeatherFragment.this, SettingsFragment.class);
+//                i.putExtra("from", "weather");
+//                startActivity(i);
+//            }
+//        });
 
-        ImageButton sleep_btn = (ImageButton)findViewById(R.id.sleep_btn_ID);
-        sleep_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        ImageButton settings_btn = (ImageButton)findViewById(R.id.settings_btn_ID);
-        settings_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(WeatherActivity.this, SettingsActivity.class);
-                i.putExtra("from", "weather");
-                startActivity(i);
-            }
-        });
+        return v;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // menu creation
-        super.onCreateOptionsMenu(menu);
-        MenuItem settings = menu.add("Settings");
-
-        settings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                Intent i = new Intent(WeatherActivity.this, SettingsActivity.class);
-                i.putExtra("activity", 2);
-                startActivity(i); // open rules activity
-                return true;
-            }
-        });
-
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu)
+//    {
+//        // menu creation
+//        super.onCreateOptionsMenu(menu);
+//        MenuItem settings = menu.add("Settings");
+//
+//        settings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+//        {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item)
+//            {
+//                Intent i = new Intent(WeatherFragment.this, SettingsFragment.class);
+//                i.putExtra("activity", 2);
+//                startActivity(i); // open rules activity
+//                return true;
+//            }
+//        });
+//
+//        return true;
+//    }
 
     public Boolean cityNameAndKeyFromLocation(){
         // get the last location
-        localisation = getLocation.getLastLocation(this, this);
+        localisation = getLocation.getLastLocation(getActivity(), getContext());
 
         if (localisation.equals("")) {
             return false;
         }
 
         // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "geoposition", localisation, metricValue);
+        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "geoposition", localisation, metricValue);
 
 
         // url to get key value of the city
@@ -190,7 +200,7 @@ public class WeatherActivity extends AppCompatActivity{
 
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             //response = "error";
         }
         return true;
@@ -198,7 +208,7 @@ public class WeatherActivity extends AppCompatActivity{
 
     public void forecast(){
         // build forecast request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "forecast", keyValue, metricValue);
+        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "forecast", keyValue, metricValue);
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
 
@@ -208,26 +218,26 @@ public class WeatherActivity extends AppCompatActivity{
 
                 //Log.d("responseFromApi", response);
 
-                ImageView dIconForecast_1 = (ImageView) findViewById(R.id.dIconForecast1_ID);
-                ImageView dIconForecast_2 = (ImageView)findViewById(R.id.dIconForecast2_ID);
-                ImageView dIconForecast_3 = (ImageView)findViewById(R.id.dIconForecast3_ID);
-                ImageView dIconForecast_4 = (ImageView)findViewById(R.id.dIconForecast4_ID);
-                ImageView dIconForecast_5 = (ImageView)findViewById(R.id.dIconForecast5_ID);
+                ImageView dIconForecast_1 = (ImageView) v.findViewById(R.id.dIconForecast1_ID);
+                ImageView dIconForecast_2 = (ImageView)v.findViewById(R.id.dIconForecast2_ID);
+                ImageView dIconForecast_3 = (ImageView)v.findViewById(R.id.dIconForecast3_ID);
+                ImageView dIconForecast_4 = (ImageView)v.findViewById(R.id.dIconForecast4_ID);
+                ImageView dIconForecast_5 = (ImageView)v.findViewById(R.id.dIconForecast5_ID);
 
                 ImageView[] dIconForecast = {dIconForecast_1, dIconForecast_2, dIconForecast_3, dIconForecast_4, dIconForecast_5};
 
-                TextView dForecast_1 = (TextView)findViewById(R.id.dForecast1_ID);
-                TextView dForecast_2 = (TextView)findViewById(R.id.dForecast2_ID);
-                TextView dForecast_3 = (TextView)findViewById(R.id.dForecast3_ID);
-                TextView dForecast_4 = (TextView)findViewById(R.id.dForecast4_ID);
-                TextView dForecast_5 = (TextView)findViewById(R.id.dForecast5_ID);
+                TextView dForecast_1 = (TextView)v.findViewById(R.id.dForecast1_ID);
+                TextView dForecast_2 = (TextView)v.findViewById(R.id.dForecast2_ID);
+                TextView dForecast_3 = (TextView)v.findViewById(R.id.dForecast3_ID);
+                TextView dForecast_4 = (TextView)v.findViewById(R.id.dForecast4_ID);
+                TextView dForecast_5 = (TextView)v.findViewById(R.id.dForecast5_ID);
 
                 TextView[] dForecast = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
 
-                TextView day2 = (TextView)findViewById(R.id.day2_ID);
-                TextView day3 = (TextView)findViewById(R.id.day3_ID);
-                TextView day4 = (TextView)findViewById(R.id.day4_ID);
-                TextView day5 = (TextView)findViewById(R.id.day5_ID);
+                TextView day2 = (TextView)v.findViewById(R.id.day2_ID);
+                TextView day3 = (TextView)v.findViewById(R.id.day3_ID);
+                TextView day4 = (TextView)v.findViewById(R.id.day4_ID);
+                TextView day5 = (TextView)v.findViewById(R.id.day5_ID);
 
                 TextView[] daysTextView = {day2, day3, day4, day5};
 
@@ -239,7 +249,7 @@ public class WeatherActivity extends AppCompatActivity{
 
                     JSONObject icon = dailyForecast.getJSONObject("Day");
                     String iconName = "i" + icon.getInt("Icon");
-                    int icon_id = getApplicationContext().getResources().getIdentifier(iconName, "drawable", getPackageName());
+                    int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
                     dIconForecast[i].setImageResource(icon_id);
 
                     JSONObject temperature = dailyForecast.getJSONObject("Temperature");
@@ -277,12 +287,12 @@ public class WeatherActivity extends AppCompatActivity{
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             //response = "error";
         }
 
@@ -290,7 +300,7 @@ public class WeatherActivity extends AppCompatActivity{
 
     public void currentConditions(){
         // build currentconditions request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "currentconditions", keyValue, metricValue);
+        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "currentconditions", keyValue, metricValue);
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
 
@@ -299,13 +309,13 @@ public class WeatherActivity extends AppCompatActivity{
                 final String METRIC_VALUE = "Metric";
                 final String IMPERIAL_VALUE = "Imperial";
 
-                ImageView currentIconForecast = (ImageView) findViewById(R.id.currentIconForecast_ID);
-                TextView currentForecast = (TextView)findViewById(R.id.currentForecast_ID);
+                ImageView currentIconForecast = (ImageView)v.findViewById(R.id.currentIconForecast_ID);
+                TextView currentForecast = (TextView)v.findViewById(R.id.currentForecast_ID);
 
                 JSONArray currentConditionsJsonArray = new JSONArray(response);
                 String currentConditionsIconName = "i" + currentConditionsJsonArray.getJSONObject(0).getInt("WeatherIcon");
                 String weatherText = currentConditionsJsonArray.getJSONObject(0).getString("WeatherText");
-                int icon_id = getApplicationContext().getResources().getIdentifier(currentConditionsIconName, "drawable", getPackageName());
+                int icon_id = getContext().getResources().getIdentifier(currentConditionsIconName, "drawable", getContext().getPackageName());
                 currentIconForecast.setImageResource(icon_id);
 
                 JSONObject currentConditions = currentConditionsJsonArray.getJSONObject(0).getJSONObject("Temperature");
@@ -320,43 +330,43 @@ public class WeatherActivity extends AppCompatActivity{
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d("Debug2", response);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
             //response = "error";
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             Log.d("Debug1", response);
         }
 
         // build hourly forecast request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "hourlyforecast", keyValue, metricValue);
+        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "hourlyforecast", keyValue, metricValue);
         try {
             response = NetworkUtils.getResponseFromHttpUrl(builtUri);
 
             // send get request to the api
             try {
 
-                ImageView hIconForecast_1 = (ImageView) findViewById(R.id.hIconForecast1_ID);
-                ImageView hIconForecast_2 = (ImageView)findViewById(R.id.hIconForecast2_ID);
-                ImageView hIconForecast_3 = (ImageView)findViewById(R.id.hIconForecast3_ID);
-                ImageView hIconForecast_4 = (ImageView)findViewById(R.id.hIconForecast4_ID);
+                ImageView hIconForecast_1 = (ImageView)v.findViewById(R.id.hIconForecast1_ID);
+                ImageView hIconForecast_2 = (ImageView)v.findViewById(R.id.hIconForecast2_ID);
+                ImageView hIconForecast_3 = (ImageView)v.findViewById(R.id.hIconForecast3_ID);
+                ImageView hIconForecast_4 = (ImageView)v.findViewById(R.id.hIconForecast4_ID);
 
                 ImageView[] hIconForecast = {hIconForecast_1, hIconForecast_2, hIconForecast_3, hIconForecast_4};
 
-                TextView hForecast_1 = (TextView)findViewById(R.id.hForecast1_ID);
-                TextView hForecast_2 = (TextView)findViewById(R.id.hForecast2_ID);
-                TextView hForecast_3 = (TextView)findViewById(R.id.hForecast3_ID);
-                TextView hForecast_4 = (TextView)findViewById(R.id.hForecast4_ID);
+                TextView hForecast_1 = (TextView)v.findViewById(R.id.hForecast1_ID);
+                TextView hForecast_2 = (TextView)v.findViewById(R.id.hForecast2_ID);
+                TextView hForecast_3 = (TextView)v.findViewById(R.id.hForecast3_ID);
+                TextView hForecast_4 = (TextView)v.findViewById(R.id.hForecast4_ID);
 
                 TextView[] hForecast = {hForecast_1, hForecast_2, hForecast_3, hForecast_4};
 
-                TextView h_1 = (TextView)findViewById(R.id.hour1_ID);
-                TextView h_2 = (TextView)findViewById(R.id.hour2_ID);
-                TextView h_3 = (TextView)findViewById(R.id.hour3_ID);
-                TextView h_4 = (TextView)findViewById(R.id.hour4_ID);
+                TextView h_1 = (TextView)v.findViewById(R.id.hour1_ID);
+                TextView h_2 = (TextView)v.findViewById(R.id.hour2_ID);
+                TextView h_3 = (TextView)v.findViewById(R.id.hour3_ID);
+                TextView h_4 = (TextView)v.findViewById(R.id.hour4_ID);
 
                 TextView[] hours = {h_1, h_2, h_3, h_4};
 
@@ -381,7 +391,7 @@ public class WeatherActivity extends AppCompatActivity{
 
                     //JSONObject icon = hourlyJsonObject.getJSONObject("WeatherIcon");
                     String iconName = "i" + hourlyJsonObject.getInt("WeatherIcon");
-                    int icon_id = getApplicationContext().getResources().getIdentifier(iconName, "drawable", getPackageName());
+                    int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
                     hIconForecast[i].setImageResource(icon_id);
 
                     JSONObject temperature = hourlyJsonObject.getJSONObject("Temperature");
@@ -396,14 +406,14 @@ public class WeatherActivity extends AppCompatActivity{
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
                 Log.d("Debug2", response);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
             //response = "error";
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             Log.d("Debug1", response);
         }
     }
@@ -497,9 +507,9 @@ public class WeatherActivity extends AppCompatActivity{
 //        }
 //    }
 
-    @Override
-    protected void onStop(){
-        super.onStop();
-        finish();
-    }
+//    @Override
+//    protected void onStop(){
+//        super.onStop();
+//        finish();
+//    }
 }

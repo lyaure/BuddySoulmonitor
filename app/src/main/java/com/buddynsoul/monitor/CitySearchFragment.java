@@ -1,13 +1,16 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -22,7 +25,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class CitySearchActivity extends AppCompatActivity {
+public class CitySearchFragment extends Fragment {
 
     private ArrayList<City> cities = new ArrayList<>();
     private TextView cityName;
@@ -30,15 +33,19 @@ public class CitySearchActivity extends AppCompatActivity {
     private ListView citiesList;
     private CityAdapter adapter;
     private URL builtUri;
+    private View v;
 
+
+    public CitySearchFragment(){
+
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_city_search);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        v = inflater.inflate(R.layout.fragment_city_search, container, false);
 
-        cityName = (TextView)findViewById(R.id.autocomplete_ID);
-        citiesList = (ListView)findViewById(R.id.citiesList_ID);
+        cityName = (TextView)v.findViewById(R.id.autocomplete_ID);
+        citiesList = (ListView)v.findViewById(R.id.citiesList_ID);
 
         cityName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -67,7 +74,7 @@ public class CitySearchActivity extends AppCompatActivity {
             }
         });
 
-        adapter = new CityAdapter(this, cities);
+        adapter = new CityAdapter(getContext(), cities);
         citiesList.setAdapter(adapter);
 
 //        search = (Button)findViewById(R.id.searchBtn_ID);
@@ -84,10 +91,10 @@ public class CitySearchActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                String[] values = {cities.get(position).getCityName() ,cities.get(position).getKeyValue()};
-                Intent i = new Intent(CitySearchActivity.this, WeatherActivity.class);
-                i.putExtra("cityValues", values);
-                startActivity(i);
+//                String[] values = {cities.get(position).getCityName() ,cities.get(position).getKeyValue()};
+//                Intent i = new Intent(CitySearchFragment.this, WeatherFragment.class);
+//                i.putExtra("cityValues", values);
+//                startActivity(i);
             }
         });
 
@@ -99,11 +106,12 @@ public class CitySearchActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
 
+        return v;
     }
 
     public void buildAutoCompleteListSearch(){
         // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(this, "autocomplete", cityName.getText().toString(), "true");
+        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "autocomplete", cityName.getText().toString(), "true");
         String response = "";
 
         // url to get key value of the city
@@ -136,15 +144,15 @@ public class CitySearchActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             //response = "error";
         }
 
     }
 
-    @Override
-    protected void onStop(){
-        super.onStop();
-        finish();
-    }
+//    @Override
+//    protected void onStop(){
+//        super.onStop();
+//        finish();
+//    }
 }

@@ -20,11 +20,12 @@
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SettingsActivity"></activity>
-        <activity android:name=".PedometerActivity" />
-        <activity android:name=".WeatherActivity" />
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".SettingsFragment" />
+        <activity android:name=".PedometerFragment" />
+        <activity android:name=".WeatherFragment" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".CitySearchActivity" />
+        <activity android:name=".CitySearchFragment" />
         <activity
             android:name=".SignupActivity"
             android:windowSoftInputMode="stateVisible|adjustResize" />
@@ -44,7 +45,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".StepCounterListener"/>
+        <service android:name=".StepCounterListener" />
     </application>
 
 </manifest>
