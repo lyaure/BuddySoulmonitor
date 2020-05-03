@@ -1,5 +1,6 @@
 package com.buddynsoul.monitor;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
@@ -15,14 +16,17 @@ import com.buddynsoul.monitor.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-    BottomNavigationView bottomNavigation;
+    private BottomNavigationView bottomNavigation;
+    private Fragment fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-        loadFragment(new PedometerFragment());
+        fragment = new PedometerFragment();
+        loadFragment(fragment);
     }
     private void loadFragment(Fragment fragment) {
         // load fragment
@@ -37,16 +41,29 @@ public class MainActivity extends AppCompatActivity {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.navigation_pedometer:
-                            loadFragment(new PedometerFragment());
+                            fragment = new PedometerFragment();
+                            loadFragment(fragment);
                             return true;
                         case R.id.navigation_weather:
-                            loadFragment(new WeatherFragment());
+                            fragment = new WeatherFragment();
+                            loadFragment(fragment);
                             return true;
 //                        case R.id.navigation_sleep:
 //                            openFragment(NotificationFragment.newInstance("", ""));
 //                            return true;
                         case R.id.navigation_settings:
-                            loadFragment(new SettingsFragment());
+                            fragment = new SettingsFragment();
+
+                            Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container);
+                            Bundle bundle = new Bundle();
+
+                            if(tmp instanceof PedometerFragment)
+                                bundle.putString("from", "pedometer");
+                            else
+                                bundle.putString("from", "weather");
+
+                            fragment.setArguments(bundle);
+                            loadFragment(fragment);
                             return true;
                     }
                     return false;

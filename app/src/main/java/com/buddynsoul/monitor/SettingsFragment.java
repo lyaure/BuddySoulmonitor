@@ -24,9 +24,10 @@ public class SettingsFragment extends Fragment {
     private int oldGoal;
     private RadioGroup temperature;
     private Boolean boolTemp;
-    private String val;
+//    private String val;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
+    private String from;
 
 
     public SettingsFragment(){
@@ -39,6 +40,11 @@ public class SettingsFragment extends Fragment {
 
 //        Intent intent = getIntent();
 //        val = intent.getStringExtra("from");
+
+        Bundle bundle = this.getArguments();
+        if(bundle != null)
+            from = bundle.getString("from", "pedometer");
+
 
 
         sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
@@ -109,15 +115,17 @@ public class SettingsFragment extends Fragment {
                     editor.commit();
                 }
 
-//                Intent i;
-//
-//                if(val.equals("pedometer"))
-//                    i = new Intent(SettingsFragment.this, PedometerFragment.class);
-//                else
-//                    i = new Intent(SettingsFragment.this, WeatherActivity.class);
-//
-//
-//                startActivity(i);
+                Fragment fragment;
+
+                if(from.equals("pedometer"))
+                    fragment = new PedometerFragment();
+                else
+                    fragment = new WeatherFragment();
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, fragment, "tag")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

@@ -37,7 +37,6 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
     private HorizontalScrollView hs;
     double tmp;
 
-
     public PedometerFragment(){
 
     }
