@@ -3,6 +3,16 @@ package com.buddynsoul.monitor;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.core.view.GestureDetectorCompat;
+//import io.reactivex.android.schedulers.AndroidSchedulers;
+//import io.reactivex.disposables.CompositeDisposable;
+//import io.reactivex.functions.Consumer;
+//import io.reactivex.schedulers.Schedulers;
+import okhttp3.Cookie;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -28,6 +38,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class PedometerFragment extends Fragment implements SensorEventListener {
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
@@ -37,6 +53,9 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
     private HorizontalScrollView hs;
     double tmp;
 
+    //    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    IMyService iMyService;
+
     public PedometerFragment(){
 
     }
@@ -44,6 +63,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_pedometer, container, false);
+        iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         if (Build.VERSION.SDK_INT >= 29) {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION)
@@ -142,6 +162,78 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
             }
         });
 
+        // Button sendDataBtn = findViewById(R.id.sendDataBtn_ID);
+        // sendDataBtn.setOnClickListener(new View.OnClickListener() {
+        //        @Override
+        //        public void onClick(View v) {
+        //            try {
+        //                sendData();
+        //            } catch (JSONException e) {
+        //                e.printStackTrace();
+        //            }
+        //        }
+        //     }
+        // );
+
+
+        MenuItem logout = menu.add("Logout");
+        final Intent myService = new Intent(this, StepCounterListener.class);
+
+        logout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        {
+            @Override
+            public boolean onMenuItemClick(MenuItem item)
+            {
+                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean("logged", false);
+                editor.commit();
+
+                stopService(myService);
+
+                Intent i = new Intent(PedometerActivity.this, LoginActivity.class);
+                startActivity(i); // open rules activity
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if(e1.getX() > e2.getX()){
+            Intent i = new Intent(PedometerActivity.this, WeatherActivity.class);
+            startActivity(i);
+        }
+        return true;
+    }
 
 //        ImageButton weather_btn = (ImageButton)v.findViewById(R.id.weather_btn_ID);
 //        weather_btn.setOnClickListener(new View.OnClickListener() {
@@ -316,9 +408,81 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
         //db.close();
     }
 
-//    @Override
-//    protected void onStop(){
-//        super.onStop();
-//        finish();
-//    }
+    private void sendData() throws JSONException {
+
+        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+        String refreshToken = sp.getString("refreshToken", "");
+//        refreshToken = refreshToken.substring(1, refreshToken.length()-1);
+
+
+
+
+        // Init Service
+//        Retrofit retrofitClient = RetrofitClient.getInstance();
+//        iMyService = retrofitClient.create(IMyService.class);
+
+        String dataToSend = preprocessData();
+
+//        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String response) throws Exception {
+//                        if (!response.equals("\"Wrong password\"")) {
+//                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//                            SharedPreferences.Editor editor = sp.edit();
+//                            editor.putBoolean("sendToServer", true);
+//                            editor.commit();
+//
+//                        }
+//                        else {
+//                            Toast.makeText(PedometerActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    }
+//                }));
+
+        Call<String> todoCall = iMyService.sendData(refreshToken, dataToSend);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+//                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//                SharedPreferences.Editor editor = sp.edit();
+//                editor.putBoolean("sendToServer", true);
+//                editor.commit();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private String preprocessData() throws JSONException {
+
+        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+
+        String timestamp = "" + Util.getToday();
+        //String email = sp.getString("email", "");
+        Database db = new Database(this);
+        String steps = ""+ db.getSteps(Util.getToday());
+        String sleepingTime = "" + db.getSleepingTime(Util.getToday());
+        String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");
+        String night_location = "" + db.getLocation(Util.getToday(), "night_location");
+
+
+        JSONObject json = new JSONObject();
+        json.put("timestamp", timestamp);
+        //json.put("email", email);
+        json.put("steps", steps);
+        json.put("sleeping_time", sleepingTime);
+        json.put("morning_location", morning_location);
+        json.put("night_location", night_location);
+
+        return json.toString();
+    }
+
 }

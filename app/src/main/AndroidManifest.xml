@@ -21,6 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"></activity>
+        <activity android:name=".ResetPasswordActivity"/>
         <activity android:name=".SettingsFragment" />
         <activity android:name=".PedometerFragment" />
         <activity android:name=".WeatherFragment" />

@@ -149,6 +149,29 @@ public class WeatherFragment extends Fragment {
 //        });
 
         return v;
+
+        // MenuItem logout = menu.add("Logout");
+        // final Intent myService = new Intent(this, StepCounterListener.class);
+        // 
+        // logout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
+        // {
+        //     @Override
+        //     public boolean onMenuItemClick(MenuItem item)
+        //     {
+        //         SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+        //         SharedPreferences.Editor editor = sp.edit();
+        //         editor.putBoolean("logged", false);
+        //         editor.commit();
+
+        //         stopService(myService);
+
+        //         Intent i = new Intent(WeatherActivity.this, LoginActivity.class);
+        //         startActivity(i); // open rules activity
+        //         return true;
+        //     }
+        // });
+
+        return true;
     }
 
 //    @Override
