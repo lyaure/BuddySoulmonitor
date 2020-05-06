@@ -44,6 +44,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
         email = (TextView) findViewById(R.id.txtv_email_ID);
         password = (TextView) findViewById(R.id.txtv_password_ID);
 
+        //Init Loading Dialog
+        LoadingDialog loadingDialog = new LoadingDialog(ResetPasswordActivity.this);
+
         Button login = (Button) findViewById(R.id.loginBtn_ID);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,14 +59,15 @@ public class ResetPasswordActivity extends AppCompatActivity {
                     return;
                 }
 
-                resetUserPassword(email.getText().toString().trim());
+                loadingDialog.startLoadingDialog();
+                resetUserPassword(email.getText().toString().trim(), loadingDialog);
 //                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
 //                startActivity(i);
             }
         });
     }
 
-    private void resetUserPassword(final String email) {
+    private void resetUserPassword(final String email, LoadingDialog loadingDialog) {
         final Intent i = new Intent(ResetPasswordActivity.this, LoginActivity.class);
 
 //        compositeDisposable.add(iMyService.resetUserPassword(email)
@@ -91,6 +95,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         todoCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
+                loadingDialog.dismissDialog();
                 String msg = "If a matching account was found an email was sent to "
                         + email + " to allow you to reset your password.";
                 Toast.makeText(ResetPasswordActivity.this, msg, Toast.LENGTH_LONG).show();
@@ -99,6 +104,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                loadingDialog.dismissDialog();
+                Toast.makeText(ResetPasswordActivity.this, "Something wrong happened", Toast.LENGTH_SHORT).show();
                 Log.d("Response", "onFailure: "+t.getLocalizedMessage());
             }
 

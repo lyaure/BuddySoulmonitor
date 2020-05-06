@@ -44,6 +44,8 @@ import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class PedometerFragment extends Fragment implements SensorEventListener {
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
@@ -176,65 +178,6 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
         // );
 
 
-        MenuItem logout = menu.add("Logout");
-        final Intent myService = new Intent(this, StepCounterListener.class);
-
-        logout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putBoolean("logged", false);
-                editor.commit();
-
-                stopService(myService);
-
-                Intent i = new Intent(PedometerActivity.this, LoginActivity.class);
-                startActivity(i); // open rules activity
-                return true;
-            }
-        });
-
-        return true;
-    }
-
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if(e1.getX() > e2.getX()){
-            Intent i = new Intent(PedometerActivity.this, WeatherActivity.class);
-            startActivity(i);
-        }
-        return true;
-    }
-
 //        ImageButton weather_btn = (ImageButton)v.findViewById(R.id.weather_btn_ID);
 //        weather_btn.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -335,7 +278,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
         todayOffset = db.getSteps(Util.getToday());
 
         SharedPreferences prefs =
-                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+                getActivity().getSharedPreferences("pedometer", MODE_PRIVATE);
 
 //        goal = prefs.getInt("goal", Fragment_Settings.DEFAULT_GOAL);
         since_boot = db.getCurrentSteps();
@@ -410,7 +353,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 
     private void sendData() throws JSONException {
 
-        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+        SharedPreferences sp = this.getActivity().getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
 //        refreshToken = refreshToken.substring(1, refreshToken.length()-1);
 
@@ -463,11 +406,10 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 
     private String preprocessData() throws JSONException {
 
-        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+        SharedPreferences sp = this.getActivity().getSharedPreferences("user", MODE_PRIVATE);
 
-        String timestamp = "" + Util.getToday();
-        //String email = sp.getString("email", "");
-        Database db = new Database(this);
+        String timestamps = "" + Util.getToday();
+        Database db = new Database(this.getActivity());
         String steps = ""+ db.getSteps(Util.getToday());
         String sleepingTime = "" + db.getSleepingTime(Util.getToday());
         String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");
@@ -475,8 +417,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 
 
         JSONObject json = new JSONObject();
-        json.put("timestamp", timestamp);
-        //json.put("email", email);
+        json.put("timestamps", timestamps);
         json.put("steps", steps);
         json.put("sleeping_time", sleepingTime);
         json.put("morning_location", morning_location);

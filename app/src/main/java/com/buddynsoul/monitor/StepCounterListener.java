@@ -395,7 +395,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
         notificationBuilder.setPriority(Notification.PRIORITY_MIN).setShowWhen(false)
                 .setContentIntent(PendingIntent
-                        .getActivity(context, 0, new Intent(context, PedometerFragment.class),
+                        .getActivity(context, 0, new Intent(context, MainActivity.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT))
                 .setSmallIcon(R.drawable.icon)
                 .setOngoing(true);

@@ -14,7 +14,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:srcCompat="@drawable/logo2" />
-<!--        android:src="@drawable/icon"-->
+    <!--        android:src="@drawable/icon"-->
 
 
     <ScrollView
@@ -38,74 +38,151 @@
                 android:textSize="36sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/txtv_firstName_ID"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/textview_border_gray"
-                android:drawableStart="@drawable/ic_user_gray_24dp"
-                android:ems="10"
-                android:hint="First name *"
-                android:inputType="textPersonName"
-                android:paddingStart="10dp"
-                android:textColorHint="@color/colorBlack" />
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <EditText
-                android:id="@+id/txtv_lastName_ID"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/textview_border_gray"
-                android:drawableStart="@drawable/ic_user_gray_24dp"
-                android:ems="10"
-                android:hint="Last name"
-                android:inputType="textPersonName"
-                android:paddingStart="10dp"
-                android:textColorHint="@color/colorBlack" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtv_firstName_ID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="First name"
+                    android:inputType="textPersonName" />
 
-            <EditText
-                android:id="@+id/txtv_email_ID"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/textview_border_gray"
-                android:drawableStart="@drawable/ic_email_gray_24dp"
-                android:ems="10"
-                android:hint="Email *"
-                android:inputType="textEmailAddress"
-                android:paddingStart="10dp"
-                android:textColorHint="@color/colorBlack" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/txtv_password_ID"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/textview_border_gray"
-                android:drawableStart="@drawable/ic_lock_gray_24dp"
-                android:drawableRight="@drawable/ic_eye_gray_24dp"
-                android:ems="10"
-                android:hint="Password *"
-                android:inputType="textPassword"
-                android:paddingStart="10dp"
-                android:paddingEnd="5dp"
-                android:textColorHint="@color/colorBlack" />
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
 
-            <EditText
-                android:id="@+id/txtv_confirmPassword_ID"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtv_lastName_ID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Last name"
+                    android:inputType="textPersonName"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/textview_border_gray"
-                android:drawableStart="@drawable/ic_lock_gray_24dp"
-                android:drawableRight="@drawable/ic_eye_gray_24dp"
-                android:ems="10"
-                android:hint="Confirm password *"
-                android:inputType="textPassword"
-                android:paddingStart="10dp"
-                android:paddingEnd="5dp"
-                android:textColorHint="@color/colorBlack" />
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtv_email_ID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtv_password_ID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtv_confirmPassword_ID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <!--            <EditText-->
+            <!--                android:id="@+id/txtv_firstName_ID"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_margin="10dp"-->
+            <!--                android:background="@drawable/textview_border_gray"-->
+            <!--                android:drawableStart="@drawable/ic_user_gray_24dp"-->
+            <!--                android:ems="10"-->
+            <!--                android:hint="First name *"-->
+            <!--                android:inputType="textPersonName"-->
+            <!--                android:paddingStart="10dp"-->
+            <!--                android:textColorHint="@color/colorBlack" />-->
+
+            <!--            <EditText-->
+            <!--                android:id="@+id/txtv_lastName_ID"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_margin="10dp"-->
+            <!--                android:background="@drawable/textview_border_gray"-->
+            <!--                android:drawableStart="@drawable/ic_user_gray_24dp"-->
+            <!--                android:ems="10"-->
+            <!--                android:hint="Last name"-->
+            <!--                android:inputType="textPersonName"-->
+            <!--                android:paddingStart="10dp"-->
+            <!--                android:textColorHint="@color/colorBlack" />-->
+
+            <!--            <EditText-->
+            <!--                android:id="@+id/txtv_email_ID"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_margin="10dp"-->
+            <!--                android:background="@drawable/textview_border_gray"-->
+            <!--                android:drawableStart="@drawable/ic_email_gray_24dp"-->
+            <!--                android:ems="10"-->
+            <!--                android:hint="Email *"-->
+            <!--                android:inputType="textEmailAddress"-->
+            <!--                android:paddingStart="10dp"-->
+            <!--                android:textColorHint="@color/colorBlack" />-->
+
+            <!--            <EditText-->
+            <!--                android:id="@+id/txtv_password_ID"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_margin="10dp"-->
+            <!--                android:background="@drawable/textview_border_gray"-->
+            <!--                android:drawableStart="@drawable/ic_lock_gray_24dp"-->
+            <!--                android:drawableEnd="@drawable/ic_eye_gray_24dp"-->
+            <!--                android:ems="10"-->
+            <!--                android:hint="Password *"-->
+            <!--                android:inputType="textPassword"-->
+            <!--                android:paddingStart="10dp"-->
+            <!--                android:paddingEnd="25dp"-->
+            <!--                android:textColorHint="@color/colorBlack" />-->
+
+            <!--            <EditText-->
+            <!--                android:id="@+id/txtv_confirmPassword_ID"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_margin="10dp"-->
+            <!--                android:background="@drawable/textview_border_gray"-->
+            <!--                android:drawableStart="@drawable/ic_lock_gray_24dp"-->
+            <!--                android:drawableEnd="@drawable/ic_eye_gray_24dp"-->
+            <!--                android:ems="10"-->
+            <!--                android:hint="Confirm password *"-->
+            <!--                android:inputType="textPassword"-->
+            <!--                android:paddingStart="10dp"-->
+            <!--                android:paddingEnd="25dp"-->
+            <!--                android:textColorHint="@color/colorBlack" />-->
 
             <CheckBox
                 android:id="@+id/checkBox"

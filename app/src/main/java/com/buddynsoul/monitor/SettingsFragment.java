@@ -18,6 +18,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class SettingsFragment extends Fragment {
     private TextView goal;
     private RadioButton oldButton, c, f;
@@ -150,6 +152,27 @@ public class SettingsFragment extends Fragment {
                 boolTemp = true;
             }
         });
+
+
+        final Intent myService = new Intent(getActivity(), StepCounterListener.class);
+
+        ImageButton logOut = (ImageButton) v.findViewById(R.id.logOutBtn_ID);
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean("logged", false);
+                editor.commit();
+
+                getActivity().stopService(myService);
+
+                Intent i = new Intent(getActivity(), LoginActivity.class);
+                startActivity(i); // open rules activity
+            }
+        });
+
 
 //        ImageButton pedometer_btn = (ImageButton)v.findViewById(R.id.pedometer_btn_ID);
 //        pedometer_btn.setOnClickListener(new View.OnClickListener() {

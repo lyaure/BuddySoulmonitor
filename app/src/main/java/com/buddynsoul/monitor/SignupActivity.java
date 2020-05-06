@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -36,8 +37,8 @@ public class SignupActivity extends AppCompatActivity {
     private TextView email;
     private TextView password;
     private TextView confirmPassword;
-    private boolean hideP;
-    private boolean hideC;
+//    private boolean hideP;
+//    private boolean hideC;
 
     private static final String EMAIL_PATTERN =
             "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
@@ -66,6 +67,9 @@ public class SignupActivity extends AppCompatActivity {
 //        Retrofit retrofitClient = RetrofitClient.getInstance();
 //        iMyService = retrofitClient.create(IMyService.class);
         iMyService = RetrofitClient.getClient().create(IMyService.class);
+
+        //Init Loading Dialog
+        LoadingDialog loadingDialog = new LoadingDialog(SignupActivity.this);
 
         //Button singnup = (Button)findViewById(R.id.signupBtn_ID);
         singnup = (Button)findViewById(R.id.signupBtn_ID);
@@ -129,62 +133,64 @@ public class SignupActivity extends AppCompatActivity {
 
                 final String name = firstName.getText().toString().trim() + " " + lastName.getText().toString().trim();
 
-                registerUser(name, email.getText().toString().trim(), password.getText().toString().trim());
+                loadingDialog.startLoadingDialog();
+                registerUser(name, email.getText().toString().trim(), password.getText().toString().trim(),
+                        loadingDialog);
             }
         });
 
-        hideP = true;
-        hideC = true;
+//        hideP = true;
+//        hideC = true;
 
-        password = (TextView)findViewById(R.id.txtv_password_ID);
-        password.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
-                final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
+//        password = (TextView)findViewById(R.id.txtv_password_ID);
+//        password.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                final int DRAWABLE_LEFT = 0;
+//                final int DRAWABLE_TOP = 1;
+//                final int DRAWABLE_RIGHT = 2;
+//                final int DRAWABLE_BOTTOM = 3;
+//
+//                if(event.getAction() == MotionEvent.ACTION_UP) {
+//                    if(event.getX() >= (password.getRight() - password.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+//                        hideP = !hideP;
+//                        if(hideP)
+//                            password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+//                        else
+//                            password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+//
+//                    }
+//                }
+//                return false;
+//            }
+//        });
 
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getX() >= (password.getRight() - password.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        hideP = !hideP;
-                        if(hideP)
-                            password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                        else
-                            password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-
-                    }
-                }
-                return false;
-            }
-        });
-
-        confirmPassword = (TextView)findViewById(R.id.txtv_confirmPassword_ID);
-        confirmPassword.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
-                final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
-
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getX() >= (confirmPassword.getRight() - confirmPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        hideC = !hideC;
-                        if(hideC)
-                            confirmPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                        else
-                            confirmPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-
-                    }
-                }
-                return false;
-            }
-        });
+//        confirmPassword = (TextView)findViewById(R.id.txtv_confirmPassword_ID);
+//        confirmPassword.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                final int DRAWABLE_LEFT = 0;
+//                final int DRAWABLE_TOP = 1;
+//                final int DRAWABLE_RIGHT = 2;
+//                final int DRAWABLE_BOTTOM = 3;
+//
+//                if(event.getAction() == MotionEvent.ACTION_UP) {
+//                    if(event.getX() >= (confirmPassword.getRight() - confirmPassword.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+//                        hideC = !hideC;
+//                        if(hideC)
+//                            confirmPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+//                        else
+//                            confirmPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+//
+//                    }
+//                }
+//                return false;
+//            }
+//        });
     }
 
     private void registerUser(String name, String email,
-                              String password) {
+                              String password, LoadingDialog loadingDialog) {
 
         final Intent i = new Intent(SignupActivity.this, LoginActivity.class);
 //
@@ -205,17 +211,21 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if(response.code() == 200) {
-                    startActivity(i);
+                    loadingDialog.dismissDialog();
                     Toast.makeText(SignupActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+                    startActivity(i);
                 }
                 else if(response.code() == 409) {
+                    loadingDialog.dismissDialog();
                     Toast.makeText(SignupActivity.this, "Email already exists", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                loadingDialog.dismissDialog();
+                Toast.makeText(SignupActivity.this, "Something wrong happened", Toast.LENGTH_SHORT).show();
+                Log.d("Response", "onFailure: "+t.getLocalizedMessage());
             }
         });
     }
