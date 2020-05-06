@@ -33,10 +33,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 
 
@@ -69,9 +65,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private float oldPitch, oldRoll, oldAzimuth;
     private boolean flagAccStart;
-
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
-    IMyService iMyService;
 
     @Override
     public void onSensorChanged(SensorEvent event) {

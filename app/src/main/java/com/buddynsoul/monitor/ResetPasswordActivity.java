@@ -1,16 +1,20 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+//import io.reactivex.android.schedulers.AndroidSchedulers;
+//import io.reactivex.disposables.CompositeDisposable;
+//import io.reactivex.functions.Consumer;
+//import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,7 +27,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private TextView email;
     private TextView password;
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
     @Override
@@ -32,20 +36,20 @@ public class ResetPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reset_password);
 
         // Init Service
-        Retrofit retrofitClient = RetrofitClient.getInstance();
-        iMyService = retrofitClient.create(IMyService.class);
+//        Retrofit retrofitClient = RetrofitClient.getInstance();
+//        iMyService = retrofitClient.create(IMyService.class);
+        iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         // Init view
-        email = (TextView)findViewById(R.id.txtv_email_ID);
-        password = (TextView)findViewById(R.id.txtv_password_ID);
+        email = (TextView) findViewById(R.id.txtv_email_ID);
+        password = (TextView) findViewById(R.id.txtv_password_ID);
 
-        Button login = (Button)findViewById(R.id.loginBtn_ID);
+        Button login = (Button) findViewById(R.id.loginBtn_ID);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(TextUtils.isEmpty(email.getText().toString().trim()))
-                {
+                if (TextUtils.isEmpty(email.getText().toString().trim())) {
                     //Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
                     email.setError("Email required");
                     email.requestFocus();
@@ -62,25 +66,43 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private void resetUserPassword(final String email) {
         final Intent i = new Intent(ResetPasswordActivity.this, LoginActivity.class);
 
-        compositeDisposable.add(iMyService.resetUserPassword(email)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String response) throws Exception {
-                        String msg = "If a matching account was found an email was sent to "
-                                + email + " to allow you to reset your password.";
-                        Toast.makeText(ResetPasswordActivity.this, msg, Toast.LENGTH_LONG).show();
-                        startActivity(i);
-//                        if (response.equals("\"Login success\"")) {
-//                            SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
-//                            SharedPreferences.Editor editor = sp.edit();
-//                            editor.putBoolean("logged", true);
-//                            editor.commit();
-//
-//                            startActivity(i);
-//                        }
-                    }
-                }));
+//        compositeDisposable.add(iMyService.resetUserPassword(email)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String response) throws Exception {
+//                        String msg = "If a matching account was found an email was sent to "
+//                                + email + " to allow you to reset your password.";
+//                        Toast.makeText(ResetPasswordActivity.this, msg, Toast.LENGTH_LONG).show();
+//                        startActivity(i);
+////                        if (response.equals("\"Login success\"")) {
+////                            SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
+////                            SharedPreferences.Editor editor = sp.edit();
+////                            editor.putBoolean("logged", true);
+////                            editor.commit();
+////
+////                            startActivity(i);
+////                        }
+//                    }
+//                }));
+
+        Call<String> todoCall = iMyService.resetUserPassword(email);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String msg = "If a matching account was found an email was sent to "
+                        + email + " to allow you to reset your password.";
+                Toast.makeText(ResetPasswordActivity.this, msg, Toast.LENGTH_LONG).show();
+                startActivity(i);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("Response", "onFailure: "+t.getLocalizedMessage());
+            }
+
+        });
+
     }
 }

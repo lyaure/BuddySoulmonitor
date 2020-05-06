@@ -1,11 +1,11 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+//import io.reactivex.android.schedulers.AndroidSchedulers;
+//import io.reactivex.disposables.CompositeDisposable;
+//import io.reactivex.disposables.Disposable;
+//import io.reactivex.functions.Consumer;
+//import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,14 +43,14 @@ public class LoginActivity extends AppCompatActivity {
     private TextView password;
     private Boolean hide;
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+//    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
-    @Override
-    protected void onStop() {
-        compositeDisposable.clear();
-        super.onStop();
-    }
+//    @Override
+//    protected void onStop() {
+//        compositeDisposable.clear();
+//        super.onStop();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +58,9 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Init Service
-        Retrofit retrofitClient = RetrofitClient.getInstance();
-        iMyService = retrofitClient.create(IMyService.class);
+        //Retrofit retrofitClient = RetrofitClient.getInstance();
+        //iMyService = retrofitClient.create(IMyService.class);
+        iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         // Init view
         email = (TextView)findViewById(R.id.txtv_email_ID);
@@ -81,8 +82,8 @@ public class LoginActivity extends AppCompatActivity {
                 if(TextUtils.isEmpty(password.getText().toString().trim()))
                 {
                     //Toast.makeText(this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    email.setError("Password required");
-                    email.requestFocus();
+                    password.setError("Password required");
+                    password.requestFocus();
                     return;
                 }
 
@@ -154,58 +155,73 @@ public class LoginActivity extends AppCompatActivity {
     private void loginUser(final String email, String password) {
         final Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
 
-        compositeDisposable.add(iMyService.loginUser(email, password)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Consumer<String>() {
-            @Override
-            public void accept(String response) throws Exception {
-                //Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-                //Log.d("Response", response);
-                Log.d("Response", response);
-                if (!response.equals("\"Wrong password\"") && !response.equals("\"Your account doesn\'t exist\"")) {
-                    SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("email", email);
-                    editor.putString("refreshToken", response);
-
-                    response = response.substring(1, response.length()-1);
-                    Log.d("Response", "After substring:" + response);
-
-                    editor.putBoolean("logged", true);
-                    editor.commit();
-
-                    startActivity(i);
-                }
-                else {
-                    Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        }));
-
-//        Call<ResponseBody<ResponseData>> call = (Call<ResponseBody>) RetrofitClient
-//                .getInstance()
-//                .getImyService()
-//                .loginUser(email, password);
-//
-//        call.enqueue(new Callback<ResponseBody>() {
+//        compositeDisposable.add(iMyService.loginUser(email, password)
+//        .subscribeOn(Schedulers.io())
+//        .observeOn(AndroidSchedulers.mainThread())
+//        .subscribe(new Consumer<String>() {
 //            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                try {
-//                    if(response.)
-//                    String s = response.body().string();
-//                    Toast.makeText(LoginActivity.this, s, Toast.LENGTH_LONG).show();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
+//            public void accept(String response) throws Exception {
+//                //Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+//                //Log.d("Response", response);
+//                Log.d("Response", response);
+//                if (!response.equals("\"Wrong password\"") && !response.equals("\"Your account doesn\'t exist\"")) {
+//                    SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//                    SharedPreferences.Editor editor = sp.edit();
+//                    editor.putString("email", email);
+//                    editor.putString("refreshToken", response);
+//
+//                    response = response.substring(1, response.length()-1);
+//                    Log.d("Response", "After substring:" + response);
+//
+//                    editor.putBoolean("logged", true);
+//                    editor.commit();
+//
+//                    startActivity(i);
 //                }
-//            }
+//                else {
+//                    Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+//                }
 //
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
 //            }
-//        });
+//        }));
+
+        Call<String> todoCall = iMyService.loginUser(email, password);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.code() == 200) {
+                    if(response.body().equals("Please confirm your email")) {
+                        Toast.makeText(LoginActivity.this, "Please confirm your email", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString("email", email);
+                        editor.putString("refreshToken", response.body());
+                        //response = response.substring(1, response.length()-1);
+                        Log.d("Response", "After substring: " + response.body());
+
+                        editor.putBoolean("logged", true);
+                        editor.commit();
+
+                        startActivity(i);
+                    }
+                }
+                else if(response.code() == 404){
+                    Toast.makeText(LoginActivity.this, "Your account doesn\'t exist", Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() == 401){
+                    Toast.makeText(LoginActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("Response", "onFailure: "+t.getLocalizedMessage());
+            }
+        });
+
+
 
     }
 }

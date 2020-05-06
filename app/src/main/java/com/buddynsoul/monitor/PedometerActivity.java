@@ -4,11 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+//import io.reactivex.android.schedulers.AndroidSchedulers;
+//import io.reactivex.disposables.CompositeDisposable;
+//import io.reactivex.functions.Consumer;
+//import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cookie;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import android.Manifest;
@@ -48,7 +51,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
     final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+//    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
 
@@ -57,6 +60,7 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pedometer);
 
+        iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         if (Build.VERSION.SDK_INT >= 29) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
@@ -373,36 +377,53 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
 
         SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
-        refreshToken = refreshToken.substring(1, refreshToken.length()-1);
+//        refreshToken = refreshToken.substring(1, refreshToken.length()-1);
 
 
 
 
         // Init Service
-        Retrofit retrofitClient = RetrofitClient.getInstance();
-        iMyService = retrofitClient.create(IMyService.class);
+//        Retrofit retrofitClient = RetrofitClient.getInstance();
+//        iMyService = retrofitClient.create(IMyService.class);
 
         String dataToSend = preprocessData();
 
-        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String response) throws Exception {
-                        if (!response.equals("\"Wrong password\"")) {
-                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sp.edit();
-                            editor.putBoolean("sendToServer", true);
-                            editor.commit();
+//        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String response) throws Exception {
+//                        if (!response.equals("\"Wrong password\"")) {
+//                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//                            SharedPreferences.Editor editor = sp.edit();
+//                            editor.putBoolean("sendToServer", true);
+//                            editor.commit();
+//
+//                        }
+//                        else {
+//                            Toast.makeText(PedometerActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    }
+//                }));
 
-                        }
-                        else {
-                            Toast.makeText(PedometerActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-                        }
+        Call<String> todoCall = iMyService.sendData(refreshToken, dataToSend);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+//                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+//                SharedPreferences.Editor editor = sp.edit();
+//                editor.putBoolean("sendToServer", true);
+//                editor.commit();
+            }
 
-                    }
-                }));
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private String preprocessData() throws JSONException {
@@ -422,9 +443,9 @@ public class PedometerActivity extends AppCompatActivity implements GestureDetec
         json.put("timestamp", timestamp);
         //json.put("email", email);
         json.put("steps", steps);
-        json.put("sleeping time", sleepingTime);
-        json.put("morning location", morning_location);
-        json.put("night", night_location);
+        json.put("sleeping_time", sleepingTime);
+        json.put("morning_location", morning_location);
+        json.put("night_location", night_location);
 
         return json.toString();
     }

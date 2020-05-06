@@ -1,10 +1,13 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+//import io.reactivex.android.schedulers.AndroidSchedulers;
+//import io.reactivex.disposables.CompositeDisposable;
+//import io.reactivex.functions.Consumer;
+//import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import android.content.Intent;
@@ -43,16 +46,16 @@ public class SignupActivity extends AppCompatActivity {
 //    private static final String PASSWORD_PATTERN = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])" +
 //            "(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+//    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
     private Button singnup;
 
-    @Override
-    protected void onStop() {
-        compositeDisposable.clear();
-        super.onStop();
-    }
+//    @Override
+//    protected void onStop() {
+//        compositeDisposable.clear();
+//        super.onStop();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +63,9 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         // Init Service
-        Retrofit retrofitClient = RetrofitClient.getInstance();
-        iMyService = retrofitClient.create(IMyService.class);
+//        Retrofit retrofitClient = RetrofitClient.getInstance();
+//        iMyService = retrofitClient.create(IMyService.class);
+        iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         //Button singnup = (Button)findViewById(R.id.signupBtn_ID);
         singnup = (Button)findViewById(R.id.signupBtn_ID);
@@ -183,18 +187,37 @@ public class SignupActivity extends AppCompatActivity {
                               String password) {
 
         final Intent i = new Intent(SignupActivity.this, LoginActivity.class);
+//
+//        compositeDisposable.add(iMyService.registerUser(email, name, password)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<String>() {
+//                    @Override
+//                    public void accept(String response) throws Exception {
+//                        Toast.makeText(SignupActivity.this, ""+response, Toast.LENGTH_LONG).show();
+//                        //if (response.equals("\"Registration success\""))
+//                            startActivity(i);
+//                    }
+//                }));
 
-        compositeDisposable.add(iMyService.registerUser(email, name, password)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String response) throws Exception {
-                        Toast.makeText(SignupActivity.this, ""+response, Toast.LENGTH_LONG).show();
-                        //if (response.equals("\"Registration success\""))
-                            startActivity(i);
-                    }
-                }));
+        Call<String> todoCall = iMyService.registerUser(email, name, password);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if(response.code() == 200) {
+                    startActivity(i);
+                    Toast.makeText(SignupActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+                }
+                else if(response.code() == 409) {
+                    Toast.makeText(SignupActivity.this, "Email already exists", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
     }
 
 }
