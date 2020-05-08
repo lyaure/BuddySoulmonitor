@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
 
@@ -43,6 +44,10 @@ public class LoginActivity extends AppCompatActivity {
     private TextView email;
     private TextView password;
 //    private Boolean hide;
+
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
 //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
@@ -67,6 +72,9 @@ public class LoginActivity extends AppCompatActivity {
         email = (TextView)findViewById(R.id.txtv_email_ID);
         password = (TextView)findViewById(R.id.txtv_password_ID);
 
+        TextInputLayout email_layout = findViewById(R.id.email_layout_ID);
+        TextInputLayout password_layout = findViewById(R.id.password_layout_ID);
+
         //Init Loading Dialog
         LoadingDialog loadingDialog = new LoadingDialog(LoginActivity.this);
 
@@ -75,18 +83,25 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                email_layout.setError(null);
+                password_layout.setError(null);
+
                 if(TextUtils.isEmpty(email.getText().toString().trim()))
                 {
-                    //Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    email.setError("Email required");
+                    email_layout.setError("Email required");
+                    email.requestFocus();
+                    return;
+                }
+
+                if (!email.getText().toString().matches(EMAIL_PATTERN)) {
+                    email_layout.setError("Email is not valid");
                     email.requestFocus();
                     return;
                 }
 
                 if(TextUtils.isEmpty(password.getText().toString().trim()))
                 {
-                    //Toast.makeText(this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    password.setError("Password required");
+                    password_layout.setError("Password required");
                     password.requestFocus();
                     return;
                 }

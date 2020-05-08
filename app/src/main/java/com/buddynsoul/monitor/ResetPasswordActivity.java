@@ -22,10 +22,10 @@ import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class ResetPasswordActivity extends AppCompatActivity {
     private TextView email;
-    private TextView password;
 
     //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
@@ -42,19 +42,21 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         // Init view
         email = (TextView) findViewById(R.id.txtv_email_ID);
-        password = (TextView) findViewById(R.id.txtv_password_ID);
+
+        TextInputLayout email_layout = findViewById(R.id.password_layout_ID);
 
         //Init Loading Dialog
         LoadingDialog loadingDialog = new LoadingDialog(ResetPasswordActivity.this);
 
-        Button login = (Button) findViewById(R.id.loginBtn_ID);
-        login.setOnClickListener(new View.OnClickListener() {
+        Button reset = (Button) findViewById(R.id.resetBtn_ID);
+        reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                email_layout.setError(null);
+
                 if (TextUtils.isEmpty(email.getText().toString().trim())) {
-                    //Toast.makeText(this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    email.setError("Email required");
+                    email_layout.setError("Email required");
                     email.requestFocus();
                     return;
                 }

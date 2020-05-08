@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,51 +84,56 @@ public class SignupActivity extends AppCompatActivity {
                 password = (TextView)findViewById(R.id.txtv_password_ID);
                 confirmPassword = (TextView)findViewById(R.id.txtv_confirmPassword_ID);
 
+                TextInputLayout firstName_layout = findViewById(R.id.firstName_layout_ID);
+                TextInputLayout lastName_layout = findViewById(R.id.lastName_layout_ID);
+                TextInputLayout email_layout = findViewById(R.id.email_layout_ID);
+                TextInputLayout password_layout = findViewById(R.id.password_layout_ID);
+                TextInputLayout confirmPassword_layout = findViewById(R.id.confirmPassword_layout_ID);
+
+                firstName_layout.setError(null);
+                lastName_layout.setError(null);
+                email_layout.setError(null);
+                password_layout.setError(null);
+                confirmPassword_layout.setError(null);
+
                 if(TextUtils.isEmpty(firstName.getText().toString().trim())) {
-                    //Toast.makeText(SignupActivity.this, "First name cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    email.setError("First name required");
-                    email.requestFocus();
+                    firstName_layout.setError("First name required");
+                    firstName.requestFocus();
                     return;
                 }
 
                 if(TextUtils.isEmpty(lastName.getText().toString().trim())) {
-                    //Toast.makeText(SignupActivity.this, "Last name cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    email.setError("Last name required");
-                    email.requestFocus();
+                    lastName_layout.setError("Last name required");
+                    lastName.requestFocus();
                     return;
                 }
 
                 if(TextUtils.isEmpty(email.getText().toString().trim())) {
-                    //Toast.makeText(SignupActivity.this, "Email cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    email.setError("Email required");
+                    email_layout.setError("Email required");
                     email.requestFocus();
                     return;
                 }
 
                 if (!email.getText().toString().matches(EMAIL_PATTERN)) {
-                    email.setError("Email is not valid");
+                    email_layout.setError("Email is not valid");
                     email.requestFocus();
                     return;
                 }
 
                 if(TextUtils.isEmpty(password.getText().toString())) {
-                    //Toast.makeText(SignupActivity.this, "Password cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    password.setError("Password required");
-                    password.requestFocus();
+                    password_layout.setError("Password required");
                     return;
                 }
 
                 if(TextUtils.isEmpty(confirmPassword.getText().toString())) {
-                    //Toast.makeText(SignupActivity.this, "Confirmed password cannot be null or empty", Toast.LENGTH_SHORT).show();
-                    confirmPassword.setError("Password required");
+                    confirmPassword_layout.setError("Password required");
                     confirmPassword.requestFocus();
                     return;
                 }
 
                 if(!password.getText().toString().equals(confirmPassword.getText().toString())) {
-                    //Toast.makeText(SignupActivity.this, "Passwords do no match", Toast.LENGTH_SHORT).show();
-                    password.setError("Passwords do no match");
-                    password.requestFocus();
+                    password_layout.setError("Passwords do no match");
+                    confirmPassword.requestFocus();
                     return;
                 }
 
