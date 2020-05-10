@@ -36,11 +36,15 @@
 
 package com.buddynsoul.monitor.Retrofit;
 
+import com.google.gson.JsonElement;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface IMyService {
 
@@ -64,4 +68,27 @@ public interface IMyService {
     Call<String> sendData(@Path("refreshToken") String refreshToken,
                                 @Field("data") String data);
 
+    // AccuWeather Request
+
+    @GET("locations/v1/cities/geoposition/search")
+    Call<JsonElement> geoposition(@Query("apikey") String apikey,
+                                  @Query ("q") String location);
+
+    @GET("forecasts/v1/daily/5day/{keyValue}")
+    Call<JsonElement> forecast(@Path("keyValue") String keyValue,
+                          @Query("apikey") String apikey,
+                          @Query("metric") String metric);
+
+    @GET("currentconditions/v1/{keyValue}")
+    Call<JsonElement> currentconditions(@Path("keyValue") String keyValue,
+                                   @Query("apikey") String apikey);
+
+    @GET("forecasts/v1/hourly/12hour/{keyValue}")
+    Call<JsonElement>hourlyforecast(@Path("keyValue") String keyValue,
+                                @Query("apikey") String apikey,
+                                @Query("metric") String metric);
+
+    @GET("locations/v1/cities/autocomplete")
+    Call<JsonElement> autocomplete(@Query("apikey") String apikey,
+                              @Query("q") String location);
 }

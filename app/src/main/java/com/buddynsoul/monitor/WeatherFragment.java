@@ -2,6 +2,9 @@ package com.buddynsoul.monitor;
 
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +22,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +37,7 @@ import java.io.IOException;
 import java.lang.Math;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -46,7 +56,18 @@ public class WeatherFragment extends Fragment {
     private String metricValue;
     private View v;
 
-    public WeatherFragment(){
+    private String API_KEY;
+    private IMyService iMyService;
+
+    private ArrayList<ImageView> dIconForecast = new ArrayList<>();
+    private ArrayList<TextView> dForecast = new ArrayList<>();
+    private ArrayList<TextView> daysTextView = new ArrayList<>();
+    private ArrayList<ImageView> hIconForecast = new ArrayList<>();
+    private ArrayList<TextView> hForecast = new ArrayList<>();
+    private ArrayList<TextView> hours = new ArrayList<>();
+
+
+    public WeatherFragment() {
 
     }
 
@@ -54,8 +75,50 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_weather, container, false);
 
+        iMyService = RetrofitClient.getAccuweatherClient().create(IMyService.class);
+
+        API_KEY = getResources().getString(R.string.accuweather_api_key);
+
+
         SharedPreferences prefs = getActivity().getSharedPreferences("Settings", getActivity().MODE_PRIVATE);
         metricValue = prefs.getString("metricValue", "true");
+
+        for (int i = 1; i <= 5; i++) {
+
+            String id_str = "dIconForecast" + i + "_ID";
+            int id = getResources().getIdentifier(id_str, "id", getActivity().getPackageName());
+            ImageView tmpImgView = (ImageView) v.findViewById(id);
+            dIconForecast.add(tmpImgView);
+
+            id_str = "dForecast" + i + "_ID";
+            id = getResources().getIdentifier(id_str, "id", getActivity().getPackageName());
+            TextView tmpTxtView = (TextView) v.findViewById(id);
+            dForecast.add(tmpTxtView);
+
+            if (i < 5) {
+                int tmp_index = i+1;
+                id_str = "day" + tmp_index + "_ID";
+                id = getResources().getIdentifier(id_str, "id", getActivity().getPackageName());
+                tmpTxtView = (TextView) v.findViewById(id);
+                daysTextView.add(tmpTxtView);
+
+                id_str = "hIconForecast" + i + "_ID";
+                id = getResources().getIdentifier(id_str, "id", getActivity().getPackageName());
+                tmpImgView = (ImageView) v.findViewById(id);
+                hIconForecast.add(tmpImgView);
+
+                id_str = "hForecast" + i + "_ID";
+                id = getResources().getIdentifier(id_str, "id", getActivity().getPackageName());
+                tmpTxtView = (TextView) v.findViewById(id);
+                hForecast.add(tmpTxtView);
+
+                id_str = "hour" + i + "_ID";
+                id = getResources().getIdentifier(id_str, "id", getActivity().getPackageName());
+                tmpTxtView = (TextView) v.findViewById(id);
+                hours.add(tmpTxtView);
+            }
+        }
+
 
 //        Intent intent = getIntent();
         final String[] cityValues = null;
@@ -71,19 +134,19 @@ public class WeatherFragment extends Fragment {
             }
         });
 
-        ImageButton actualPosition = (ImageButton)v.findViewById(R.id.actualPositionBtn_ID);
+        ImageButton actualPosition = (ImageButton) v.findViewById(R.id.actualPositionBtn_ID);
         actualPosition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!cityNameAndKeyFromLocation()) {
                     return;
                 }
-                forecast();
-                currentConditions();
+                //forecast();
+                //currentConditions();
             }
         });
 
-        ImageButton AWLink = (ImageButton)v.findViewById(R.id.AWLink_imgButton);
+        ImageButton AWLink = (ImageButton) v.findViewById(R.id.AWLink_imgButton);
         AWLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,27 +157,26 @@ public class WeatherFragment extends Fragment {
         });
 
 
-        city = (TextView)v.findViewById(R.id.cityName_ID);
+        city = (TextView) v.findViewById(R.id.cityName_ID);
 
 
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new
-                    StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
+//        if (android.os.Build.VERSION.SDK_INT > 9) {
+//            StrictMode.ThreadPolicy policy = new
+//                    StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//        }
+
+        if (cityValues == null) {
+            if (!cityNameAndKeyFromLocation()) {
+                return v;
+            }
+        } else {
+            city.setText(cityValues[0]);
+            keyValue = cityValues[1];
         }
 
-       if(cityValues == null){
-           if (!cityNameAndKeyFromLocation()) {
-               return v;
-           }
-       }
-       else {
-           city.setText(cityValues[0]);
-           keyValue = cityValues[1];
-       }
-
-       forecast();
-       currentConditions();
+        //forecast();
+        //currentConditions();
 
 
 //        ImageButton pedometer_btn = (ImageButton)v.findViewById(R.id.pedometer_btn_ID);
@@ -145,54 +207,11 @@ public class WeatherFragment extends Fragment {
 //        });
 
         return v;
-
-        // MenuItem logout = menu.add("Logout");
-        // final Intent myService = new Intent(this, StepCounterListener.class);
-        // 
-        // logout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-        // {
-        //     @Override
-        //     public boolean onMenuItemClick(MenuItem item)
-        //     {
-        //         SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-        //         SharedPreferences.Editor editor = sp.edit();
-        //         editor.putBoolean("logged", false);
-        //         editor.commit();
-
-        //         stopService(myService);
-
-        //         Intent i = new Intent(WeatherActivity.this, LoginActivity.class);
-        //         startActivity(i); // open rules activity
-        //         return true;
-        //     }
-        // });
-
-//        return true;
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu)
-//    {
-//        // menu creation
-//        super.onCreateOptionsMenu(menu);
-//        MenuItem settings = menu.add("Settings");
-//
-//        settings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener()
-//        {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item)
-//            {
-//                Intent i = new Intent(WeatherFragment.this, SettingsFragment.class);
-//                i.putExtra("activity", 2);
-//                startActivity(i); // open rules activity
-//                return true;
-//            }
-//        });
-//
-//        return true;
-//    }
 
-    public Boolean cityNameAndKeyFromLocation(){
+
+    public Boolean cityNameAndKeyFromLocation() {
         // get the last location
         localisation = getLocation.getLastLocation(getActivity(), getContext());
 
@@ -200,241 +219,196 @@ public class WeatherFragment extends Fragment {
             return false;
         }
 
-        // build geoposition request
-        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "geoposition", localisation, metricValue);
-
-
-        // url to get key value of the city
-
-        try {
-            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
-
-            // send get request to the api to get the uniqueId and the city name
-            try {
-                keyValue = new JSONObject(response).getString("Key");
-                city.setText(new JSONObject(response).getString("EnglishName"));
-            } catch (JSONException e) {
-                e.printStackTrace();
+        // send geoposition request to the api
+        Call<JsonElement> todoCall = iMyService.geoposition(API_KEY, localisation);
+        todoCall.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.code() == 200) {
+                    keyValue = ((JsonObject) response.body()).get("Key").toString();
+                    keyValue = keyValue.substring(1, keyValue.length() - 1);
+                    String cityName = ((JsonObject) response.body()).get("EnglishName").toString();
+                    cityName = cityName.substring(1, cityName.length() - 1);
+                    city.setText(cityName);
+                    forecast();
+                    currentConditions();
+                }
+                else {
+                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
+                }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-            //response = "error";
-        }
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
         return true;
     }
 
-    public void forecast(){
-        // build forecast request
-        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "forecast", keyValue, metricValue);
-        try {
-            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+    public void forecast() {
+        // send forecast request to the api
 
-            // send get request to the api
-            try {
-                //JSONObject jsnobject = new JSONObject(response);
+        Call<JsonElement> todoCall = iMyService.forecast(keyValue, API_KEY, metricValue);
+        todoCall.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 
-                //Log.d("responseFromApi", response);
+                if (response.code() == 200) {
+                    JsonArray forecastArray = ((JsonObject) response.body()).getAsJsonArray("DailyForecasts");
+                    int minTemp, maxTemp, currentDayIndex = -1;
+                    for (int i = 0; i < forecastArray.size(); i++) {
 
-                ImageView dIconForecast_1 = (ImageView) v.findViewById(R.id.dIconForecast1_ID);
-                ImageView dIconForecast_2 = (ImageView)v.findViewById(R.id.dIconForecast2_ID);
-                ImageView dIconForecast_3 = (ImageView)v.findViewById(R.id.dIconForecast3_ID);
-                ImageView dIconForecast_4 = (ImageView)v.findViewById(R.id.dIconForecast4_ID);
-                ImageView dIconForecast_5 = (ImageView)v.findViewById(R.id.dIconForecast5_ID);
+                        JsonElement dailyForecast = forecastArray.get(i);
 
-                ImageView[] dIconForecast = {dIconForecast_1, dIconForecast_2, dIconForecast_3, dIconForecast_4, dIconForecast_5};
+                        JsonObject icon = ((JsonObject) dailyForecast).getAsJsonObject("Day");
+                        String iconName = "i" + icon.get("Icon");
+                        int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
+                        dIconForecast.get(i).setImageResource(icon_id);
 
-                TextView dForecast_1 = (TextView)v.findViewById(R.id.dForecast1_ID);
-                TextView dForecast_2 = (TextView)v.findViewById(R.id.dForecast2_ID);
-                TextView dForecast_3 = (TextView)v.findViewById(R.id.dForecast3_ID);
-                TextView dForecast_4 = (TextView)v.findViewById(R.id.dForecast4_ID);
-                TextView dForecast_5 = (TextView)v.findViewById(R.id.dForecast5_ID);
+                        JsonObject temperature = ((JsonObject) dailyForecast).getAsJsonObject("Temperature");
 
-                TextView[] dForecast = {dForecast_1, dForecast_2, dForecast_3, dForecast_4, dForecast_5};
+                        minTemp = (int) Math.round(Double.parseDouble(temperature.getAsJsonObject("Minimum").get("Value").toString()));
+                        maxTemp = (int) Math.round(Double.parseDouble(temperature.getAsJsonObject("Maximum").get("Value").toString()));
 
-                TextView day2 = (TextView)v.findViewById(R.id.day2_ID);
-                TextView day3 = (TextView)v.findViewById(R.id.day3_ID);
-                TextView day4 = (TextView)v.findViewById(R.id.day4_ID);
-                TextView day5 = (TextView)v.findViewById(R.id.day5_ID);
+                        String tmpTemp = minTemp + "°\n" + maxTemp + "°";
+                        dForecast.get(i).setText(tmpTemp);
 
-                TextView[] daysTextView = {day2, day3, day4, day5};
+                        // get the forecast day
+                        String[] day = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
-                JSONObject forecastJson = new JSONObject(response);
-                JSONArray forecastArray = forecastJson.getJSONArray("DailyForecasts");
-                int minTemp, maxTemp, currentDayIndex = -1;
-                for(int i = 0; i < forecastArray.length(); i++) {
-                    JSONObject dailyForecast = forecastArray.getJSONObject(i);
+                        if (i == 0) {
+                            Calendar calendar = Calendar.getInstance();
+                            Date date = calendar.getTime();
+                            String forecastDay = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
 
-                    JSONObject icon = dailyForecast.getJSONObject("Day");
-                    String iconName = "i" + icon.getInt("Icon");
-                    int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
-                    dIconForecast[i].setImageResource(icon_id);
-
-                    JSONObject temperature = dailyForecast.getJSONObject("Temperature");
-
-                    minTemp = (int)Math.round(temperature.getJSONObject("Minimum").getDouble("Value"));
-                    maxTemp = (int)Math.round(temperature.getJSONObject("Maximum").getDouble("Value"));
-
-                    String tmpTemp = minTemp + "°\n" + maxTemp + "°";
-                    dForecast[i].setText(tmpTemp);
-
-                    // get the forecast day
-                    String[] day = {"Monday", "Tuesday" , "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-
-                    if ( i == 0 ) {
-                        Calendar calendar = Calendar.getInstance();
-                        Date date = calendar.getTime();
-                        String forecastDay = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
-
-                        // get the current day index
-                        for (int j=0; j<day.length; j++) {
-                            if (day[j].equals(forecastDay)) {
-                                currentDayIndex = j;
-                                break;
+                            // get the current day index
+                            for (int j = 0; j < day.length; j++) {
+                                if (day[j].equals(forecastDay)) {
+                                    currentDayIndex = j;
+                                    break;
+                                }
                             }
+                        } else {
+                            int tmpIndexId = i - 1;
+                            int tmpIndexDay = (currentDayIndex + i) % 7;
+                            daysTextView.get(tmpIndexId).setText(day[tmpIndexDay]);
                         }
-                    }
-                    else {
-                        int tmpIndexId = i - 1;
-                        int tmpIndexDay = (currentDayIndex + i) % 7;
-                        daysTextView[tmpIndexId].setText(day[tmpIndexDay]);
-                    }
 
-
+                    }
+                }
+                else {
+                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
                 }
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-            //response = "error";
-        }
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.d("FailureDebug", t.getMessage());
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
 
     }
 
-    public void currentConditions(){
-        // build currentconditions request
-        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "currentconditions", keyValue, metricValue);
-        try {
-            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
+    public void currentConditions() {
+        // send current condition request to the api
 
-            // send get request to the api
-            try {
-                final String METRIC_VALUE = "Metric";
-                final String IMPERIAL_VALUE = "Imperial";
+        Call<JsonElement> todoCall = iMyService.currentconditions(keyValue, API_KEY);
+        todoCall.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.code() == 200) {
+                    final String METRIC_VALUE = "Metric";
+                    final String IMPERIAL_VALUE = "Imperial";
 
-                ImageView currentIconForecast = (ImageView)v.findViewById(R.id.currentIconForecast_ID);
-                TextView currentForecast = (TextView)v.findViewById(R.id.currentForecast_ID);
+                    ImageView currentIconForecast = (ImageView) v.findViewById(R.id.currentIconForecast_ID);
+                    TextView currentForecast = (TextView) v.findViewById(R.id.currentForecast_ID);
+//
+                    JsonArray currentConditionsJsonArray = (JsonArray) response.body();
+                    String currentConditionsIconName = "i" + currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherIcon");
+                    String weatherText = currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherText").toString();
+                    weatherText = weatherText.substring(1, weatherText.length()-1);
+                    int icon_id = getContext().getResources().getIdentifier(currentConditionsIconName, "drawable", getContext().getPackageName());
+                    currentIconForecast.setImageResource(icon_id);
+//
+                    double currentConditionsTemp = Math.round(Double.parseDouble("" +
+                            currentConditionsJsonArray.get(0).getAsJsonObject().get("Temperature")
+                                    .getAsJsonObject().get("Metric").getAsJsonObject().get("Value")));
+//
+                    if (metricValue.equals("false")) {
+                        currentConditionsTemp = ((9 / 5) * currentConditionsTemp) + 32;
+                    }
 
-                JSONArray currentConditionsJsonArray = new JSONArray(response);
-                String currentConditionsIconName = "i" + currentConditionsJsonArray.getJSONObject(0).getInt("WeatherIcon");
-                String weatherText = currentConditionsJsonArray.getJSONObject(0).getString("WeatherText");
-                int icon_id = getContext().getResources().getIdentifier(currentConditionsIconName, "drawable", getContext().getPackageName());
-                currentIconForecast.setImageResource(icon_id);
-
-                JSONObject currentConditions = currentConditionsJsonArray.getJSONObject(0).getJSONObject("Temperature");
-                int currentConditionsTemp = (int)Math.round(currentConditions.getJSONObject(METRIC_VALUE).getDouble("Value"));
-
-                if (metricValue.equals("false")) {
-                    currentConditionsTemp = ((9/5) * currentConditionsTemp) + 32;
+                    String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
+                    currentForecast.setText(currentForecastText);
                 }
-
-                String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
-                currentForecast.setText(currentForecastText);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-                Log.d("Debug2", response);
+                else {
+                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
+                }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            //response = "error";
-            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-            Log.d("Debug1", response);
-        }
-
-        // build hourly forecast request
-        builtUri = NetworkUtils.buildUrlForWeather(getContext(), "hourlyforecast", keyValue, metricValue);
-        try {
-            response = NetworkUtils.getResponseFromHttpUrl(builtUri);
-
-            // send get request to the api
-            try {
-
-                ImageView hIconForecast_1 = (ImageView)v.findViewById(R.id.hIconForecast1_ID);
-                ImageView hIconForecast_2 = (ImageView)v.findViewById(R.id.hIconForecast2_ID);
-                ImageView hIconForecast_3 = (ImageView)v.findViewById(R.id.hIconForecast3_ID);
-                ImageView hIconForecast_4 = (ImageView)v.findViewById(R.id.hIconForecast4_ID);
-
-                ImageView[] hIconForecast = {hIconForecast_1, hIconForecast_2, hIconForecast_3, hIconForecast_4};
-
-                TextView hForecast_1 = (TextView)v.findViewById(R.id.hForecast1_ID);
-                TextView hForecast_2 = (TextView)v.findViewById(R.id.hForecast2_ID);
-                TextView hForecast_3 = (TextView)v.findViewById(R.id.hForecast3_ID);
-                TextView hForecast_4 = (TextView)v.findViewById(R.id.hForecast4_ID);
-
-                TextView[] hForecast = {hForecast_1, hForecast_2, hForecast_3, hForecast_4};
-
-                TextView h_1 = (TextView)v.findViewById(R.id.hour1_ID);
-                TextView h_2 = (TextView)v.findViewById(R.id.hour2_ID);
-                TextView h_3 = (TextView)v.findViewById(R.id.hour3_ID);
-                TextView h_4 = (TextView)v.findViewById(R.id.hour4_ID);
-
-                TextView[] hours = {h_1, h_2, h_3, h_4};
-
-                JSONArray hourlyJsonArray = new JSONArray(response);
-
-                Calendar calendar = Calendar.getInstance();
-                Date date = calendar.getTime();
-                calendar.setTime(date);
-                int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
 
 
-                for(int i = 0; i < 4; i++) {
+        // send hourly forecast request to the api
 
-                    int tmpIndex = (i+1) * 2;
-                    int tmpHour = (currentHour + tmpIndex) % 24;
+        Call<JsonElement> todoCall2 = iMyService.hourlyforecast(keyValue, API_KEY, metricValue);
+        todoCall2.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 
-                    String tmpHourStr = tmpHour + ":00";
+                if (response.code() == 200) {
+                    JsonArray hourlyJsonArray = response.body().getAsJsonArray();
 
-                    hours[i].setText(tmpHourStr);
+                    Calendar calendar = Calendar.getInstance();
+                    Date date = calendar.getTime();
+                    calendar.setTime(date);
+                    int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
 
-                    JSONObject hourlyJsonObject = hourlyJsonArray.getJSONObject(tmpIndex);
 
-                    //JSONObject icon = hourlyJsonObject.getJSONObject("WeatherIcon");
-                    String iconName = "i" + hourlyJsonObject.getInt("WeatherIcon");
-                    int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
-                    hIconForecast[i].setImageResource(icon_id);
+                    for (int i = 0; i < 4; i++) {
 
-                    JSONObject temperature = hourlyJsonObject.getJSONObject("Temperature");
+                        int tmpIndex = (i + 1) * 2;
+                        int tmpHour = (currentHour + tmpIndex) % 24;
 
-                    int temp = (int) Math.round(temperature.getDouble("Value"));
+                        String tmpHourStr = tmpHour + ":00";
 
-                    String tmpTemp = temp + "°";
-                    hForecast[i].setText(tmpTemp);
+                        hours.get(i).setText(tmpHourStr);
+
+                        JsonObject hourlyJsonObject = hourlyJsonArray.get(tmpIndex).getAsJsonObject();
+
+                        //JSONObject icon = hourlyJsonObject.getJSONObject("WeatherIcon");
+                        String iconName = "i" + hourlyJsonObject.get("WeatherIcon");
+                        int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
+                        hIconForecast.get(i).setImageResource(icon_id);
+
+                        JsonObject temperature = hourlyJsonObject.get("Temperature").getAsJsonObject();
+
+                        int temp = (int) Math.round(Double.parseDouble("" + temperature.get("Value")));
+
+                        String tmpTemp = temp + "°";
+                        hForecast.get(i).setText(tmpTemp);
+                    }
                 }
-
-
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-                Log.d("Debug2", response);
+                else {
+                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
+                }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            //response = "error";
-            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_LONG).show();
-            Log.d("Debug1", response);
-        }
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+
     }
 
 //    private boolean checkPermissions(){
@@ -524,11 +498,5 @@ public class WeatherFragment extends Fragment {
 //            requestPermissions();
 //            return "";
 //        }
-//    }
-
-//    @Override
-//    protected void onStop(){
-//        super.onStop();
-//        finish();
 //    }
 }
