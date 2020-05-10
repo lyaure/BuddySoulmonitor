@@ -21,16 +21,16 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                 boolean remember = sp.getBoolean("logged", false);
-                Class activityToLaunch;
-
-                if (remember) {
-                    activityToLaunch = MainActivity.class;
-                }
-                else {
-                    activityToLaunch = LoginActivity.class;
-                }
-                Intent i = new Intent(SplashActivity.this, activityToLaunch);
-//                Intent i = new Intent(SplashActivity.this, MainActivity.class);
+//                Class activityToLaunch;
+//
+//                if (remember) {
+//                    activityToLaunch = MainActivity.class;
+//                }
+//                else {
+//                    activityToLaunch = LoginActivity.class;
+//                }
+//                Intent i = new Intent(SplashActivity.this, activityToLaunch);
+                Intent i = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(i);
                 finish();
             }

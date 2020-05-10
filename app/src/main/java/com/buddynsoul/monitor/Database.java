@@ -82,10 +82,12 @@ public class Database {
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " ORDER BY date DESC", null );
 
         if(cursor.moveToFirst()){
+            steps += cursor.getInt(cursor.getColumnIndex("steps"));
             ContentValues cv = new ContentValues();
             cv.put("steps", steps);
 
-            int date = cursor.getInt(cursor.getColumnIndex("date"));
+//            int date = cursor.getInt(cursor.getColumnIndex("date"));
+            long date = cursor.getLong(cursor.getColumnIndex("date"));
 
             db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
 
@@ -177,7 +179,7 @@ public class Database {
     }
 
     public long[] getDates(){
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE steps < 0", null);
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE steps >= 0 AND date > 0", null);
         cursor.moveToFirst();
 
         int t = cursor.getInt(0);
@@ -189,7 +191,8 @@ public class Database {
         if(cursor.moveToFirst()){
             do{
                 long date = cursor.getLong(cursor.getColumnIndex("date"));
-                if(date != -1){
+                int steps = cursor.getInt(cursor.getColumnIndex("steps"));
+                if(date != -1 && steps >=0){
                     dates[index] = date;
                     index++;
                 }

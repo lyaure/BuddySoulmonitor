@@ -30,8 +30,8 @@ public class GraphChartView extends View {
         Database db = new Database(context);
         long[] dates = db.getDates();
 
-        for(int i=0; i<dates.length-1; i++)
-            objects.add(new MyObject(dates[i], (db.getSteps(dates[i+1]) - db.getSteps(dates[i])) * -1));
+        for(int i=0; i<dates.length; i++)
+            objects.add(new MyObject(dates[i], (db.getSteps(dates[i]))));
 
         barWidth = 50;
         space = 250;

@@ -241,6 +241,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
                 // we dont know when the reboot was, so set todays steps to 0 by
                 // initializing them with -STEPS_SINCE_BOOT
                 todayOffset = -(int) event.values[0];
+//                todayOffset = (int) event.values[0];
                 //Database db = Database.getInstance(this);
                 Database db = new Database(getActivity());
                 db.insertNewDay(Util.getToday(), (int) event.values[0]);
