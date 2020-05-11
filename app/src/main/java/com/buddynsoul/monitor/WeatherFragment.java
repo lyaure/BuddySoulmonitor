@@ -2,6 +2,8 @@ package com.buddynsoul.monitor;
 
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -129,6 +131,11 @@ public class WeatherFragment extends Fragment {
         changeCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Fragment search = new CitySearchFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, search ); // give your fragment container id in first parameter
+                transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+                transaction.commit();
 //                Intent i = new Intent(WeatherFragment.this, CitySearchActivity.class);
 //                startActivity(i);
             }

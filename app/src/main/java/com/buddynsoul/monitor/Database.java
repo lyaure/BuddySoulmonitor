@@ -86,7 +86,6 @@ public class Database {
             ContentValues cv = new ContentValues();
             cv.put("steps", steps);
 
-//            int date = cursor.getInt(cursor.getColumnIndex("date"));
             long date = cursor.getLong(cursor.getColumnIndex("date"));
 
             db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});

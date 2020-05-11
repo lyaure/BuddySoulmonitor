@@ -17,13 +17,13 @@ public class GraphChartView extends View {
     private int screenWidth, screenHeight;
     private int scrollPosition;
     private ArrayList<MyObject> objects;
-    private int width, height, graphHeight, barWidth, space;
+    private int width, height, graphHeight, barWidth, space, radius;
     private boolean bars;
     private int goal;
 
     public GraphChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        objects = new ArrayList<MyObject>();
+        objects = new ArrayList<>();
 
         bars = true;
 
@@ -39,18 +39,15 @@ public class GraphChartView extends View {
         pRED = new Paint();
         pRED.setColor(Color.RED);
         pRED.setTextAlign(Paint.Align.CENTER);
-        pRED.setTextSize(50);
 
         pWhite = new Paint();
         pWhite.setColor(Color.WHITE);
         pWhite.setTextAlign(Paint.Align.CENTER);
-        pWhite.setTextSize(50);
         pWhite.setStrokeWidth(5);
 
         pBlack = new Paint();
         pBlack.setColor(Color.BLACK);
         pBlack.setTextAlign(Paint.Align.CENTER);
-        pBlack.setTextSize(50);
 
         pPrimary = new Paint();
         pPrimary.setColor(Color.parseColor("#3eabb8"));
@@ -132,12 +129,12 @@ public class GraphChartView extends View {
             int pos = (int) Math.round(scrollPosition / space);
 
             if (pos == i) {
-                canvas.drawCircle(points[i].x, points[i].y, 25, pRED);
+                canvas.drawCircle(points[i].x, points[i].y, radius, pRED);
                 canvas.drawText(objects.get(i).getDate(), points[i].x, canvasHeight - (canvasHeight / 30), pRED);
                 canvas.drawText(Integer.toString((int)objects.get(i).getData()), points[i].x, points[i].y + canvasHeight/10, pBlack);
             }
             else {
-                canvas.drawCircle(points[i].x, points[i].y, 25, pWhite);
+                canvas.drawCircle(points[i].x, points[i].y, radius, pWhite);
                 canvas.drawText(objects.get(i).getDate(), points[i].x, canvasHeight - (canvasHeight / 30), pWhite);
             }
         }
@@ -147,7 +144,6 @@ public class GraphChartView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh){
         canvasWidth = w;
         canvasHeight = h;
-
     }
 
     @Override
@@ -163,11 +159,19 @@ public class GraphChartView extends View {
             width = screenWidth;
 
         setMeasuredDimension(width, height);
+        setSize(screenWidth/30);
     }
 
     public void setScreenDimensions(int width, int height) {
         this.screenWidth = width;
         this.screenHeight = height;
+    }
+
+    private void setSize(int size){
+        pBlack.setTextSize(size);
+        pWhite.setTextSize(size);
+        pRED.setTextSize(size);
+        radius = size/2;
     }
 
     public void setScrollPosition(int position){

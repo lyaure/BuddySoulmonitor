@@ -366,8 +366,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     public static Notification getNotification(final Context context) {
         if (BuildConfig.DEBUG) Log.d("debug", "getNotification");
-        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-        int goal = prefs.getInt("goal", 10000);
+        SharedPreferences sp = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        int goal = sp.getInt("goal", 10000);
 
         Database db = new Database(context);
         //Database db = Database.getInstance(context);

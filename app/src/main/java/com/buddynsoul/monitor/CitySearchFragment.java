@@ -91,18 +91,18 @@ public class CitySearchFragment extends Fragment {
         adapter = new CityAdapter(getContext(), cities);
         citiesList.setAdapter(adapter);
 
-        search = (TextView)v.findViewById(R.id.searchCity_ID);
-
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("DebugTextViewCity", "clicked");
-                cities.clear();
-                autoCompleteListSearch();
-                Fragment fragment = new PedometerFragment();
-                loadFragment(fragment);
-            }
-        });
+//        search = (TextView)v.findViewById(R.id.searchCity_ID);
+//
+//        search.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("DebugTextViewCity", "clicked");
+//                cities.clear();
+//                autoCompleteListSearch();
+//                Fragment fragment = new PedometerFragment();
+//                loadFragment(fragment);
+//            }
+//        });
 
         citiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
