@@ -1,18 +1,12 @@
 package com.buddynsoul.monitor;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-
-import com.buddynsoul.monitor.PedometerFragment;
-import com.buddynsoul.monitor.WeatherFragment;
-import com.buddynsoul.monitor.CitySearchFragment;
-import com.buddynsoul.monitor.SettingsFragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -49,9 +43,10 @@ public class MainActivity extends AppCompatActivity {
                             fragment = new WeatherFragment();
                             loadFragment(fragment);
                             return true;
-//                        case R.id.navigation_sleep:
-//                            openFragment(NotificationFragment.newInstance("", ""));
-//                            return true;
+                        case R.id.navigation_sleep:
+                            fragment = new SleepingTimeFragment();
+                            loadFragment(fragment);
+                            return true;
                         case R.id.navigation_settings:
                             fragment = new SettingsFragment();
 

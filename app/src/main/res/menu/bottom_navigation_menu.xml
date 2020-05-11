@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_pedometer"
-        android:icon="@drawable/ic_directions_run_black"
+        android:icon="@drawable/pedometer_black"
         android:title="Pedometer" />
     <item
         android:id="@+id/navigation_weather"
-        android:icon="@drawable/ic_wb_sunny_black"
+        android:icon="@drawable/weather_black"
         android:title="Weather" />
     <item
         android:id="@+id/navigation_sleep"
-        android:icon="@drawable/sleep_balck"
+        android:icon="@drawable/sleep_black"
         android:title="Sleep" />
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings_black"
+        android:icon="@drawable/settings_black"
         android:title="Setting" />
 </menu>
