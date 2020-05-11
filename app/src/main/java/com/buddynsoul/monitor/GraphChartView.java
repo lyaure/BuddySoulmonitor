@@ -153,7 +153,11 @@ public class GraphChartView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         height = (screenHeight - 350)/3;
-        width = screenWidth + barWidth*(objects.size()-1) + space * (objects.size()-3);
+
+        if(objects.size() < 2)
+            width = screenWidth;
+        else
+            width = screenWidth + (objects.size() - 1)/2 + (objects.size() - 1)*space;
 
         if(width < screenWidth)
             width = screenWidth;
