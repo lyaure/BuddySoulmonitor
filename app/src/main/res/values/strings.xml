@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Buddy&amp;Soul monitor</string>
-                    <string name="accuweather_api_key">sQ4Urdjd2y0wIofeyDZDUKzwK4FMxQEk</string>
-<!--    <string name="accuweather_api_key">GAS3M6snacxHxsvVjOZftAqoG0vgtIk3</string>-->
+<!--                    <string name="accuweather_api_key">sQ4Urdjd2y0wIofeyDZDUKzwK4FMxQEk</string>-->
+    <string name="accuweather_api_key">GAS3M6snacxHxsvVjOZftAqoG0vgtIk3</string>
     <!--    <string name="accuweather_api_key">6OZfZ3afTcnRYeMH2fMSfAQobw5s2Z3a</string>-->
     <!--        <string name="accuweather_api_key">VcAh1nr3hzI7AzFseqTi4D6OoS2qkKGf</string>-->
     <string name="no_sensor">Sensor not found</string>

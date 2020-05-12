@@ -155,10 +155,10 @@ public class CitySearchFragment extends Fragment {
                             String cityName = "" + jObj.get("LocalizedName").toString();
                             cityName = cityName.substring(1, cityName.length()-1);
 
-                            String countryName = jObj.get("Country").getAsJsonObject().get("LocalizedName").getAsJsonObject().toString();
+                            String countryName = jObj.get("Country").getAsJsonObject().get("LocalizedName").toString();
                             countryName = countryName.substring(1, countryName.length()-1);
 
-                            keyValue = jObj.get("Key").getAsJsonObject().toString();
+                            keyValue = jObj.get("Key").toString();
                             keyValue = keyValue.substring(1, keyValue.length()-1);
                             cities.add(new City(cityName, countryName, keyValue));
                         }
