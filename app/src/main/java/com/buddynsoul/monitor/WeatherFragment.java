@@ -219,37 +219,21 @@ public class WeatherFragment extends Fragment {
 
 
     public Boolean cityNameAndKeyFromLocation() {
-        // get the last location
-        localisation = getLocation.getLastLocation(getActivity(), getContext());
 
-        if (localisation.equals("")) {
+        SharedPreferences sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+
+        keyValue = sp.getString("keyValue", "");
+
+        if (keyValue.equals("")) {
             return false;
         }
 
-        // send geoposition request to the api
-        Call<JsonElement> todoCall = iMyService.geoposition(API_KEY, localisation);
-        todoCall.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                if (response.code() == 200) {
-                    keyValue = ((JsonObject) response.body()).get("Key").toString();
-                    keyValue = keyValue.substring(1, keyValue.length() - 1);
-                    String cityName = ((JsonObject) response.body()).get("EnglishName").toString();
-                    cityName = cityName.substring(1, cityName.length() - 1);
-                    city.setText(cityName);
-                    forecast();
-                    currentConditions();
-                }
-                else {
-                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
-                }
-            }
+        String cityName = sp.getString("cityName", "");
+        city.setText(cityName);
 
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        forecast();
+        currentConditions();
+
         return true;
     }
 
