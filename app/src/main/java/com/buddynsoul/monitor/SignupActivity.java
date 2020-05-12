@@ -139,6 +139,11 @@ public class SignupActivity extends AppCompatActivity {
 
                 final String name = firstName.getText().toString().trim() + " " + lastName.getText().toString().trim();
 
+                if (!Util.isNetworkAvailable(SignupActivity.this)) {
+                    Toast.makeText(SignupActivity.this, "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 loadingDialog.startLoadingDialog();
                 registerUser(name, email.getText().toString().trim(), password.getText().toString().trim(),
                         loadingDialog);

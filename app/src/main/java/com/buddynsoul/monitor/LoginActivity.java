@@ -106,6 +106,11 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (!Util.isNetworkAvailable(LoginActivity.this)) {
+                    Toast.makeText(LoginActivity.this, "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 loadingDialog.startLoadingDialog();
                 loginUser(email.getText().toString().trim(), password.getText().toString().trim(), loadingDialog);
 //                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);

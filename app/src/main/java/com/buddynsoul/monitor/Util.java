@@ -1,6 +1,11 @@
 package com.buddynsoul.monitor;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.Calendar;
 
 public abstract class Util {
@@ -44,5 +49,15 @@ public abstract class Util {
         c.set(Calendar.MILLISECOND, 0);
         c.add(Calendar.DATE, -1);
         return c.getTimeInMillis();
+    }
+
+    /**
+     * @return True if the internet connection is available, else return False
+     */
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

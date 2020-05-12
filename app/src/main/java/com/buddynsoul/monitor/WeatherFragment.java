@@ -77,6 +77,11 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_weather, container, false);
 
+        if (!Util.isNetworkAvailable(getActivity())) {
+            Toast.makeText(getActivity(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+            return v;
+        }
+
         iMyService = RetrofitClient.getAccuweatherClient().create(IMyService.class);
 
         API_KEY = getResources().getString(R.string.accuweather_api_key);
@@ -148,8 +153,6 @@ public class WeatherFragment extends Fragment {
                 if (!cityNameAndKeyFromLocation()) {
                     return;
                 }
-                //forecast();
-                //currentConditions();
             }
         });
 
@@ -181,9 +184,6 @@ public class WeatherFragment extends Fragment {
             city.setText(cityValues[0]);
             keyValue = cityValues[1];
         }
-
-        //forecast();
-        //currentConditions();
 
 
 //        ImageButton pedometer_btn = (ImageButton)v.findViewById(R.id.pedometer_btn_ID);

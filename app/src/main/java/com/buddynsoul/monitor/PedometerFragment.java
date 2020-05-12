@@ -25,6 +25,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -204,6 +206,10 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 //                startActivity(i);
 //            }
 //        });
+
+        if (!Util.isNetworkAvailable(getActivity())) {
+            Toast.makeText(getActivity(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+        }
 
         return v;
     }

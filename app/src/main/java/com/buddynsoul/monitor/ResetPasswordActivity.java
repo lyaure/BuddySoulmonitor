@@ -61,6 +61,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (!Util.isNetworkAvailable(ResetPasswordActivity.this)) {
+                    Toast.makeText(ResetPasswordActivity.this, "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 loadingDialog.startLoadingDialog();
                 resetUserPassword(email.getText().toString().trim(), loadingDialog);
 //                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
