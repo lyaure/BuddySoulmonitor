@@ -3,18 +3,12 @@ package com.buddynsoul.monitor;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.core.view.GestureDetectorCompat;
-//import io.reactivex.android.schedulers.AndroidSchedulers;
-//import io.reactivex.disposables.CompositeDisposable;
-//import io.reactivex.functions.Consumer;
-//import io.reactivex.schedulers.Schedulers;
-import okhttp3.Cookie;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,8 +19,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -45,6 +37,8 @@ import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -166,6 +160,58 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
             }
         });
 
+        TextView stepsAverage_txtv = (TextView)v.findViewById(R.id.stepsAverage_ID);
+        TextView distanceAverage_txtv = (TextView)v.findViewById(R.id.distanceAverage_ID);
+        ProgressBar stepsAverage_bar = (ProgressBar)v.findViewById(R.id.stepsAverage_progressBar_ID);
+        ProgressBar distanceAverage_bar = (ProgressBar)v.findViewById(R.id.distanceAverage_progressBar_ID);
+
+        TextView maxSteps_txtv = (TextView)v.findViewById(R.id.maxSteps_ID);
+        TextView distanceMaxSteps_txtv = (TextView)v.findViewById(R.id.distanceMaxSteps_ID);
+        ProgressBar maxSteps_bar = (ProgressBar)v.findViewById(R.id.maxSteps_progressBar_ID);
+        ProgressBar distanceMaxSteps_bar = (ProgressBar)v.findViewById(R.id.distanceMaxSteps_progressBar_ID);
+
+        int maxSteps = db.getRecord();
+        String maxSteps_txt = "Max steps:\n" + maxSteps;
+        maxSteps_txtv.setText(maxSteps_txt);
+
+        maxSteps_bar.setMax(goal);
+        ObjectAnimator.ofInt(maxSteps_bar, "progress", maxSteps)
+                .setDuration(3000)
+                .start();
+
+        final double stepToKilometre = 0.000762;
+        final int maxDistance = (int) (goal * stepToKilometre);
+
+        double distanceMaxSteps = maxSteps * stepToKilometre;
+        distanceMaxSteps = Math.round(distanceMaxSteps * 1000d) / 1000d;
+        String distanceMaxSteps_txt = "Max distance:\n" + distanceMaxSteps + " (km)";
+        distanceMaxSteps_txtv.setText(distanceMaxSteps_txt);
+
+        distanceMaxSteps_bar.setMax(maxDistance);
+        ObjectAnimator.ofInt(distanceMaxSteps_bar, "progress", (int) distanceMaxSteps)
+                .setDuration(3000)
+                .start();
+
+        int stepsAverage = db.getSteps(Util.getSpecificDate(7), Util.getYesterday()) / 7;
+        String averageSteps_txt = "Average steps:\n" + stepsAverage;
+        stepsAverage_txtv.setText(averageSteps_txt);
+
+        stepsAverage_bar.setMax(goal);
+        ObjectAnimator.ofInt(stepsAverage_bar, "progress", stepsAverage)
+                .setDuration(3000)
+                .start();
+
+        double distanceAverage = stepsAverage * stepToKilometre;
+        distanceAverage = Math.round(distanceAverage * 1000d) / 1000d;
+        String stepsAverage_txt = "Average distance:\n" + distanceAverage + " (km)";
+        distanceAverage_txtv.setText(stepsAverage_txt);
+
+        distanceAverage_bar.setMax(maxDistance);
+        ObjectAnimator.ofInt(distanceAverage_bar, "progress", (int) (distanceAverage))
+                .setDuration(3000)
+                .start();
+
+
         // Button sendDataBtn = findViewById(R.id.sendDataBtn_ID);
         // sendDataBtn.setOnClickListener(new View.OnClickListener() {
         //        @Override
@@ -256,8 +302,13 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
             since_boot = (int) event.values[0];
             //updatePie();
             int steps_today = Math.max(todayOffset + since_boot, 0);
-            if(Build.VERSION.SDK_INT >= 24)
-                progSteps.setProgress(steps_today, true);
+            if(Build.VERSION.SDK_INT >= 24) {
+                //progSteps.setProgress(steps_today, true);
+                ObjectAnimator.ofInt(progSteps, "progress", steps_today)
+                        .setDuration(3000)
+                        .start();
+            }
+
             else
                 progSteps.setProgress(steps_today);
             steps.setText(String.valueOf(steps_today) + "\nsteps");

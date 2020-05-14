@@ -202,4 +202,39 @@ public class Database {
         cursor.close();
         return dates;
     }
+
+    /**
+     * Get the maximum of steps walked in one day
+     *
+     * @return the maximum number of steps walked in one day
+     */
+    public int getRecord() {
+        Cursor cursor = db.rawQuery("SELECT MAX(steps) FROM " + DB_NAME + " WHERE steps >= 0 AND date > 0", null);
+
+        cursor.moveToFirst();
+        int re = cursor.getInt(0);
+        cursor.close();
+        return re;
+    }
+
+    /**
+     * Get the number of steps taken between 'start' and 'end' date
+     * <p/>
+     * Note that todays entry might have a negative value, so take care of that
+     * if 'end' >= Util.getToday()!
+     *
+     * @param start start date in ms since 1970 (steps for this date included)
+     * @param end   end date in ms since 1970 (steps for this date included)
+     * @return the number of steps from 'start' to 'end'. Can be < 0 as todays
+     * entry might have negative value
+     */
+    public int getSteps(final long start, final long end) {
+        Cursor cursor = db.rawQuery("SELECT SUM(steps) FROM " + DB_NAME + " WHERE steps >= 0 AND date >= " + start +
+                " AND date <= "+ end, null);
+        int res = 0;
+        cursor.moveToFirst();
+        res = cursor.getInt(0);
+        cursor.close();
+        return res;
+    }
 }
