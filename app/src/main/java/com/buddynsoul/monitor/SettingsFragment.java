@@ -157,10 +157,10 @@ public class SettingsFragment extends Fragment {
                 else
                     fragment = new WeatherFragment();
 
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, fragment, "tag")
-                        .addToBackStack(null)
-                        .commit();
+//                getActivity().getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.container, fragment, "tag")
+//                        .addToBackStack(null)
+//                        .commit();
 
 //                Fragment fragment;
 //

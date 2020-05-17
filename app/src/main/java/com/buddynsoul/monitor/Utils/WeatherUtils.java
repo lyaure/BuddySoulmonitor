@@ -96,14 +96,14 @@ public abstract class WeatherUtils {
         API_KEY = context.getResources().getString(R.string.accuweather_api_key);
 
         SharedPreferences prefs = context.getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
-        String metricValue = prefs.getString("metricValue", "true");
+        boolean metricValue = prefs.getBoolean("metricValue", true);
 
         chooseSpFile(context, autocomplete);
         String keyValue = sp.getString("keyValue", "");
 
         // send forecast request to the api
         IMyService iMyService = RetrofitClient.getAccuweatherClient().create(IMyService.class);
-        Call<JsonElement> todoCall = iMyService.forecast(keyValue, API_KEY, metricValue);
+        Call<JsonElement> todoCall = iMyService.forecast(keyValue, API_KEY, ""+metricValue);
         todoCall.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -182,7 +182,7 @@ public abstract class WeatherUtils {
         API_KEY = context.getResources().getString(R.string.accuweather_api_key);
 
         SharedPreferences prefs = context.getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
-        String metricValue = prefs.getString("metricValue", "true");
+        boolean metricValue = prefs.getBoolean("metricValue", true);
 
         chooseSpFile(context, autocomplete);
         String keyValue = sp.getString("keyValue", "");
@@ -231,7 +231,7 @@ public abstract class WeatherUtils {
 
 
         // send hourly forecast request to the api
-        Call<JsonElement> todoCall2 = iMyService.hourlyforecast(keyValue, API_KEY, metricValue);
+        Call<JsonElement> todoCall2 = iMyService.hourlyforecast(keyValue, API_KEY, ""+metricValue);
         todoCall2.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
