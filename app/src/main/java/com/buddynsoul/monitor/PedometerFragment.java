@@ -45,11 +45,13 @@ import static android.content.Context.MODE_PRIVATE;
 public class PedometerFragment extends Fragment implements SensorEventListener {
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
+    private TextView distance_txtv;
     final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
     private GraphChartView graph;
     private HorizontalScrollView hs;
     double tmp;
+    final double stepToKilometre = 0.000762;
 
     //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
@@ -93,6 +95,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 
 //        detector = new GestureDetectorCompat(this, this);
         steps = v.findViewById(R.id.stepTxtv_ID);
+        distance_txtv = v.findViewById(R.id.distanceTxtv_ID);
         progSteps = v.findViewById(R.id.stepProgress_ID);
 
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
@@ -181,7 +184,6 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
                 .setDuration(3000)
                 .start();
 
-        final double stepToKilometre = 0.000762;
         final int maxDistance = (int) (goal * stepToKilometre);
 
         double distanceMaxSteps = maxSteps * stepToKilometre;
@@ -311,9 +313,13 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
                         .start();
             }
 
-            else
+            else {
                 progSteps.setProgress(steps_today);
-            steps.setText(String.valueOf(steps_today) + "\nsteps");
+            }
+            steps.setText(String.valueOf(steps_today + "\nsteps"));
+            double distance = steps_today * stepToKilometre;
+            distance = Math.round(distance * 1000d) / 1000d;
+            distance_txtv.setText(String.valueOf(distance + "\nKm"));
         }
     }
 
