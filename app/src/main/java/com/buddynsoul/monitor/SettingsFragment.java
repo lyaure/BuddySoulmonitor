@@ -52,7 +52,10 @@ public class SettingsFragment extends Fragment {
 
 
         sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
+
         oldGoal = sp.getInt("goal", 10000);
+
+
 
         goal = v.findViewById(R.id.goalTxtv_ID);
         goal.setText(Integer.toString(oldGoal));
@@ -145,6 +148,7 @@ public class SettingsFragment extends Fragment {
 
                     getActivity();
                     sp = getActivity().getSharedPreferences("Settings", MODE_PRIVATE);
+
                     editor = sp.edit();
                     editor.putBoolean("metricValue", temp);
                     editor.commit();

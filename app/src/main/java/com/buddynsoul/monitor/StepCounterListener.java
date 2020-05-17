@@ -214,7 +214,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
         editor = sp.edit();
 
-
         int endH = endHour, endM = endMin;
         if(endMin == 0){
             endM = 59;

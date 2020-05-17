@@ -99,6 +99,7 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
         progSteps = v.findViewById(R.id.stepProgress_ID);
 
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
+
         int  goal = sp.getInt("goal", 10000);
 
         progSteps.setMax(goal);
