@@ -8,10 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +20,7 @@ import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.Utils.Util;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class ResetPasswordActivity extends AppCompatActivity {

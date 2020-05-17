@@ -1,21 +1,12 @@
 package com.buddynsoul.monitor;
 
-import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,42 +15,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.buddynsoul.monitor.Retrofit.IMyService;
-import com.buddynsoul.monitor.Retrofit.RetrofitClient;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.buddynsoul.monitor.Utils.Util;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.JSONException;
+import java.lang.reflect.Type;
 
-import java.net.URL;
-import java.io.IOException;
-import java.lang.Math;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class WeatherFragment extends Fragment {
-    private static final long MIN_TIME_FOR_UPDATE = 0;
-    private static final float MIN_DIS_FOR_UPDATE = 0;
-    final int PERMISSION_ID = 42;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    private String localisation;
-    private GestureDetectorCompat detector;
-    private URL builtUri;
-    private String response = "", keyValue = null;
-    private TextView city;
-    private String metricValue;
     private View v;
-
-    private String API_KEY;
-    private IMyService iMyService;
 
     private ArrayList<ImageView> dIconForecast = new ArrayList<>();
     private ArrayList<TextView> dForecast = new ArrayList<>();
@@ -67,6 +33,13 @@ public class WeatherFragment extends Fragment {
     private ArrayList<ImageView> hIconForecast = new ArrayList<>();
     private ArrayList<TextView> hForecast = new ArrayList<>();
     private ArrayList<TextView> hours = new ArrayList<>();
+
+    private ArrayList<String> forecast_data = new ArrayList<>();
+    private ArrayList<String> currentConditions_data = new ArrayList<>();
+    private ArrayList<String> hourlyForecast_data = new ArrayList<>();
+
+    private SharedPreferences sp;
+    private boolean metricValue;
 
 
     public WeatherFragment() {
@@ -82,13 +55,24 @@ public class WeatherFragment extends Fragment {
             return v;
         }
 
-        iMyService = RetrofitClient.getAccuweatherClient().create(IMyService.class);
+        SharedPreferences prefs = getActivity().getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
+        metricValue = prefs.getBoolean("metricValue", true);
 
-        API_KEY = getResources().getString(R.string.accuweather_api_key);
+        // choose the right sp file and update last update text field
+        TextView last_update_txtv = (TextView) v.findViewById(R.id.lastUpdate_ID);
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            if (bundle.getBoolean("autocomplete", true)) {
+                sp = getActivity().getSharedPreferences("Weather_autocomplete", MainActivity.MODE_PRIVATE);
+                last_update_txtv.setText("");
+            }
+        }
+        else {
+            sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
 
-
-        SharedPreferences prefs = getActivity().getSharedPreferences("Settings", getActivity().MODE_PRIVATE);
-        metricValue = prefs.getString("metricValue", "true");
+            String last_update_txt = lastUpdate(sp);
+            last_update_txtv.setText(last_update_txt);
+        }
 
         for (int i = 1; i <= 5; i++) {
 
@@ -127,11 +111,6 @@ public class WeatherFragment extends Fragment {
         }
 
 
-//        Intent intent = getIntent();
-        final String[] cityValues = null;
-//        final String[] cityValues = intent.getStringArrayExtra("cityValues");
-//        Toast.makeText(this, keyValue, Toast.LENGTH_SHORT).show();
-
         TextView changeCity = (TextView) v.findViewById(R.id.searchCity_ID);
         changeCity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,17 +120,27 @@ public class WeatherFragment extends Fragment {
                 transaction.replace(R.id.container, search ); // give your fragment container id in first parameter
                 transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
                 transaction.commit();
-//                Intent i = new Intent(WeatherFragment.this, CitySearchActivity.class);
-//                startActivity(i);
             }
         });
+
+        if (!initialize_arrayList(sp)) {
+            return v;
+        }
 
         ImageButton actualPosition = (ImageButton) v.findViewById(R.id.actualPositionBtn_ID);
         actualPosition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!cityNameAndKeyFromLocation()) {
-                    return;
+                //cityNameAndKeyFromLocation();
+                sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+
+                if (initialize_arrayList(sp)) {
+                    cityNameAndKeyFromLocation();
+                    forecast(forecast_data);
+                    currentConditions(currentConditions_data, hourlyForecast_data);
+
+                    String last_update_txt = lastUpdate(sp);
+                    last_update_txtv.setText(last_update_txt);
                 }
             }
         });
@@ -167,327 +156,119 @@ public class WeatherFragment extends Fragment {
         });
 
 
-        city = (TextView) v.findViewById(R.id.cityName_ID);
-
-
-//        if (android.os.Build.VERSION.SDK_INT > 9) {
-//            StrictMode.ThreadPolicy policy = new
-//                    StrictMode.ThreadPolicy.Builder().permitAll().build();
-//            StrictMode.setThreadPolicy(policy);
-//        }
-
-        if (cityValues == null) {
-            if (!cityNameAndKeyFromLocation()) {
-                return v;
-            }
-        } else {
-            city.setText(cityValues[0]);
-            keyValue = cityValues[1];
-        }
-
-
-//        ImageButton pedometer_btn = (ImageButton)v.findViewById(R.id.pedometer_btn_ID);
-//        pedometer_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                Intent i = new Intent(WeatherFragment.this, PedometerFragment.class);
-////                startActivity(i);
-//            }
-//        });
-//
-//        ImageButton sleep_btn = (ImageButton)v.findViewById(R.id.sleep_btn_ID);
-//        sleep_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        ImageButton settings_btn = (ImageButton)findViewById(R.id.settings_btn_ID);
-//        settings_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(WeatherFragment.this, SettingsFragment.class);
-//                i.putExtra("from", "weather");
-//                startActivity(i);
-//            }
-//        });
+        cityNameAndKeyFromLocation();
+        forecast(forecast_data);
+        currentConditions(currentConditions_data, hourlyForecast_data);
 
         return v;
     }
 
 
 
-    public Boolean cityNameAndKeyFromLocation() {
+    private Boolean cityNameAndKeyFromLocation() {
 
-        SharedPreferences sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
-
-        keyValue = sp.getString("keyValue", "");
+        String keyValue = sp.getString("keyValue", "");
 
         if (keyValue.equals("")) {
             return false;
         }
 
         String cityName = sp.getString("cityName", "");
-        city.setText(cityName);
 
-        forecast();
-        currentConditions();
+        TextView city = (TextView) v.findViewById(R.id.cityName_ID);
+        city.setText(cityName);
 
         return true;
     }
 
-    public void forecast() {
-        // send forecast request to the api
+    private void forecast(ArrayList<String> forecast_data) {
+        // add forecast data to fragment view
+        final int forecast_size = 5;
 
-        Call<JsonElement> todoCall = iMyService.forecast(keyValue, API_KEY, metricValue);
-        todoCall.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+        for (int i = 0, j = 0; i < forecast_size; i++, j+=3) {
+            dIconForecast.get(i).setImageResource(Integer.parseInt(forecast_data.get(j)));
+            int minTemp = checkUnitTemperature(metricValue, Integer.parseInt(forecast_data.get(j+1)));
+            int maxTemp = checkUnitTemperature(metricValue, Integer.parseInt(forecast_data.get(j+2)));
+            String tmpTemp = minTemp + "°\n" + maxTemp + "°";
+            dForecast.get(i).setText(tmpTemp);
+            //dForecast.get(i).setText(forecast_data.get(j+1));
 
-                if (response.code() == 200) {
-                    JsonArray forecastArray = ((JsonObject) response.body()).getAsJsonArray("DailyForecasts");
-                    int minTemp, maxTemp, currentDayIndex = -1;
-                    for (int i = 0; i < forecastArray.size(); i++) {
-
-                        JsonElement dailyForecast = forecastArray.get(i);
-
-                        JsonObject icon = ((JsonObject) dailyForecast).getAsJsonObject("Day");
-                        String iconName = "i" + icon.get("Icon");
-                        int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
-                        dIconForecast.get(i).setImageResource(icon_id);
-
-                        JsonObject temperature = ((JsonObject) dailyForecast).getAsJsonObject("Temperature");
-
-                        minTemp = (int) Math.round(Double.parseDouble(temperature.getAsJsonObject("Minimum").get("Value").toString()));
-                        maxTemp = (int) Math.round(Double.parseDouble(temperature.getAsJsonObject("Maximum").get("Value").toString()));
-
-                        String tmpTemp = minTemp + "°\n" + maxTemp + "°";
-                        dForecast.get(i).setText(tmpTemp);
-
-                        // get the forecast day
-                        String[] day = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-
-                        if (i == 0) {
-                            Calendar calendar = Calendar.getInstance();
-                            Date date = calendar.getTime();
-                            String forecastDay = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date.getTime());
-
-                            // get the current day index
-                            for (int j = 0; j < day.length; j++) {
-                                if (day[j].equals(forecastDay)) {
-                                    currentDayIndex = j;
-                                    break;
-                                }
-                            }
-                        } else {
-                            int tmpIndexId = i - 1;
-                            int tmpIndexDay = (currentDayIndex + i) % 7;
-                            daysTextView.get(tmpIndexId).setText(day[tmpIndexDay]);
-                        }
-
-                    }
-                }
-                else {
-                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
-                }
-
+            if (i != 0) {
+                daysTextView.get(i-1).setText(forecast_data.get(j+3));
+                j++;
             }
 
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.d("FailureDebug", t.getMessage());
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-
-
+        }
     }
 
-    public void currentConditions() {
-        // send current condition request to the api
+    private void currentConditions(ArrayList<String> currentConditions_data, ArrayList<String> hourlyForecast_data) {
+        // add current conditions data to fragment view
 
-        Call<JsonElement> todoCall = iMyService.currentconditions(keyValue, API_KEY);
-        todoCall.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                if (response.code() == 200) {
-                    final String METRIC_VALUE = "Metric";
-                    final String IMPERIAL_VALUE = "Imperial";
+        ImageView currentIconForecast = (ImageView) v.findViewById(R.id.currentIconForecast_ID);
+        TextView currentForecast = (TextView) v.findViewById(R.id.currentForecast_ID);
 
-                    ImageView currentIconForecast = (ImageView) v.findViewById(R.id.currentIconForecast_ID);
-                    TextView currentForecast = (TextView) v.findViewById(R.id.currentForecast_ID);
-//
-                    JsonArray currentConditionsJsonArray = (JsonArray) response.body();
-                    String currentConditionsIconName = "i" + currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherIcon");
-                    String weatherText = currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherText").toString();
-                    weatherText = weatherText.substring(1, weatherText.length()-1);
-                    int icon_id = getContext().getResources().getIdentifier(currentConditionsIconName, "drawable", getContext().getPackageName());
-                    currentIconForecast.setImageResource(icon_id);
-//
-                    double currentConditionsTemp = Math.round(Double.parseDouble("" +
-                            currentConditionsJsonArray.get(0).getAsJsonObject().get("Temperature")
-                                    .getAsJsonObject().get("Metric").getAsJsonObject().get("Value")));
-//
-                    if (metricValue.equals("false")) {
-                        currentConditionsTemp = ((9 / 5) * currentConditionsTemp) + 32;
-                    }
+        currentIconForecast.setImageResource(Integer.parseInt(currentConditions_data.get(0)));
 
-                    String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
-                    currentForecast.setText(currentForecastText);
-                }
-                else {
-                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
-                }
-            }
+        int currentConditionsTemp = checkUnitTemperature(metricValue, Integer.parseInt(currentConditions_data.get(1)));
+        String weatherText = currentConditions_data.get(2);
+        String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
 
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        currentForecast.setText(currentForecastText);
 
+        // add hourly forecast data to fragment view
+        for (int i = 0, j = 0; i < 4; i++, j+=3) {
+            hours.get(i).setText(hourlyForecast_data.get(j));
+            hIconForecast.get(i).setImageResource(Integer.parseInt(hourlyForecast_data.get(j+1)));
 
-        // send hourly forecast request to the api
-
-        Call<JsonElement> todoCall2 = iMyService.hourlyforecast(keyValue, API_KEY, metricValue);
-        todoCall2.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-
-                if (response.code() == 200) {
-                    JsonArray hourlyJsonArray = response.body().getAsJsonArray();
-
-                    Calendar calendar = Calendar.getInstance();
-                    Date date = calendar.getTime();
-                    calendar.setTime(date);
-                    int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-
-
-                    for (int i = 0; i < 4; i++) {
-
-                        int tmpIndex = (i + 1) * 2;
-                        int tmpHour = (currentHour + tmpIndex) % 24;
-
-                        String tmpHourStr = tmpHour + ":00";
-
-                        hours.get(i).setText(tmpHourStr);
-
-                        JsonObject hourlyJsonObject = hourlyJsonArray.get(tmpIndex).getAsJsonObject();
-
-                        //JSONObject icon = hourlyJsonObject.getJSONObject("WeatherIcon");
-                        String iconName = "i" + hourlyJsonObject.get("WeatherIcon");
-                        int icon_id = getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
-                        hIconForecast.get(i).setImageResource(icon_id);
-
-                        JsonObject temperature = hourlyJsonObject.get("Temperature").getAsJsonObject();
-
-                        int temp = (int) Math.round(Double.parseDouble("" + temperature.get("Value")));
-
-                        String tmpTemp = temp + "°";
-                        hForecast.get(i).setText(tmpTemp);
-                    }
-                }
-                else {
-                    Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-
-
+            int temp = checkUnitTemperature(metricValue, Integer.parseInt(hourlyForecast_data.get(j+2)));
+            String tmpTemp = temp + "°";
+            hForecast.get(i).setText(tmpTemp);
+        }
     }
 
-//    private boolean checkPermissions(){
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-//                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    private void requestPermissions() {
-//        String[] permissionArray = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-//        ActivityCompat.requestPermissions(this, permissionArray, PERMISSION_ID);
-//    }
+    private boolean initialize_arrayList(SharedPreferences sp) {
+        Gson gson = new Gson();
+        String json_data = sp.getString("json_data", "");
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == PERMISSION_ID) {
-//            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//                // Granted. Start getting the location information
-//                localisation = getLastLocation();
-//                //return getLocation.getLastLocation(this, this);
-//            }
-//        }
-//    }
+        if (json_data.equals("")) {
+            return false;
+        }
 
-//    private boolean isLocationEnabled(){
-//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-//                LocationManager.NETWORK_PROVIDER
-//        );
-//    }
+        Type type = new TypeToken<ArrayList<ArrayList<String>> >(){}.getType();
+        ArrayList<ArrayList<String>>  weather_data = gson.fromJson(json_data, type);
 
-//    @SuppressLint("MissingPermission")
-//    private String getLastLocation(){
-//        if (checkPermissions()) {
-//            if (isLocationEnabled()) {
-//                locationListener = new LocationListener() {
-//                    @Override
-//                    public void onLocationChanged(Location location) {
-//                        localisation = location.toString();
-//                    }
-//
-//                    @Override
-//                    public void onStatusChanged(String provider, int status, Bundle extras) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onProviderEnabled(String provider) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onProviderDisabled(String provider) {
-//
-//                    }
-//                };
-//                // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_FOR_UPDATE, MIN_DIS_FOR_UPFATE, locationListener);
-//
-//                Criteria criteria = new Criteria();
-//                criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-//                //criteria.setAltitudeRequired(true);
-//                criteria.setPowerRequirement(Criteria.POWER_LOW);
-//                criteria.setCostAllowed(true);
-//
-//                locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-//
-//
-//                String best = locationManager.getBestProvider(criteria, false);
-//                locationManager.requestLocationUpdates(best, MIN_TIME_FOR_UPDATE, MIN_DIS_FOR_UPDATE, locationListener);
-//                String provider =locationManager.getBestProvider(criteria, true);
-//                Location loc = locationManager.getLastKnownLocation(provider);
-//
-//                Log.d("GPS", "loc:" + loc.toString());
-//                return  loc.getLatitude() + "," + loc.getLongitude();
-//
-//            }
-//            else {
-//                Toast.makeText(this, "Turn on location", Toast.LENGTH_LONG).show();
-//                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//                startActivity(intent);
-//                return "";
-//            }
-//        } else {
-//            requestPermissions();
-//            return "";
-//        }
-//    }
+        forecast_data = weather_data.get(0);
+        currentConditions_data = weather_data.get(1);
+        hourlyForecast_data = weather_data.get(2);
+
+        return true;
+    }
+
+    private String lastUpdate(SharedPreferences sp) {
+        long last_update = sp.getLong("last_update", System.currentTimeMillis());
+        long time_difference = System.currentTimeMillis() - last_update;
+        last_update = TimeUnit.MILLISECONDS.toMinutes(time_difference);
+
+        String last_update_txt = "";
+        if (last_update == 0) {
+            last_update_txt = "just upadated";
+        }
+        else if (last_update < 60) {
+            last_update_txt = "last update "+ (int) last_update + " min";
+        }
+        else {
+            last_update_txt = "last update more than 60 min";
+        }
+        return last_update_txt;
+    }
+
+    private int checkUnitTemperature(boolean metricValue, int temperature) {
+        if(!metricValue) {
+            return (int) (((9 / 5) * (double)temperature) + 32);
+        }
+        else {
+            return temperature;
+        }
+    }
+
 }

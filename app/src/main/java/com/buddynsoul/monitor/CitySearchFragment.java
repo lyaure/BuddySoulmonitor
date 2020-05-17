@@ -6,46 +6,35 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class CitySearchFragment extends Fragment {
 
     private ArrayList<City> cities = new ArrayList<>();
     private TextView cityName;
-    private TextView search;
     private ListView citiesList;
     private CityAdapter adapter;
-    private URL builtUri;
-    private View v;
     private IMyService iMyService;
     private String API_KEY;
-
 
     public CitySearchFragment() {
 
@@ -53,7 +42,7 @@ public class CitySearchFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_city_search, container, false);
+        View v = inflater.inflate(R.layout.fragment_city_search, container, false);
 
         iMyService = RetrofitClient.getAccuweatherClient().create(IMyService.class);
 
@@ -107,19 +96,36 @@ public class CitySearchFragment extends Fragment {
         citiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String[] values = {cities.get(position).getCityName() ,cities.get(position).getKeyValue()};
-//                Intent i = new Intent(CitySearchFragment.this, WeatherFragment.class);
-//                i.putExtra("cityValues", values);
-//                startActivity(i);
+                //String[] values = {cities.get(position).getCityName() ,cities.get(position).getKeyValue()};
+
+                SharedPreferences sp = getContext().getSharedPreferences("Weather_autocomplete", MainActivity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("keyValue", cities.get(position).getKeyValue());
+                editor.putString("cityName", cities.get(position).getCityName());
+                editor.commit();
+
+                WeatherUtils.forecast(getContext(), true);
+                WeatherUtils.currentConditions(getContext(), true);
+
+                Fragment weather = new WeatherFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("autocomplete", true);
+                weather.setArguments(bundle);
+
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, weather); // give your fragment container id in first parameter
+                transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+                transaction.commit();
             }
         });
 
 
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new
-                    StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
+//        if (android.os.Build.VERSION.SDK_INT > 9) {
+//            StrictMode.ThreadPolicy policy = new
+//                    StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//        }
 
         return v;
     }

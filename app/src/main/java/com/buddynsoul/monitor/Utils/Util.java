@@ -1,4 +1,4 @@
-package com.buddynsoul.monitor;
+package com.buddynsoul.monitor.Utils;
 
 
 import android.app.Activity;
@@ -48,6 +48,17 @@ public abstract class Util {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         c.add(Calendar.DATE, -1);
+        return c.getTimeInMillis();
+    }
+
+    public static long getSpecificDate(int days) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(System.currentTimeMillis());
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        c.add(Calendar.DATE, -days);
         return c.getTimeInMillis();
     }
 

@@ -2,6 +2,7 @@ package com.buddynsoul.monitor;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -83,9 +84,10 @@ public class SettingsFragment extends Fragment {
         c = (RadioButton)v.findViewById(R.id.radioButtonC_ID);
         f = (RadioButton) v.findViewById(R.id.radioButtonF_ID);
 
-        sp = getActivity().getSharedPreferences("Settings", getActivity().MODE_PRIVATE);
-        final String oldTemperature = sp.getString("metricValue", "true");
-        if(oldTemperature.equals("true")) {
+        getActivity();
+        sp = getActivity().getSharedPreferences("Settings", MODE_PRIVATE);
+        final boolean oldTemperature = sp.getBoolean("metricValue", true);
+        if(oldTemperature) {
             c.setChecked(true);
             oldButton = c;
             boolTemp = true;
@@ -131,18 +133,20 @@ public class SettingsFragment extends Fragment {
 
                 String oldGoalStr = "" + oldGoal;
                 if (!oldGoalStr.equals(goal.getText().toString()) && !goal.getText().toString().equals("")){
-                    sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
+                    getActivity();
+                    sp = getActivity().getSharedPreferences("pedometer", MODE_PRIVATE);
                     editor = sp.edit();
                     editor.putInt("goal", Integer.parseInt(goal.getText().toString()));
                     editor.commit();
                 }
 
                 if(unitTemperature.getCheckedRadioButtonId() != oldButton.getId()){
-                    String temp = boolTemp ? "false" : "true";
+                    boolean temp = !boolTemp;
 
-                    sp = getActivity().getSharedPreferences("Settings", getActivity().MODE_PRIVATE);
+                    getActivity();
+                    sp = getActivity().getSharedPreferences("Settings", MODE_PRIVATE);
                     editor = sp.edit();
-                    editor.putString("metricValue", temp);
+                    editor.putBoolean("metricValue", temp);
                     editor.commit();
                 }
 
@@ -157,6 +161,19 @@ public class SettingsFragment extends Fragment {
                         .replace(R.id.container, fragment, "tag")
                         .addToBackStack(null)
                         .commit();
+
+//                Fragment fragment;
+//
+//                if(from.equals("pedometer"))
+//                    fragment = new PedometerFragment();
+//                else
+//                    fragment = new WeatherFragment();
+//
+//                getActivity().getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.container, fragment, "tag")
+//                        .addToBackStack(null)
+//                        .commit();
+                Toast.makeText(getContext(), "Changes have been successfully completed", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -164,21 +181,25 @@ public class SettingsFragment extends Fragment {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
+                getActivity();
+                sp = getActivity().getSharedPreferences("pedometer", MODE_PRIVATE);
                 editor = sp.edit();
                 editor.putInt("goal", 10000);
                 editor.commit();
 
                 goal.setText("10000");
 
-                sp = getActivity().getSharedPreferences("Settings", getActivity().MODE_PRIVATE);
+                getActivity();
+                sp = getActivity().getSharedPreferences("Settings", MODE_PRIVATE);
                 editor = sp.edit();
-                editor.putString("metricValue", "true");
+                editor.putBoolean("metricValue", true);
                 editor.commit();
 
                 c.setChecked(true);
                 oldButton = c;
                 boolTemp = true;
+
+                Toast.makeText(getContext(), "Settings have been successfully reset", Toast.LENGTH_SHORT).show();
             }
         });
 
