@@ -1,6 +1,5 @@
 package com.buddynsoul.monitor;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
@@ -18,10 +17,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class SettingsFragment extends Fragment {
-    private TextView goal;
+    private TextView goal, fromTime, toTime;
     private RadioButton oldButton, c, f;
     private int oldGoal;
     private RadioGroup temperature;
@@ -29,7 +30,7 @@ public class SettingsFragment extends Fragment {
 //    private String val;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
-    private String from;
+    private String fromFragment;
 
 
     public SettingsFragment(){
@@ -45,7 +46,7 @@ public class SettingsFragment extends Fragment {
 
         Bundle bundle = this.getArguments();
         if(bundle != null)
-            from = bundle.getString("from", "pedometer");
+            fromFragment = bundle.getString("from", "pedometer");
 
 
 
@@ -95,6 +96,34 @@ public class SettingsFragment extends Fragment {
             boolTemp = false;
         }
 
+        fromTime = (TextView) v.findViewById(R.id.fromTime_ID);
+        SharedPreferences preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
+        fromTime.setText(String.format("%02d", preferences.getInt("fromHour", 20)) + ":" + String.format("%02d", preferences.getInt("fromMinute", 0)));
+        fromTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment dialogFragment = new TimePickerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("from", "fromTime");
+                dialogFragment.setArguments(bundle);
+                dialogFragment.show(getActivity().getFragmentManager(), "time");
+            }
+        });
+
+        toTime = (TextView) v.findViewById(R.id.toTime_ID);
+        preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
+        toTime.setText(String.format("%02d", preferences.getInt("toHour", 8)) + ":" + String.format("%02d", preferences.getInt("toMinute", 0)));
+        toTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment dialogFragment = new TimePickerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("from", "toTime");
+                dialogFragment.setArguments(bundle);
+                dialogFragment.show(getActivity().getFragmentManager(), "time");
+            }
+        });
+
         Button apply = v.findViewById(R.id.applyBtn_ID);
         apply.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +148,7 @@ public class SettingsFragment extends Fragment {
 
                 Fragment fragment;
 
-                if(from.equals("pedometer"))
+                if(fromFragment.equals("pedometer"))
                     fragment = new PedometerFragment();
                 else
                     fragment = new WeatherFragment();
