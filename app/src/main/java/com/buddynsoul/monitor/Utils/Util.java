@@ -1,4 +1,4 @@
-package com.buddynsoul.monitor;
+package com.buddynsoul.monitor.Utils;
 
 
 import android.app.Activity;

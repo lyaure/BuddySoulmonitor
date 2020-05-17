@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         fragment = new PedometerFragment();
         loadFragment(fragment);
 
-        WeatherUtils.cityNameAndKeyFromLocation(MainActivity.this, MainActivity.this);
+        //WeatherUtils.cityNameAndKeyFromLocation(MainActivity.this, MainActivity.this);
 
     }
     private void loadFragment(Fragment fragment) {

@@ -34,11 +34,11 @@ import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.Utils.Util;
+import com.buddynsoul.monitor.Utils.WeatherUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -81,6 +81,8 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 
             }
         }
+
+        WeatherUtils.cityNameAndKeyFromLocation(getActivity(), getActivity());
 
 
         if (Build.VERSION.SDK_INT >= 26) {

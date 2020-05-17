@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,6 +39,7 @@ public class WeatherFragment extends Fragment {
     private ArrayList<String> hourlyForecast_data = new ArrayList<>();
 
     private SharedPreferences sp;
+    private boolean metricValue;
 
 
     public WeatherFragment() {
@@ -52,6 +54,9 @@ public class WeatherFragment extends Fragment {
             Toast.makeText(getActivity(), "Please check your internet connection", Toast.LENGTH_LONG).show();
             return v;
         }
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
+        metricValue = prefs.getBoolean("metricValue", true);
 
         // choose the right sp file and update last update text field
         TextView last_update_txtv = (TextView) v.findViewById(R.id.lastUpdate_ID);
@@ -180,12 +185,16 @@ public class WeatherFragment extends Fragment {
         // add forecast data to fragment view
         final int forecast_size = 5;
 
-        for (int i = 0, j = 0; i < forecast_size; i++, j+=2) {
+        for (int i = 0, j = 0; i < forecast_size; i++, j+=3) {
             dIconForecast.get(i).setImageResource(Integer.parseInt(forecast_data.get(j)));
-            dForecast.get(i).setText(forecast_data.get(j+1));
+            int minTemp = checkUnitTemperature(metricValue, Integer.parseInt(forecast_data.get(j+1)));
+            int maxTemp = checkUnitTemperature(metricValue, Integer.parseInt(forecast_data.get(j+2)));
+            String tmpTemp = minTemp + "°\n" + maxTemp + "°";
+            dForecast.get(i).setText(tmpTemp);
+            //dForecast.get(i).setText(forecast_data.get(j+1));
 
             if (i != 0) {
-                daysTextView.get(i-1).setText(forecast_data.get(j+2));
+                daysTextView.get(i-1).setText(forecast_data.get(j+3));
                 j++;
             }
 
@@ -199,13 +208,21 @@ public class WeatherFragment extends Fragment {
         TextView currentForecast = (TextView) v.findViewById(R.id.currentForecast_ID);
 
         currentIconForecast.setImageResource(Integer.parseInt(currentConditions_data.get(0)));
-        currentForecast.setText(currentConditions_data.get(1));
+
+        int currentConditionsTemp = checkUnitTemperature(metricValue, Integer.parseInt(currentConditions_data.get(1)));
+        String weatherText = currentConditions_data.get(2);
+        String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
+
+        currentForecast.setText(currentForecastText);
 
         // add hourly forecast data to fragment view
         for (int i = 0, j = 0; i < 4; i++, j+=3) {
             hours.get(i).setText(hourlyForecast_data.get(j));
             hIconForecast.get(i).setImageResource(Integer.parseInt(hourlyForecast_data.get(j+1)));
-            hForecast.get(i).setText(hourlyForecast_data.get(j+2));
+
+            int temp = checkUnitTemperature(metricValue, Integer.parseInt(hourlyForecast_data.get(j+2)));
+            String tmpTemp = temp + "°";
+            hForecast.get(i).setText(tmpTemp);
         }
     }
 
@@ -214,7 +231,6 @@ public class WeatherFragment extends Fragment {
         String json_data = sp.getString("json_data", "");
 
         if (json_data.equals("")) {
-            Toast.makeText(getActivity(), "change Api Key", Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -237,10 +253,22 @@ public class WeatherFragment extends Fragment {
         if (last_update == 0) {
             last_update_txt = "just upadated";
         }
-        else {
+        else if (last_update < 60) {
             last_update_txt = "last update "+ (int) last_update + " min";
         }
+        else {
+            last_update_txt = "last update more than 60 min";
+        }
         return last_update_txt;
+    }
+
+    private int checkUnitTemperature(boolean metricValue, int temperature) {
+        if(!metricValue) {
+            return (int) (((9 / 5) * (double)temperature) + 32);
+        }
+        else {
+            return temperature;
+        }
     }
 
 }

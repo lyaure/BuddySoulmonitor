@@ -1,4 +1,4 @@
-package com.buddynsoul.monitor;
+package com.buddynsoul.monitor.Utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,8 +6,11 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.MainActivity;
+import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.getLocation;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -125,8 +128,11 @@ public abstract class WeatherUtils {
                         minTemp = (int) Math.round(Double.parseDouble(temperature.getAsJsonObject("Minimum").get("Value").toString()));
                         maxTemp = (int) Math.round(Double.parseDouble(temperature.getAsJsonObject("Maximum").get("Value").toString()));
 
-                        String tmpTemp = minTemp + "°\n" + maxTemp + "°";
-                        forecast_data.add(tmpTemp);
+                        forecast_data.add(""+minTemp);
+                        forecast_data.add(""+maxTemp);
+
+                        //String tmpTemp = minTemp + "°\n" + maxTemp + "°";
+                        //forecast_data.add(tmpTemp);
 
                         // get the forecast day
                         String[] day = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
@@ -191,9 +197,6 @@ public abstract class WeatherUtils {
 
                     ArrayList<String> currentConditions_data = new ArrayList<>();
 
-                    final String METRIC_VALUE = "Metric";
-                    final String IMPERIAL_VALUE = "Imperial";
-
                     JsonArray currentConditionsJsonArray = (JsonArray) response.body();
                     String currentConditionsIconName = "i" + currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherIcon");
                     String weatherText = currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherText").toString();
@@ -201,17 +204,14 @@ public abstract class WeatherUtils {
                     int icon_id = context.getResources().getIdentifier(currentConditionsIconName, "drawable", context.getPackageName());
                     currentConditions_data.add("" + icon_id);
 
-                    double currentConditionsTemp = Math.round(Double.parseDouble("" +
+                    int currentConditionsTemp = (int) Math.round(Double.parseDouble("" +
                             currentConditionsJsonArray.get(0).getAsJsonObject().get("Temperature")
                                     .getAsJsonObject().get("Metric").getAsJsonObject().get("Value")));
 
-                    if (metricValue.equals("false")) {
-                        currentConditionsTemp = ((9 / 5) * currentConditionsTemp) + 32;
-                    }
 
-                    String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
-                    //currentForecast.setText(currentForecastText);
-                    currentConditions_data.add(currentForecastText);
+                    currentConditions_data.add("" + currentConditionsTemp);
+                    currentConditions_data.add(weatherText);
+                    //String currentForecastText = currentConditionsTemp + "°\n" + weatherText;
 
                     weather_data.set(1, currentConditions_data);
 
@@ -267,8 +267,9 @@ public abstract class WeatherUtils {
 
                         int temp = (int) Math.round(Double.parseDouble("" + temperature.get("Value")));
 
-                        String tmpTemp = temp + "°";
-                        hourlyForecast_data.add(tmpTemp);
+                        //String tmpTemp = temp + "°";
+                        //hourlyForecast_data.add(tmpTemp);
+                        hourlyForecast_data.add("" + temp);
                     }
 
                     weather_data.set(2, hourlyForecast_data);

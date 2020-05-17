@@ -21,18 +21,12 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.buddynsoul.monitor.Retrofit.IMyService;
-import com.buddynsoul.monitor.Retrofit.RetrofitClient;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.buddynsoul.monitor.Utils.Util;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-import retrofit2.Retrofit;
 
 
 /**
