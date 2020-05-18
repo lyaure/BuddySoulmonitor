@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -127,7 +128,7 @@ public class WeatherFragment extends Fragment {
             return v;
         }
 
-        ImageButton actualPosition = (ImageButton) v.findViewById(R.id.actualPositionBtn_ID);
+        Button actualPosition = (Button) v.findViewById(R.id.actualPositionBtn_ID);
         actualPosition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,7 +146,7 @@ public class WeatherFragment extends Fragment {
             }
         });
 
-        ImageButton AWLink = (ImageButton) v.findViewById(R.id.AWLink_imgButton);
+        Button AWLink = (Button) v.findViewById(R.id.AWLink_button_ID);
         AWLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -254,7 +255,7 @@ public class WeatherFragment extends Fragment {
             last_update_txt = "just upadated";
         }
         else if (last_update < 60) {
-            last_update_txt = "last update "+ (int) last_update + " min";
+            last_update_txt = "last update "+ (int) last_update + " min ago";
         }
         else {
             last_update_txt = "last update more than 60 min";
