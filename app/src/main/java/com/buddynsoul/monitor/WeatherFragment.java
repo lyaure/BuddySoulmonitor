@@ -1,8 +1,10 @@
 package com.buddynsoul.monitor;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +45,8 @@ public class WeatherFragment extends Fragment {
     private SharedPreferences sp;
     private boolean metricValue;
 
+    private LinearLayout layout;
+
 
     public WeatherFragment() {
 
@@ -50,6 +55,8 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_weather, container, false);
+
+        layout = (LinearLayout)v.findViewById(R.id.mainLayout_ID);
 
         if (!Util.isNetworkAvailable(getActivity())) {
             Toast.makeText(getActivity(), "Please check your internet connection", Toast.LENGTH_LONG).show();
@@ -203,6 +210,14 @@ public class WeatherFragment extends Fragment {
     }
 
     private void currentConditions(ArrayList<String> currentConditions_data, ArrayList<String> hourlyForecast_data) {
+//         add background according to time in day
+        sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+        boolean bool = sp.getBoolean("IsDayTime", true);
+        if(bool)
+            layout.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.day_gradiant_background));
+        else
+            layout.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.nigth_gradiant_background));
+
         // add current conditions data to fragment view
 
         ImageView currentIconForecast = (ImageView) v.findViewById(R.id.currentIconForecast_ID);
