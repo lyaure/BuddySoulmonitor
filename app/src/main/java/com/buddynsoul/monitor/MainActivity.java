@@ -21,7 +21,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-        fragment = new PedometerCurrentFragment();
+        fragment = new PedometerFragment();
         loadFragment(fragment);
 
         //WeatherUtils.cityNameAndKeyFromLocation(MainActivity.this, MainActivity.this);
@@ -40,7 +40,7 @@ public class MainActivity extends FragmentActivity {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.navigation_pedometer:
-                            fragment = new PedometerCurrentFragment();
+                            fragment = new PedometerFragment();
                             loadFragment(fragment);
                             return true;
                         case R.id.navigation_weather:
