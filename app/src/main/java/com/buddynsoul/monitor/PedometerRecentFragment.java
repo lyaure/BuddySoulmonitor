@@ -13,17 +13,17 @@ import com.buddynsoul.monitor.Utils.Util;
 
 import androidx.fragment.app.Fragment;
 
-public class Pedometer_2Fragment extends Fragment {
+public class PedometerRecentFragment extends Fragment {
     final double stepToKilometre = 0.000762;
 
 
-    public Pedometer_2Fragment(){
+    public PedometerRecentFragment(){
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_pedometer_2, container, false);
+        View v = inflater.inflate(R.layout.fragment_pedometer_recent, container, false);
 
         TextView stepsAverage_txtv = (TextView)v.findViewById(R.id.stepsAverage_ID);
         TextView distanceAverage_txtv = (TextView)v.findViewById(R.id.distanceAverage_ID);

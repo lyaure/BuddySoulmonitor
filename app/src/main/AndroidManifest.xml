@@ -25,7 +25,7 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".ResetPasswordActivity"/>
         <activity android:name=".SettingsFragment" />
-        <activity android:name=".PedometerFragment" />
+        <activity android:name=".PedometerCurrentFragment" />
         <activity android:name=".WeatherFragment" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".CitySearchFragment" />

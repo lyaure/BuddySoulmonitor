@@ -8,7 +8,7 @@
     android:background="#FFFFFF"
     android:clipToPadding="false"
     android:orientation="vertical"
-    tools:context=".PedometerFragment">
+    tools:context=".PedometerCurrentFragment">
 
     <FrameLayout
         android:layout_width="match_parent"

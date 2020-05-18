@@ -42,7 +42,7 @@ import org.json.JSONObject;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class PedometerFragment extends Fragment implements SensorEventListener {
+public class PedometerCurrentFragment extends Fragment implements SensorEventListener {
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     private TextView distance_txtv;
@@ -56,13 +56,13 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
     //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
-    public PedometerFragment(){
+    public PedometerCurrentFragment(){
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_pedometer, container, false);
+        View v = inflater.inflate(R.layout.fragment_pedometer_current, container, false);
         iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         if (Build.VERSION.SDK_INT >= 29) {
