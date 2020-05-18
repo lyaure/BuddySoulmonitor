@@ -97,6 +97,13 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         steps = v.findViewById(R.id.stepTxtv_ID);
         distance_txtv = v.findViewById(R.id.distanceTxtv_ID);
         progSteps = v.findViewById(R.id.stepProgress_ID);
+        progSteps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeVisibility(steps);
+                changeVisibility(distance_txtv);
+            }
+        });
 
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
 
@@ -214,6 +221,13 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         }
 
         return v;
+    }
+
+    private void changeVisibility(View v){
+        if(v.getVisibility() == View.VISIBLE)
+            v.setVisibility(View.INVISIBLE);
+        else
+            v.setVisibility(View.VISIBLE);
     }
 
     @Override
