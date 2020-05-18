@@ -5,7 +5,7 @@
     android:id="@+id/mainLayout_ID"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/day_gradiant_background"
+    android:background="@color/colorGray"
     android:orientation="vertical"
     tools:context=".WeatherFragment">
 
