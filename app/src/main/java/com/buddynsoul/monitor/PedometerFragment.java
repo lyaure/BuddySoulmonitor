@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
+
 public class PedometerFragment extends Fragment {
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
@@ -26,6 +28,9 @@ public class PedometerFragment extends Fragment {
         viewPager = (ViewPager) v.findViewById(R.id.viewpager_ID);
         adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
         viewPager.setAdapter(adapter);
+
+        DotsIndicator dotsIndicator = (DotsIndicator)v.findViewById(R.id.dots_indicator);
+        dotsIndicator.setViewPager(viewPager);
 
         PedometerCurrentFragment current = new PedometerCurrentFragment();
         PedometerRecentFragment recent = new PedometerRecentFragment();

@@ -5,11 +5,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="Pedometer"
+        android:textColor="@color/colorPrimary"
+        android:textSize="36sp"
+        android:textStyle="normal" />
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager_ID"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="0.95"/>
 
-
+    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+        android:id="@+id/dots_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.05"
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        app:dotsColor="#CCC"
+        app:selectedDotColor="@color/colorPrimary"
+        app:dotsSize="7dp"
+        app:dotsWidthFactor="3"
+        />
 
 </LinearLayout>
