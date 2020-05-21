@@ -1,8 +1,10 @@
 package com.buddynsoul.monitor;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -10,8 +12,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +45,8 @@ public class WeatherFragment extends Fragment {
     private SharedPreferences sp;
     private boolean metricValue;
 
+    private LinearLayout layout;
+
 
     public WeatherFragment() {
 
@@ -49,6 +55,8 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_weather, container, false);
+
+        layout = (LinearLayout)v.findViewById(R.id.mainLayout_ID);
 
         if (!Util.isNetworkAvailable(getActivity())) {
             Toast.makeText(getActivity(), "Please check your internet connection", Toast.LENGTH_LONG).show();
@@ -127,7 +135,7 @@ public class WeatherFragment extends Fragment {
             return v;
         }
 
-        ImageButton actualPosition = (ImageButton) v.findViewById(R.id.actualPositionBtn_ID);
+        Button actualPosition = (Button) v.findViewById(R.id.actualPositionBtn_ID);
         actualPosition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,7 +153,7 @@ public class WeatherFragment extends Fragment {
             }
         });
 
-        ImageButton AWLink = (ImageButton) v.findViewById(R.id.AWLink_imgButton);
+        Button AWLink = (Button) v.findViewById(R.id.AWLink_button_ID);
         AWLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -202,6 +210,14 @@ public class WeatherFragment extends Fragment {
     }
 
     private void currentConditions(ArrayList<String> currentConditions_data, ArrayList<String> hourlyForecast_data) {
+//         add background according to time in day
+        sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+        boolean bool = sp.getBoolean("IsDayTime", true);
+        if(bool)
+            layout.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.day_gradiant_background));
+        else
+            layout.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.nigth_gradiant_background));
+
         // add current conditions data to fragment view
 
         ImageView currentIconForecast = (ImageView) v.findViewById(R.id.currentIconForecast_ID);
@@ -254,7 +270,7 @@ public class WeatherFragment extends Fragment {
             last_update_txt = "just upadated";
         }
         else if (last_update < 60) {
-            last_update_txt = "last update "+ (int) last_update + " min";
+            last_update_txt = "last update "+ (int) last_update + " min ago";
         }
         else {
             last_update_txt = "last update more than 60 min";

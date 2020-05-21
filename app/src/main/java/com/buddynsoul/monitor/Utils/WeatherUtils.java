@@ -201,6 +201,15 @@ public abstract class WeatherUtils {
                     String currentConditionsIconName = "i" + currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherIcon");
                     String weatherText = currentConditionsJsonArray.get(0).getAsJsonObject().get("WeatherText").toString();
                     weatherText = weatherText.substring(1, weatherText.length()-1);
+
+                    String day = currentConditionsJsonArray.get(0).getAsJsonObject().get("IsDayTime").toString();
+                    boolean isDayTime = day.equals("true")? true : false;
+
+                    SharedPreferences sp = context.getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putBoolean("IsDayTime", isDayTime);
+                    editor.commit();
+
                     int icon_id = context.getResources().getIdentifier(currentConditionsIconName, "drawable", context.getPackageName());
                     currentConditions_data.add("" + icon_id);
 

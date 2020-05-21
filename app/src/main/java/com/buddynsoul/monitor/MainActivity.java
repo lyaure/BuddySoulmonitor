@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends FragmentActivity {
@@ -59,7 +57,7 @@ public class MainActivity extends FragmentActivity {
                             Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container);
                             Bundle bundle = new Bundle();
 
-                            if(tmp instanceof PedometerFragment)
+                            if(tmp instanceof PedometerCurrentFragment)
                                 bundle.putString("from", "pedometer");
                             else
                                 bundle.putString("from", "weather");
