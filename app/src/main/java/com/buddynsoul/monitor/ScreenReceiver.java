@@ -8,6 +8,12 @@ import android.hardware.SensorEventListener;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class ScreenReceiver extends BroadcastReceiver {
@@ -21,11 +27,17 @@ public class ScreenReceiver extends BroadcastReceiver {
 
         SharedPreferences sp = context.getSharedPreferences("tempData", MODE_PRIVATE);
 
-
         if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Screen Off");
 
             long tmpScreenOff = sp.getLong("tmpScreenOff", System.currentTimeMillis());
+
+            ArrayList<long[]>  screenInterval = retrieveArrayList(sp);
+            long endCounterScreen = System.currentTimeMillis();
+            long[] interval = {tmpScreenOff, endCounterScreen};
+            screenInterval.add(interval);
+            addToSharedPreference(sp, screenInterval);
+
 
             long durationScreenOff = System.currentTimeMillis() - tmpScreenOff;
             durationScreenOff /= 1000; // convert time to sec
@@ -40,6 +52,7 @@ public class ScreenReceiver extends BroadcastReceiver {
 
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
         }
+
         else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Screen Off");
 
@@ -82,5 +95,27 @@ public class ScreenReceiver extends BroadcastReceiver {
 
 
 
+    }
+
+    private void addToSharedPreference(SharedPreferences sp, ArrayList<long[]> screenInterval) {
+        SharedPreferences.Editor editor = sp.edit();
+        Gson gson = new Gson();
+        String json_data = gson.toJson(screenInterval);
+        editor.putString("json_data", json_data);
+        editor.commit();
+    }
+
+    private ArrayList<long[]> retrieveArrayList(SharedPreferences sp) {
+        Gson gson = new Gson();
+        String json_data = sp.getString("json_data", "");
+
+        if (json_data.equals("")) {
+            return new ArrayList<long[]>();
+        }
+
+        Type type = new TypeToken<ArrayList<long[]>>(){}.getType();
+        ArrayList<long[]>  screenInterval = gson.fromJson(json_data, type);
+
+        return screenInterval;
     }
 }

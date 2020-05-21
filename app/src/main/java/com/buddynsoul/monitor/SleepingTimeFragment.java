@@ -29,6 +29,12 @@ public class SleepingTimeFragment extends Fragment {
         if(statData != -1)
             data.setText(String.valueOf(statData));
 
+        TextView sleeping_time_txtv = (TextView)v.findViewById(R.id.sleeping_time_ID);
+
+        int sleepingTime = sp.getInt("sleepingTime", -1);
+        if (sleepingTime != -1)
+            sleeping_time_txtv.setText(String.valueOf(sleepingTime));
+
         return v;
     }
 }

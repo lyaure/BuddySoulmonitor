@@ -422,36 +422,8 @@ public class PedometerFragment extends Fragment implements SensorEventListener {
 
         SharedPreferences sp = this.getActivity().getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
-//        refreshToken = refreshToken.substring(1, refreshToken.length()-1);
-
-
-
-
-        // Init Service
-//        Retrofit retrofitClient = RetrofitClient.getInstance();
-//        iMyService = retrofitClient.create(IMyService.class);
 
         String dataToSend = preprocessData();
-
-//        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<String>() {
-//                    @Override
-//                    public void accept(String response) throws Exception {
-//                        if (!response.equals("\"Wrong password\"")) {
-//                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-//                            SharedPreferences.Editor editor = sp.edit();
-//                            editor.putBoolean("sendToServer", true);
-//                            editor.commit();
-//
-//                        }
-//                        else {
-//                            Toast.makeText(PedometerActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                    }
-//                }));
 
         Call<String> todoCall = iMyService.sendData(refreshToken, dataToSend);
         todoCall.enqueue(new Callback<String>() {

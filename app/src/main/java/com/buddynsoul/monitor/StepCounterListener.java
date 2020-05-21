@@ -17,14 +17,23 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.buddynsoul.monitor.Utils.Util;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -57,17 +66,20 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private static SharedPreferences sp;
     private static SharedPreferences.Editor editor;
 
-    private float oldPitch, oldRoll, oldAzimuth;
-    private boolean flagAccStart;
+    private ArrayList<long[]> lightInterval = new ArrayList<>();
+    private ArrayList<long[]> stationaryInterval = new ArrayList<>();
 
-    ///////////////
-    private int startHour = 20, startMin = 00, endHour = 23, endMin = 30;
+    private float oldPitch, oldRoll, oldAzimuth;
+
+    private int startHour = 13, startMin = 37, endHour = 13, endMin = 38;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        // step counter sensor
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             if (event.values[0] > Integer.MAX_VALUE) {
-                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
+                if (BuildConfig.DEBUG)
+                    Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
                 return;
             } else {
                 steps = (int) event.values[0];
@@ -75,12 +87,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
             }
         }
 
+        // light sensor
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             if (event.values[0] > Integer.MAX_VALUE) {
-                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
+                if (BuildConfig.DEBUG)
+                    Log.d("DebugStepCounter", "probably not a real value: " + event.values[0]);
                 return;
-            }
-            else {
+            } else {
                 float luxVal = event.values[0];
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
                 if (luxVal == 0 && !inDarkRoom) {
@@ -92,12 +105,16 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     editor.putBoolean("inDarkRoom", true);
                     editor.commit();
-                }
-                else if (luxVal != 0 && inDarkRoom) {
+                } else if (luxVal != 0 && inDarkRoom) {
 
                     SharedPreferences.Editor editor = sp.edit();
 
                     long tmpLight = sp.getLong("tmpLight", System.currentTimeMillis());
+
+                    long endCounterLight = System.currentTimeMillis();
+                    long[] interval = {tmpLight, endCounterLight};
+                    lightInterval.add(interval);
+
                     long lightDuration = System.currentTimeMillis() - tmpLight;
                     lightDuration /= 1000; // convert time to sec
 
@@ -113,36 +130,56 @@ public class StepCounterListener extends Service implements SensorEventListener 
             }
         }
 
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+        // accelerometer sensor
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             float tempX = oldPitch - event.values[0];
             float tempY = oldRoll - event.values[1];
             float tempZ = oldAzimuth - event.values[2];
 
-            if(tempX > Math.abs(1) || tempY > Math.abs(1) || tempZ > Math.abs(1)) {
+            if (tempX > Math.abs(1) || tempY > Math.abs(1) || tempZ > Math.abs(1)) {
 
                 editor = sp.edit();
 
-                Toast.makeText(this, "phone is moving", Toast.LENGTH_SHORT).show();
+                if (BuildConfig.DEBUG)
+                    Log.d("DebugStepCounter", "phone is moving: x=" + tempX + " y=" + tempY + " z=" + tempZ);
 
-//                Toast.makeText(this, "phone is moving\n x=" + tempX + "\ny=" + tempY + "\nz=" + tempZ, Toast.LENGTH_LONG).show();
-                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "phone is moving: x=" + tempX + " y=" + tempY + " z=" + tempZ);
-
+                // get the last time when the phone was stationary
                 long tmpStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
-                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "tmp stationary: " + tmpStationary);
+                if (BuildConfig.DEBUG)
+                    Log.d("DebugStepCounter", "tmp stationary: " + tmpStationary);
 
+                // get the stationary duration time
                 long stationaryDuration = System.currentTimeMillis() - tmpStationary;
-                stationaryDuration /= 1000; // convert time to sec
 
-                stationaryDuration += sp.getLong("stationary", 0);
-                editor.putLong("stationary", stationaryDuration);
+                if (stationaryDuration >= 1000) {
+                    stationaryDuration /= 1000; // convert time to sec
 
+                    long endCounterStationary = System.currentTimeMillis();
+                    long[] interval = {tmpStationary, endCounterStationary};
+                    stationaryInterval.add(interval);
+
+                    // add the current stationary duration our stationary variable
+                    stationaryDuration += sp.getLong("stationary", 0);
+                    editor.putLong("stationary", stationaryDuration);
+
+                    String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t"
+                            + "tmpStationary: " + tmpStationary + "\n\t\t\t\t\t"
+                            + "stationaryDuration: " + (System.currentTimeMillis() - tmpStationary) + "\n\t\t\t\t\t"
+                            + "stationaryDuration(sec): " + stationaryDuration + "\n\t\t\t\t\t"
+                            + "tmpStationary: " + tmpStationary + "\n";
+
+                    generateNoteOnSD(this, "buddynsoul_debug_sleeping", txt_body);
+                }
+
+                // update the tmpStationary for the next time (event)
                 tmpStationary = System.currentTimeMillis();
                 editor.putLong("tmpStationary", tmpStationary);
 
                 editor.commit();
 
-                if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "Duration stationary: " + stationaryDuration + " sec");
+                if (BuildConfig.DEBUG)
+                    Log.d("DebugStepCounter", "Duration stationary: " + stationaryDuration + " sec");
             }
 
             oldPitch = event.values[0];
@@ -155,7 +192,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
     public void onAccuracyChanged(final Sensor sensor, int accuracy) {
         // nobody knows what happens here: step value might magically decrease
         // when this method is called...
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", sensor.getName() + " accuracy changed: " + accuracy);
+        if (BuildConfig.DEBUG)
+            Log.d("DebugStepCounter", sensor.getName() + " accuracy changed: " + accuracy);
     }
 
     /**
@@ -187,8 +225,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             showNotification(); // update notification
             //WidgetUpdateService.enqueueUpdate(this);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -214,26 +251,62 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
         editor = sp.edit();
 
-        int endH = endHour, endM = endMin;
-        if(endMin == 0){
-            endM = 59;
-            endH -= 1;
-        }
-        else
-            endM --;
 
-//        if (isTimeBetweenTwoHours(7, 59, 20, 0)) {
-        if (isTimeBetweenTwoHours(endH, endM, startHour, startMin)) {// day
-            // calculate sleeping time and add it to the db
-//            boolean check = sp.getBoolean("sleepingTimeSavedInDb", false);
+        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //night
 
-            //Log.d("DebugStepCounter", "Check: "+ check);
-            if (!sp.getBoolean("sleepingTimeSavedInDb", false)) {
-                double sleepingTime = calculateSleepingTime();
-                Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
+            Log.d("DebugStepCounter", "stationary(need to be 0 at start): " + sp.getLong("stationary", 0));
+
+            editor.putLong("stationary", 0);
+            editor.putLong("tmpStationary", System.currentTimeMillis());
+
+            editor.putLong("screenOff", 0);
+            editor.putLong("tmpScreenOff", System.currentTimeMillis());
+
+            editor.putLong("light", 0);
+            editor.putLong("tmpLight", System.currentTimeMillis());
+            editor.putString("json_data", "");
+            editor.commit();
+
+            String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t"
+                    + "tmpStationary: " + sp.getLong("tmpStationary", System.currentTimeMillis()) + "\n\t\t\t\t\t"
+                    + "stationary(need to be 0 at start): " + sp.getLong("stationary", 0) + "\n\t\t\t\t\t";
+
+            generateNoteOnSD(this, "buddynsoul_debug_sleeping", txt_body);
+
+            String lastLocation = getLocation.getLastLocation(null, this);
+            if (!sp.getBoolean("nightLocationSavedInDb", false) && !lastLocation.equals("")) {
                 Database db = new Database(this);
+
+                // if it's after or equal to midnight, we need to select the date of the day before
+                long update_date = -1;
+                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 8) {
+                    update_date = Util.getYesterday();
+                } else {
+                    update_date = Util.getToday();
+                }
+
+                db.insertLocation(update_date, lastLocation, "night_location");
+
+                editor.putBoolean("nightLocationSavedInDb", true);
+                editor.commit();
+
+                Log.d("DebugStepCounter", "Location night: " + lastLocation);
+            }
+        }
+        else {            // day (not sleeping period)
+            // calculate sleeping time and add it to the db
+            if (!sp.getBoolean("sleepingTimeSavedInDb", false)) {
+                int sleepingTime = calculateSleepingTime();
+
+                Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
+
+                Database db = new Database(this);
+
 //                db.insertSleepingTime(Util.getYesterday(), sleepingTime);
                 db.insertSleepingTime(Util.getYesterday(), sp.getLong("stat", 0));
+
+                editor.putInt("sleepingTime", sleepingTime);
+
                 editor.putBoolean("sleepingTimeSavedInDb", true);
                 editor.commit();
 
@@ -253,37 +326,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 Log.d("DebugStepCounter", "Location morning: " + lastLocation);
             }
 
-            // send data to the server
-
-        }
-        else { //night
-            if(!sp.getBoolean("statStart", true)) {
-                editor.putLong("tmpStationary", System.currentTimeMillis());
-                editor.putLong("stationary", 0);
-                editor.putBoolean("statStart", true);
-                editor.commit();
-            }
-
-            String lastLocation = getLocation.getLastLocation(null, this);
-            if (!sp.getBoolean("nightLocationSavedInDb", false) && !lastLocation.equals("")) {
-                Database db = new Database(this);
-
-                // if it's after or equal to midnight, we need to select the date of the day before
-                long update_date = -1; // remove??
-                if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 8) {
-                    update_date = Util.getYesterday();
-                }
-                else {
-                    update_date = Util.getToday();
-                }
-
-                db.insertLocation(update_date, lastLocation, "night_location");
-
-                editor.putBoolean("nightLocationSavedInDb", true);
-                editor.commit();
-
-                Log.d("DebugStepCounter", "Location night: " + lastLocation);
-            }
+            // todo send data to the server
         }
 
 
@@ -298,7 +341,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
         // restart service every hour to save the current step count
         long nextUpdate = Math.min(Util.getTomorrow(), System.currentTimeMillis() + AlarmManager.INTERVAL_HOUR);
 
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "next update: " + new Date(nextUpdate).toLocaleString());
+        if (BuildConfig.DEBUG)
+            Log.d("DebugStepCounter", "next update: " + new Date(nextUpdate).toLocaleString());
 
         AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         PendingIntent pi = PendingIntent
@@ -316,45 +360,73 @@ public class StepCounterListener extends Service implements SensorEventListener 
     }
 
     // calculate sleeping time in sec
-    public static double calculateSleepingTime() {
+    private int calculateSleepingTime() {
 
-        final double LIGHT_COEFFICIENT = 0.0626;
-        final double LOCK_SCREEN_COEFFICIENT = 0.0772;
-        final double CHARGE_COEFFICIENT = 0.0707;
-        final double STATIONARY_COEFFICIENT = 0.8218;
+        // add last interval for stationary sensor
+        long startCounterStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
+        long endCounterStationary = System.currentTimeMillis();
+        long[] interval = {startCounterStationary, endCounterStationary};
+        stationaryInterval.add(interval);
 
-        double sleepingTime = 0;
+        // add last interval for light sensor
+        long startCounterLight = sp.getLong("tmpLight", System.currentTimeMillis());
+        long endCounterLight = System.currentTimeMillis();
+        interval[0] = startCounterLight;
+        interval[1] = endCounterLight;
+        lightInterval.add(interval);
 
-        sleepingTime += sp.getLong("light", 0) * LIGHT_COEFFICIENT;
-        sleepingTime += sp.getLong("screenOff", 0) * LOCK_SCREEN_COEFFICIENT;
-        sleepingTime += sp.getLong("charge", 0) * CHARGE_COEFFICIENT;
-        sleepingTime += sp.getLong("stationary", 0) * STATIONARY_COEFFICIENT;
+        // add last interval for screen sensor
+        long startCounterScreen = sp.getLong("tmpScreenOff", System.currentTimeMillis());
+        long endCounterScreen = System.currentTimeMillis();
+        interval[0] = startCounterScreen;
+        interval[1] = endCounterScreen;
+        ArrayList<long[]> screenIntervals = retrieveArrayList(sp);
+        screenIntervals.add(interval);
+        addToSharedPreference(sp, screenIntervals);
 
-        //////////////
+        //////////////////////////////////// for printing in file //////////////////////////////////////////////
+
         long tmp = sp.getLong("stationary", 0);
-        tmp += (System.currentTimeMillis() - sp.getLong("tmpStationary", System.currentTimeMillis()))/1000;
+        tmp += (System.currentTimeMillis() - sp.getLong("tmpStationary", System.currentTimeMillis())) / 1000;
         editor.putLong("stat", tmp);
-        editor.putBoolean("statStart", false);
+
+        long tmp2 = sp.getLong("screenOff", 0);
+        tmp2 += (System.currentTimeMillis() - sp.getLong("tmpScreenOff", System.currentTimeMillis())) / 1000;
+
+        String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + "\n\t\t\t\t\t"
+                + "stationary: " + sp.getLong("stationary", 0) + "\n\t\t\t\t\t"
+                + "currentTimeMillis(): " + System.currentTimeMillis() + "\n\t\t\t\t\t"
+                + "tmpStationary: " + sp.getLong("tmpStationary", System.currentTimeMillis()) + "\n\t\t\t\t\t"
+                + "Calculate sleeping time(stationary): " + tmp + "\n\t\t\t\t\t"
+                + "ScreenOff: " + tmp2 + "\n";
+
+        txt_body += "Stationary interval: " + arrayListToString(stationaryInterval) + "\n\t\t\t\t\t"
+                + "Dark room interval: " + arrayListToString(lightInterval) + "\n\t\t\t\t\t"
+                + "Screen off interval: " + arrayListToString(retrieveArrayList(sp)) + "\n";
+
+        generateNoteOnSD(this, "buddynsoul_debug_sleeping", txt_body);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        editor.putBoolean("sleepingTimeStart", false);
         editor.commit();
 
-        if (BuildConfig.DEBUG){
-            Log.d("DebugStepCounter","light Time: " + sp.getLong("light", 0));
-            Log.d("DebugStepCounter","screenOff Time: " + sp.getLong("screenOff", 0));
-            Log.d("DebugStepCounter","charge Time: " + sp.getLong("charge", 0));
-            Log.d("DebugStepCounter","stationary Time: " + sp.getLong("stationary", 0));
-        }
-        return Math.round(sleepingTime);
+        //////// todo NEW ALGORITHM  /////////
+        // return sleeping_time
+
+
+        return -1;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","SensorListener onCreate");
+        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "SensorListener onCreate");
     }
 
     @Override
-    public void onTaskRemoved(Intent rootIntent){
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","sensor service task removed");
+    public void onTaskRemoved(Intent rootIntent) {
+        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "sensor service task removed");
         Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
         restartServiceIntent.setPackage(getPackageName());
         PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
@@ -373,7 +445,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","SensorListener onDestroy");
+        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "SensorListener onDestroy");
         try {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             sm.unregisterListener(this);
@@ -427,22 +499,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private void registerBroadcastReceiver() {
 
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","register broadcastreceiver");
+        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "register broadcastreceiver");
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SHUTDOWN);
         registerReceiver(shutdownReceiver, filter);
 
-        int startH = startHour, startM = startMin;
-        if(startMin == 0){
-            startM = 59;
-            startH -= 1;
-        }
-        else
-            startM --;
-
-//        if (isTimeBetweenTwoHours(19, 59, 8, 0)) {
-        if (isTimeBetweenTwoHours(startH, startM, endHour, endMin)) {
+        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) {
             if (Build.VERSION.SDK_INT >= 23) {
                 filter = new IntentFilter();
                 filter.addAction(ACTION_CHARGING);
@@ -456,7 +519,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private void reRegisterSensorAndSetAlarm() {
 
-        if (BuildConfig.DEBUG) Log.d("DebugStepCounter","re-register sensor listener");
+        if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "re-register sensor listener");
 
         // open the 'tempData' shared preference file
         sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
@@ -467,10 +530,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         try {
             sm.unregisterListener(this);
-            Toast.makeText(this, "OFF", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "OFF", Toast.LENGTH_LONG).show();
             this.unregisterReceiver(screenReceiver);
         } catch (Exception e) {
-            if (BuildConfig.DEBUG) Log.d("error",e.toString());
+            if (BuildConfig.DEBUG) Log.d("error", e.toString());
             e.printStackTrace();
         }
 
@@ -483,23 +546,11 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
 
-        int startH = startHour, startM = startMin;
-        if(startMin == 0){
-            startM = 59;
-            startH -= 1;
-        }
-        else
-            startM--;
-
-//        if (isTimeBetweenTwoHours(20, 0, 8, 0)) {
-//        if (isTimeBetweenTwoHours(19, 59, 8, 0)) {
-        if (isTimeBetweenTwoHours(startH, startM, endHour, endMin)) { //night
-            flagAccStart = true;
+        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //night
             // in this hour interval we enable the light and the accelerometer sensor
 
             editor.putBoolean("sleepingTimeSavedInDb", false);
             editor.putBoolean("morningLocationSavedInDb", false);
-            //editor.putBoolean("nightLocationSavedInDb", false);
 
             if (BuildConfig.DEBUG) {
                 if (sm.getSensorList(Sensor.TYPE_LIGHT).size() < 1) return; // emulator
@@ -528,49 +579,34 @@ public class StepCounterListener extends Service implements SensorEventListener 
             // if it's after or equal 8 am schedule for next day
 //            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 8 &&
 //                    Calendar.getInstance().get(Calendar.MINUTE) >= 00 ) {
-            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == endHour && Calendar.getInstance().get(Calendar.MINUTE) >= endMin
-                || Calendar.getInstance().get(Calendar.HOUR_OF_DAY) > endHour ){
+            String to_debug = "\nActual Hour: " + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + " End Hour: " + endHour +"\n"
+                    + "Actual Min: " + Calendar.getInstance().get(Calendar.MINUTE) + " End Minute: " + endMin;
+
+            Log.d("StepCounterDebug", to_debug);
+
+            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= endHour && Calendar.getInstance().get(Calendar.MINUTE) >= endMin) {
                 calendarEnd.add(Calendar.DAY_OF_YEAR, 1); // add, not set!
-                Log.d("DebugStepCounter", "Alarm will schedule for next day at 8!");
-            }
-            else{
-                Log.d("DebugStepCounter", "Alarm will schedule for today!");
+                //Log.d("DebugStepCounter", "Alarm will schedule for next day at " + endHour + ": " + endMin +" !");
+            } else {
+                //Log.d("DebugStepCounter", "Alarm will schedule for today!");
             }
 
             calendarEnd.set(Calendar.HOUR_OF_DAY, endHour);
             calendarEnd.set(Calendar.MINUTE, endMin);
             calendarEnd.set(Calendar.SECOND, 0);
 
-            if (BuildConfig.DEBUG) Log.d("DebugStepCounter", "next alarm1: " + new Date(calendarEnd.getTimeInMillis()).toLocaleString());
+            if (BuildConfig.DEBUG)
+                Log.d("DebugStepCounter", "Next Alarm1: " + new Date(calendarEnd.getTimeInMillis()).toLocaleString());
 
             if (Build.VERSION.SDK_INT >= 23) {
                 //alarmService.setExact(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
-                alarmService.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
+                alarmService.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendarEnd.getTimeInMillis(), restartServicePendingIntent);
+            } else {
+                alarmService.set(AlarmManager.RTC_WAKEUP, calendarEnd.getTimeInMillis(), restartServicePendingIntent);
             }
-            else {
-                alarmService.set(AlarmManager.RTC_WAKEUP ,calendarEnd.getTimeInMillis(), restartServicePendingIntent);
-            }
-        }
-        else { //day
+        } else { //day
 
-            //editor.putBoolean("morningLocationSavedInDb", false);
-            //editor.putBoolean("nightLocationSavedInDb", true);
             editor.putBoolean("nightLocationSavedInDb", false);
-
-            if (flagAccStart) {
-                Toast.makeText(this, "Reset all", Toast.LENGTH_LONG).show();
-                editor.putLong("screenOff", 0);
-                editor.putLong("tmpScreenOff", System.currentTimeMillis());
-                editor.putLong("stationary", 0);
-                editor.putLong("tmpStationary", System.currentTimeMillis());
-                editor.putLong("light", 0);
-                editor.putLong("tmpLight", System.currentTimeMillis());
-                editor.putBoolean("inDarkRoom", false);
-                editor.putLong("charge", 0);
-                editor.putLong("tmpCharge", System.currentTimeMillis());
-
-                flagAccStart = false;
-            }
 
 
             // set alarm to enable the light sensor at lower bound sleeping time
@@ -586,7 +622,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             // if it's after or equal 8 am schedule for next day
 //            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 20) {
             if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == startHour && Calendar.getInstance().get(Calendar.MINUTE) >= startMin
-                || Calendar.getInstance().get(Calendar.HOUR_OF_DAY) > startHour) {
+                    || Calendar.getInstance().get(Calendar.HOUR_OF_DAY) > startHour) {
                 calendarStart.add(Calendar.DAY_OF_YEAR, 1); // add, not set!
             }
             calendarStart.set(Calendar.HOUR_OF_DAY, startHour);
@@ -597,10 +633,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
             if (Build.VERSION.SDK_INT >= 23) {
                 //alarmService.setExact(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
-                alarmService.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
-            }
-            else {
-                alarmService.set(AlarmManager.RTC_WAKEUP ,calendarStart.getTimeInMillis(), restartServicePendingIntent);
+                alarmService.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendarStart.getTimeInMillis(), restartServicePendingIntent);
+            } else {
+                alarmService.set(AlarmManager.RTC_WAKEUP, calendarStart.getTimeInMillis(), restartServicePendingIntent);
             }
         }
         editor.commit();
@@ -626,7 +661,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     /**
      * @param fromHour Start Time
-     * @param toHour Stop Time
+     * @param toHour   Stop Time
      * @return true if Current Time is between fromHour and toHour
      */
     private boolean isTimeBetweenTwoHours(int fromHour, int fromMinute, int toHour, int toMinute) {
@@ -640,52 +675,79 @@ public class StepCounterListener extends Service implements SensorEventListener 
         to.set(Calendar.MINUTE, toMinute);
 
         Calendar now = Calendar.getInstance();
+        now.set(Calendar.SECOND, 1);
         now.getTimeInMillis();
         //now.setTimeInMillis(System.currentTimeMillis());
 
-        if(to.before(from)) {
-            if (now.after(to)){
-                to.add(Calendar.DATE, 1);
-            }
-            else {
-                from.add(Calendar.DATE, -1);
-            }
-        }
+//        if (to.before(from)) {
+//            if (now.after(to)) {
+//                to.add(Calendar.DATE, 1);
+//            } else {
+//                from.add(Calendar.DATE, -1);
+//            }
+//        }
+
         return now.after(from) && now.before(to);
     }
 
-    private void preprocessData(String email, String steps, String sleepingTime,
-                                      String morning_location, String night_location) {
-
-//        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-//        String refreshToken = sp.getString("refreshToken", "");
-//
-//        // Init Service
-//        Retrofit retrofitClient = RetrofitClient.getInstance();
-//        iMyService = retrofitClient.create(IMyService.class);
-//
-//        String dataToSend = "Test 1, Test 2, Test 3";
-//
-//        compositeDisposable.add(iMyService.sendData(refreshToken, dataToSend)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<String>() {
-//                    @Override
-//                    public void accept(String response) throws Exception {
-//                        if (!response.equals("\"Wrong password\"")) {
-//                            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-//                            SharedPreferences.Editor editor = sp.edit();
-//                            editor.putBoolean("sendToServer", true);
-//                            editor.commit();
-//
-//                        }
-//                        else {
-//
-//                        }
-//
-//                    }
-//                }));
-
-        //return null;
+    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
+        try {
+            File root = new File(Environment.getExternalStorageDirectory(), "buddynsoul_debug");
+            if (!root.exists()) {
+                boolean mkdirs = root.mkdirs();
+                if (!mkdirs)
+                    return;
+            }
+            File file = new File(root, sFileName + ".txt");
+            FileOutputStream writer = new FileOutputStream(file, true);
+            OutputStreamWriter streamWriter = new OutputStreamWriter(writer);
+            sBody = "\n" + sBody;
+            streamWriter.append(sBody);
+            streamWriter.flush();
+            streamWriter.close();
+            writer.close();
+            //Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    private ArrayList<long[]> retrieveArrayList(SharedPreferences sp) {
+        Gson gson = new Gson();
+        String json_data = sp.getString("json_data", "");
+
+        if (json_data.equals("")) {
+            return new ArrayList<long[]>();
+        }
+
+        Type type = new TypeToken<ArrayList<long[]>>() {
+        }.getType();
+        ArrayList<long[]> screenInterval = gson.fromJson(json_data, type);
+
+        return screenInterval;
+    }
+
+    private void addToSharedPreference(SharedPreferences sp, ArrayList<long[]> screenInterval) {
+        SharedPreferences.Editor editor = sp.edit();
+        Gson gson = new Gson();
+        String json_data = gson.toJson(screenInterval);
+        editor.putString("json_data", json_data);
+        editor.commit();
+    }
+
+    private StringBuilder arrayListToString(ArrayList<long[]> arrayListToConvert) {
+        StringBuilder str = new StringBuilder();
+        str.append("[ ");
+        for (int i = 0; i < arrayListToConvert.size(); i++) {
+            long[] s = arrayListToConvert.get(i);
+            str.append("[").append(s[0]).append(", ");
+            str.append(s[1]).append("]");
+            if (i != arrayListToConvert.size() - 1) {
+                str.append(", ");
+            }
+        }
+        str.append(" ]");
+        return str;
+    }
+
 }

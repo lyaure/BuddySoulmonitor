@@ -14,11 +14,30 @@
         android:layout_height="wrap_content"
         android:foregroundGravity="center"
         android:gravity="center"
-        android:text="Stationanry test"
+        android:text="Stationary test"
         android:textSize="24sp" />
 
     <TextView
         android:id="@+id/stat_data_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="center"
+        android:gravity="center"
+        android:text="no data yet"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="center"
+        android:gravity="center"
+        android:text="Sleeping time"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/sleeping_time_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foregroundGravity="center"
