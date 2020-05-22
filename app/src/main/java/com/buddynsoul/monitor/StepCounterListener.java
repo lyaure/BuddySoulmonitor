@@ -33,10 +33,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import androidx.annotation.RequiresApi;
 
 
 /**
@@ -71,7 +74,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private float oldPitch, oldRoll, oldAzimuth;
 
-    private int startHour = 13, startMin = 37, endHour = 13, endMin = 38;
+    //private int startHour = 20, startMin = 00, endHour = 8, endMin = 00;
+    int startHour = 20, startMin = 00, endHour = 8, endMin;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -170,16 +174,17 @@ public class StepCounterListener extends Service implements SensorEventListener 
                             + "tmpStationary: " + tmpStationary + "\n";
 
                     generateNoteOnSD(this, "buddynsoul_debug_sleeping", txt_body);
+
+                    // update the tmpStationary for the next time (event)
+                    tmpStationary = System.currentTimeMillis();
+                    editor.putLong("tmpStationary", tmpStationary);
+
+                    editor.commit();
+
+                    if (BuildConfig.DEBUG)
+                        Log.d("DebugStepCounter", "Duration stationary: " + stationaryDuration + " sec");
                 }
 
-                // update the tmpStationary for the next time (event)
-                tmpStationary = System.currentTimeMillis();
-                editor.putLong("tmpStationary", tmpStationary);
-
-                editor.commit();
-
-                if (BuildConfig.DEBUG)
-                    Log.d("DebugStepCounter", "Duration stationary: " + stationaryDuration + " sec");
             }
 
             oldPitch = event.values[0];
@@ -250,6 +255,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
         editor = sp.edit();
+
+        SharedPreferences settings_preferences = this.getSharedPreferences("prefTime", MODE_PRIVATE);
+        startHour = settings_preferences.getInt("fromHour", 20);
+        startMin = settings_preferences.getInt("fromMinute", 0);
+
+        endHour = settings_preferences.getInt("toHour", 8);
+        endMin = settings_preferences.getInt("toMinute", 0);
 
 
         if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //night
@@ -368,21 +380,24 @@ public class StepCounterListener extends Service implements SensorEventListener 
         long[] interval = {startCounterStationary, endCounterStationary};
         stationaryInterval.add(interval);
 
-        // add last interval for light sensor
-        long startCounterLight = sp.getLong("tmpLight", System.currentTimeMillis());
-        long endCounterLight = System.currentTimeMillis();
-        interval[0] = startCounterLight;
-        interval[1] = endCounterLight;
-        lightInterval.add(interval);
+//        // add last interval for light sensor
+//        long startCounterLight = sp.getLong("tmpLight", System.currentTimeMillis());
+//        long endCounterLight = System.currentTimeMillis();
+//        interval[0] = startCounterLight;
+//        interval[1] = endCounterLight;
+//        lightInterval.add(interval);
 
-        // add last interval for screen sensor
-        long startCounterScreen = sp.getLong("tmpScreenOff", System.currentTimeMillis());
-        long endCounterScreen = System.currentTimeMillis();
-        interval[0] = startCounterScreen;
-        interval[1] = endCounterScreen;
+        // todo check again these rows
+//        // add last interval for screen sensor
         ArrayList<long[]> screenIntervals = retrieveArrayList(sp);
-        screenIntervals.add(interval);
-        addToSharedPreference(sp, screenIntervals);
+//        if (screenIntervals.size() == 0) {
+            long startCounterScreen = sp.getLong("tmpScreenOff", System.currentTimeMillis());
+            long endCounterScreen = System.currentTimeMillis();
+            interval[0] = startCounterScreen;
+            interval[1] = endCounterScreen;
+            screenIntervals.add(interval);
+            addToSharedPreference(sp, screenIntervals);
+//        }
 
         //////////////////////////////////// for printing in file //////////////////////////////////////////////
 
@@ -394,11 +409,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
         tmp2 += (System.currentTimeMillis() - sp.getLong("tmpScreenOff", System.currentTimeMillis())) / 1000;
 
         String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + "\n\t\t\t\t\t"
-                + "stationary: " + sp.getLong("stationary", 0) + "\n\t\t\t\t\t"
+                //+ "stationary: " + sp.getLong("stationary", 0) + "\n\t\t\t\t\t"
                 + "currentTimeMillis(): " + System.currentTimeMillis() + "\n\t\t\t\t\t"
-                + "tmpStationary: " + sp.getLong("tmpStationary", System.currentTimeMillis()) + "\n\t\t\t\t\t"
-                + "Calculate sleeping time(stationary): " + tmp + "\n\t\t\t\t\t"
-                + "ScreenOff: " + tmp2 + "\n";
+                + "Stationary sensor: " + tmp + "\n\t\t\t\t\t"
+                //+ "tmpStationary: " + sp.getLong("tmpStationary", System.currentTimeMillis()) + "\n\t\t\t\t\t"
+                //+ "Calculate sleeping time(stationary): " + tmp + "\n\t\t\t\t\t"
+                + "Screen sensor: " + tmp2 + "\n\t\t\t\t\t"
+                + "Light sensor: " + sp.getLong("light", 0) + "\n\t\t\t\t\t";
 
         txt_body += "Stationary interval: " + arrayListToString(stationaryInterval) + "\n\t\t\t\t\t"
                 + "Dark room interval: " + arrayListToString(lightInterval) + "\n\t\t\t\t\t"
@@ -412,10 +429,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         editor.commit();
 
         //////// todo NEW ALGORITHM  /////////
-        // return sleeping_time
-
-
-        return -1;
+        return calculateTimeDifference(stationaryInterval, lightInterval, retrieveArrayList(sp));
     }
 
     @Override
@@ -679,13 +693,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
         now.getTimeInMillis();
         //now.setTimeInMillis(System.currentTimeMillis());
 
-//        if (to.before(from)) {
-//            if (now.after(to)) {
-//                to.add(Calendar.DATE, 1);
-//            } else {
-//                from.add(Calendar.DATE, -1);
-//            }
-//        }
+        if (to.before(from)) {
+            if (now.after(to)) {
+                to.add(Calendar.DATE, 1);
+            } else {
+                from.add(Calendar.DATE, -1);
+            }
+        }
 
         return now.after(from) && now.before(to);
     }
@@ -748,6 +762,63 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
         str.append(" ]");
         return str;
+    }
+
+    private static long[] isThereOverlap(long[] interval_1, long[] interval_2) {
+
+        final int START = 0;
+        final int END = 1;
+
+        if (interval_1[START] == interval_2[START] && interval_1[END] == interval_2[END]) {
+            return interval_1;
+        }
+        else if(interval_1[END] < interval_2[START] || interval_2[END] < interval_1[START]) {
+            return null;
+        }
+        else {
+            return new long[] { Math.max(interval_1[START], interval_2[START]),
+                    Math.min(interval_1[END], interval_2[END])};
+        }
+    }
+
+    private static int calculateTimeDifference(ArrayList<long[]> list_1,
+                                           ArrayList<long[]> list_2,
+                                           ArrayList<long[]> list_3) {
+
+        ArrayList<long[]> first_result = new ArrayList<>();
+        ArrayList<long[]> relevantIntervals = new ArrayList<>();
+
+        for (long[] interval_1: list_1) {
+            for (long[] interval_2: list_2) {
+                long[] res = isThereOverlap(interval_1, interval_2);
+                if(res == null) {
+                    break;
+                }
+                else {
+                    first_result.add(res);
+                }
+            }
+        }
+
+        for (long[] interval_1: first_result) {
+            for (long[] interval_2: list_3) {
+                long[] res = isThereOverlap(interval_1, interval_2);
+                if(res == null) {
+                    break;
+                }
+                else {
+                    relevantIntervals.add(res);
+                }
+            }
+        }
+
+        long sleeping_time = 0;
+        for (long[] interval : relevantIntervals) {
+            sleeping_time += interval[1] - interval[0];
+        }
+        // convert sleeping time to sec
+        sleeping_time /= 1000;
+        return (int) sleeping_time;
     }
 
 }
