@@ -2,9 +2,14 @@ package com.buddynsoul.monitor;
 
 import androidx.fragment.app.Fragment;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -23,12 +28,12 @@ public class SettingsFragment extends Fragment {
     private TextView goal, fromTime, toTime;
     private RadioButton oldButton, c, f;
     private int oldGoal;
-    private RadioGroup temperature;
     private Boolean boolTemp;
-//    private String val;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private String fromFragment;
+
+    private int old_from_hour, old_from_min, old_to_hour, old_to_min;
 
 
     public SettingsFragment(){
@@ -99,7 +104,9 @@ public class SettingsFragment extends Fragment {
         }
 
         fromTime = (TextView) v.findViewById(R.id.fromTime_ID);
-        SharedPreferences preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
+        final SharedPreferences preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
+        old_from_hour = preferences.getInt("fromHour", 20);
+        old_from_min = preferences.getInt("fromMinute", 0);
         fromTime.setText(String.format("%02d", preferences.getInt("fromHour", 20)) + ":" + String.format("%02d", preferences.getInt("fromMinute", 0)));
         fromTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +120,9 @@ public class SettingsFragment extends Fragment {
         });
 
         toTime = (TextView) v.findViewById(R.id.toTime_ID);
-        preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
+        //preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
+        old_to_hour = preferences.getInt("toHour", 8);
+        old_to_min = preferences.getInt("toMinute", 0);
         toTime.setText(String.format("%02d", preferences.getInt("toHour", 8)) + ":" + String.format("%02d", preferences.getInt("toMinute", 0)));
         toTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +184,16 @@ public class SettingsFragment extends Fragment {
 //                        .addToBackStack(null)
 //                        .commit();
                 Toast.makeText(getContext(), "Changes have been successfully completed", Toast.LENGTH_SHORT).show();
+
+                if ((old_from_hour != preferences.getInt("fromHour", 20))
+                    || (old_from_min != preferences.getInt("fromMinute", 0))
+                    || (old_to_hour != preferences.getInt("toHour", 8))
+                    || (old_to_min != preferences.getInt("toMinute", 0))) {
+
+                    Intent myService = new Intent(getActivity(), StepCounterListener.class);
+                    getActivity().stopService(myService);
+                    getActivity().startService(myService);
+                }
             }
         });
 

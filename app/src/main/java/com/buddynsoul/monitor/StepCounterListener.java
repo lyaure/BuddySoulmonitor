@@ -75,7 +75,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private float oldPitch, oldRoll, oldAzimuth;
 
     //private int startHour = 20, startMin = 00, endHour = 8, endMin = 00;
-    int startHour = 20, startMin = 00, endHour = 8, endMin;
+    int startHour, startMin, endHour, endMin;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -257,11 +257,24 @@ public class StepCounterListener extends Service implements SensorEventListener 
         editor = sp.edit();
 
         SharedPreferences settings_preferences = this.getSharedPreferences("prefTime", MODE_PRIVATE);
+
         startHour = settings_preferences.getInt("fromHour", 20);
         startMin = settings_preferences.getInt("fromMinute", 0);
 
         endHour = settings_preferences.getInt("toHour", 8);
         endMin = settings_preferences.getInt("toMinute", 0);
+
+        String am_pm_from = settings_preferences.getString("am_pm_from", "pm");
+        String am_pm_to = settings_preferences.getString("am_pm_to", "pm");
+
+        if(am_pm_from.equals("pm")) {
+            startHour += 12;
+        }
+
+        if(am_pm_to.equals("pm")) {
+            endHour += 12;
+        }
+
 
 
         if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //night
@@ -769,10 +782,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         final int START = 0;
         final int END = 1;
 
-        if (interval_1[START] == interval_2[START] && interval_1[END] == interval_2[END]) {
-            return interval_1;
-        }
-        else if(interval_1[END] < interval_2[START] || interval_2[END] < interval_1[START]) {
+        if(interval_1[END] < interval_2[START] || interval_2[END] < interval_1[START]) {
             return null;
         }
         else {

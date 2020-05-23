@@ -57,14 +57,14 @@ public class TimePickerFragment extends DialogFragment {
                         time.setText(hourOfDay + ":" + minute + " " + am_pm);
                         editor.putInt("fromHour", hourOfDay);
                         editor.putInt("fromMinute", minute);
-                        editor.putString("am_pm", am_pm);
+                        editor.putString("am_pm_from", am_pm);
                     }
                     else {
                         TextView time = (TextView)getActivity().findViewById(R.id.toTime_ID);
                         time.setText(hourOfDay + ":" + minute + " " + am_pm);
                         editor.putInt("toHour", hourOfDay);
                         editor.putInt("toMinute", minute);
-                        editor.putString("am_pm", am_pm);
+                        editor.putString("am_pm_to", am_pm);
                     }
                     editor.commit();
                 }

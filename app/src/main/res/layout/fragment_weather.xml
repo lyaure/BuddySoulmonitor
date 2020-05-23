@@ -398,7 +398,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:paddingLeft="150dp"
+            android:paddingStart="150dp"
+            android:paddingEnd="10dp"
             android:text="Last update"
             android:textStyle="italic" />
 
