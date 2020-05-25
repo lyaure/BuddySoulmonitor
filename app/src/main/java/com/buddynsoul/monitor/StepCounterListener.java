@@ -149,11 +149,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 if (BuildConfig.DEBUG)
                     Log.d("DebugStepCounter", "tmp stationary: " + tmpStationary);
 
+                Toast.makeText(getApplicationContext(), "moving", Toast.LENGTH_SHORT).show();
+
                 // get the stationary duration time
                 long stationaryDuration = System.currentTimeMillis() - tmpStationary;
 
                 // if more than one second
-                if (stationaryDuration >= 1000) {
+//                if (stationaryDuration >= 1000) {
                     stationaryDuration /= 1000; // convert time to sec
 
                     if (BuildConfig.DEBUG)
@@ -184,7 +186,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     if (BuildConfig.DEBUG)
                         Log.d("DebugStepCounter", "Duration stationary: " + stationaryDuration + " sec");
-                }
+//                }
 
             }
 
@@ -277,7 +279,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
 
 
-        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //night
+        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //slepping time mode
 
             if (!sp.getBoolean("initializedSensorsValue", true)) {
 
@@ -329,7 +331,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
             }
         }
-        else {            // day (not sleeping period)
+        else {            // not sleeping time mode
             // calculate sleeping time and add it to the db
             if (!sp.getBoolean("sleepingTimeSavedInDb", false)) {
                 int sleepingTime = calculateSleepingTime();
