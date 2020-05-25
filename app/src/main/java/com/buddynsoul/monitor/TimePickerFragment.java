@@ -50,22 +50,26 @@ public class TimePickerFragment extends DialogFragment {
                     hourOfDay -= 12;
 
                 if(!from.equals("null")){
+                    TextView time;
                     SharedPreferences sp = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
                     if(from.equals("fromTime")) {
-                        TextView time = (TextView)getActivity().findViewById(R.id.fromTime_ID);
-                        time.setText(hourOfDay + ":" + minute + " " + am_pm);
+                        time = (TextView)getActivity().findViewById(R.id.fromTime_ID);
+//                        time.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute) + " " + am_pm);
                         editor.putInt("fromHour", hourOfDay);
                         editor.putInt("fromMinute", minute);
                         editor.putString("am_pm_from", am_pm);
                     }
                     else {
-                        TextView time = (TextView)getActivity().findViewById(R.id.toTime_ID);
-                        time.setText(hourOfDay + ":" + minute + " " + am_pm);
+                        time = (TextView)getActivity().findViewById(R.id.toTime_ID);
+//                        time.setText(hourOfDay + ":" + minute + " " + am_pm);
                         editor.putInt("toHour", hourOfDay);
                         editor.putInt("toMinute", minute);
                         editor.putString("am_pm_to", am_pm);
                     }
+
+                    time.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute) + " " + am_pm);
+
                     editor.commit();
                 }
             }
