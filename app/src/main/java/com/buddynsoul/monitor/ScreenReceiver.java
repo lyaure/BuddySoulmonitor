@@ -33,9 +33,14 @@ public class ScreenReceiver extends BroadcastReceiver {
             long tmpScreenOff = sp.getLong("tmpScreenOff", System.currentTimeMillis());
 
             ArrayList<long[]>  screenInterval = retrieveArrayList(sp);
-            long endCounterScreen = System.currentTimeMillis();
-            long[] interval = {tmpScreenOff, endCounterScreen};
-            screenInterval.add(interval);
+//            long endCounterScreen = System.currentTimeMillis();
+//            long[] interval = {tmpScreenOff, endCounterScreen};
+//            screenInterval.add(interval);
+
+            ///////////////////// lyaure's changes ///////////////////
+            long[] last = screenInterval.get(screenInterval.size() - 1);
+            last[1] = System.currentTimeMillis();
+
             addToSharedPreference(sp, screenInterval);
 
 
@@ -60,6 +65,12 @@ public class ScreenReceiver extends BroadcastReceiver {
             long screenOff = System.currentTimeMillis();
             editor.putLong("tmpScreenOff", screenOff);
             editor.commit();
+
+            ///////////////////// lyaure's changes ///////////////////
+            ArrayList<long[]>  screenInterval = retrieveArrayList(sp);
+            screenInterval.add(new long[]{System.currentTimeMillis(), 0});
+            addToSharedPreference(sp, screenInterval);
+
         }
 
         if (intent.getAction().equals(ACTION_CHARGING)) {

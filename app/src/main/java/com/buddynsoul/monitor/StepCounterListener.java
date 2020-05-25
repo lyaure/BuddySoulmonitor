@@ -22,6 +22,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.buddynsoul.monitor.Utils.Util;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import androidx.annotation.RequiresApi;
 
@@ -100,25 +102,33 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 return;
             } else {
                 float luxVal = event.values[0];
+                long[] last = lightInterval.get(lightInterval.size() - 1);
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
-                if (luxVal == 0 && !inDarkRoom) {
+                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
                     long tmpLight = System.currentTimeMillis();
                     editor.putLong("tmpLight", tmpLight);
 
+                    if(last[1] != 0)
+                        lightInterval.add(new long[]{System.currentTimeMillis(), 0});
+
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
-                } else if (luxVal != 0 && inDarkRoom) {
+                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
 
                     SharedPreferences.Editor editor = sp.edit();
 
-                    long tmpLight = sp.getLong("tmpLight", System.currentTimeMillis());
+//                    long tmpLight = sp.getLong("tmpLight", System.currentTimeMillis());
+//                    long endCounterLight = System.currentTimeMillis();
+//                    long[] interval = {tmpLight, endCounterLight};
+//                    lightInterval.add(interval);
 
-                    long endCounterLight = System.currentTimeMillis();
-                    long[] interval = {tmpLight, endCounterLight};
-                    lightInterval.add(interval);
+
+                    ///////////////////// lyaure's changes ///////////////////
+                    long tmpLight = last[0];
+                    last[1] = System.currentTimeMillis();
 
                     long lightDuration = System.currentTimeMillis() - tmpLight;
                     lightDuration /= 1000; // convert time to sec
@@ -143,9 +153,14 @@ public class StepCounterListener extends Service implements SensorEventListener 
             float tempZ = oldAzimuth - event.values[2];
 
             if (tempX > Math.abs(1) || tempY > Math.abs(1) || tempZ > Math.abs(1)) {
+                long[] last = stationaryInterval.get(stationaryInterval.size() -1);
 
                 // get the last time when the phone was stationary
-                long tmpStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
+//                long tmpStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
+
+                ///////////////////// lyaure's changes ///////////////////
+                long tmpStationary = last[0];
+
                 if (BuildConfig.DEBUG)
                     Log.d("DebugStepCounter", "tmp stationary: " + tmpStationary);
 
@@ -162,8 +177,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
                         Log.d("DebugStepCounter", "phone is moving: x=" + tempX + " y=" + tempY + " z=" + tempZ);
 
                     long endCounterStationary = System.currentTimeMillis();
-                    long[] interval = {tmpStationary, endCounterStationary};
-                    stationaryInterval.add(interval);
+//                    long[] interval = {tmpStationary, endCounterStationary};
+//                    stationaryInterval.add(interval);
+
+                    last[1] = endCounterStationary;
 
                     // add the current stationary duration our stationary variable
                     stationaryDuration += sp.getLong("stationary", 0);
@@ -174,6 +191,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
                     // update the tmpStationary for the next time (event)
                     editor.putLong("tmpStationary", endCounterStationary);
                     editor.apply();
+
+                    stationaryInterval.add(new long[]{endCounterStationary, 0});
 
                     String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t"
                             + "tmpStationary: " + tmpStationary + "\n\t\t\t\t\t"
@@ -291,6 +310,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 editor.putLong("stationary", 0);
                 editor.putLong("tmpStationary", System.currentTimeMillis());
 
+                ///////////////////// lyaure's changes ///////////////////
+                stationaryInterval.clear();
+                stationaryInterval.add(new long[]{System.currentTimeMillis(), 0});
+
                 editor.putLong("screenOff", 0);
                 editor.putLong("tmpScreenOff", System.currentTimeMillis());
 
@@ -298,6 +321,15 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 editor.putLong("tmpLight", System.currentTimeMillis());
                 editor.putString("json_data", "");
                 editor.apply();
+
+                ///////////////////// lyaure's changes ///////////////////
+                lightInterval.clear();
+                lightInterval.add(new long[]{System.currentTimeMillis(), 0});
+
+                ArrayList<long[]>  screenInterval = retrieveArrayList(sp);
+                screenInterval.clear();
+                screenInterval.add(new long[]{System.currentTimeMillis(), 0});
+                addToSharedPreference(sp, screenInterval);
 
                 String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t"
                         + "tmpStationary: " + sp.getLong("tmpStationary", System.currentTimeMillis()) + "\n\t\t\t\t\t"
@@ -402,24 +434,36 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     // calculate sleeping time in sec
     private int calculateSleepingTime() {
+        // TODO remove if not necessary
+        if(lightInterval.isEmpty() || stationaryInterval.isEmpty())
+            return 0;
 
         SharedPreferences sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
 
         // add last interval for stationary sensor
-        long startCounterStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
-        long endCounterStationary = System.currentTimeMillis();
-        long[] interval = {startCounterStationary, endCounterStationary};
-        stationaryInterval.add(interval);
+//        long startCounterStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
+//        long endCounterStationary = System.currentTimeMillis();
+//        long[] interval = {startCounterStationary, endCounterStationary};
+//        stationaryInterval.add(interval);
+
+        ///////////////////// lyaure's changes ///////////////////
+        long[] stationaryLast = stationaryInterval.get(stationaryInterval.size() -1);
+        stationaryLast[1] = System.currentTimeMillis();
 
         // add last interval for light sensor
         long tmp3 = sp.getLong("light", 0);
         if (sp.getBoolean("inDarkRoom", false)) {
-            long startCounterLight = sp.getLong("tmpLight", System.currentTimeMillis());
-            long endCounterLight = System.currentTimeMillis();
-            interval[0] = startCounterLight;
-            interval[1] = endCounterLight;
-            lightInterval.add(interval);
+//            long startCounterLight = sp.getLong("tmpLight", System.currentTimeMillis());
+//            long endCounterLight = System.currentTimeMillis();
+//            interval[0] = startCounterLight;
+//            interval[1] = endCounterLight;
+//            lightInterval.add(interval);
+
+            long[] lightLast = lightInterval.get(lightInterval.size() - 1);
+            lightLast[1] = System.currentTimeMillis();
+
+
             tmp3 += (System.currentTimeMillis() - sp.getLong("tmpLight", System.currentTimeMillis())) / 1000;
         }
 
@@ -434,11 +478,16 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         // if screen off when sleeping time is done we save the last values
         if (!isScreenOn) {
-            long startCounterScreen = sp.getLong("tmpScreenOff", System.currentTimeMillis());
-            long endCounterScreen = System.currentTimeMillis();
-            interval[0] = startCounterScreen;
-            interval[1] = endCounterScreen;
-            screenIntervals.add(interval);
+//            long startCounterScreen = sp.getLong("tmpScreenOff", System.currentTimeMillis());
+//            long endCounterScreen = System.currentTimeMillis();
+//            interval[0] = startCounterScreen;
+//            interval[1] = endCounterScreen;
+//            screenIntervals.add(interval);
+
+            ///////////////////// lyaure's changes ///////////////////
+            long[] screenLast = screenIntervals.get(screenIntervals.size() - 1);
+            screenLast[1] = System.currentTimeMillis();
+
             addToSharedPreference(sp, screenIntervals);
             tmp2 += (System.currentTimeMillis() - sp.getLong("tmpScreenOff", System.currentTimeMillis())) / 1000;
         }
