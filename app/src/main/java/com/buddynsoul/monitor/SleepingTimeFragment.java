@@ -31,9 +31,14 @@ public class SleepingTimeFragment extends Fragment {
 
         TextView sleeping_time_txtv = (TextView)v.findViewById(R.id.sleeping_time_ID);
 
+        int hour = 0, min = 0, sec = 0;
+
         int sleepingTime = sp.getInt("sleepingTime", -1);
         if (sleepingTime != -1)
-            sleeping_time_txtv.setText(String.valueOf(sleepingTime));
+            hour = sleepingTime / 3600;
+            min = (sleepingTime  % 3600 ) / 60;
+            sec = ((sleepingTime % 86400 ) % 3600 ) % 60;
+        sleeping_time_txtv.setText(String.format("%s\n\n%d hour %d min %d sec", String.valueOf(sleepingTime), hour, min, sec));
 
         return v;
     }

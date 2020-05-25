@@ -15,7 +15,7 @@ public class Database {
     public Database(Context context){
         db = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
 
-        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "( date INTEGER, steps INTEGER, sleepingTime DOUBLE," +
+        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "( date INTEGER, steps INTEGER, sleepingTime INTEGER," +
                 "morning_location STRING, night_location STRING)";
         db.execSQL(query);
     }
@@ -29,7 +29,7 @@ public class Database {
             ContentValues cv = new ContentValues();
             cv.put("date", date);
             cv.put("steps", -steps);
-            cv.put("sleepingTime", 0.0);
+            cv.put("sleepingTime", 0);
             cv.put("morning_location", "");
             cv.put("night_location", "");
 
@@ -44,12 +44,12 @@ public class Database {
         }
     }
 
-    public void insertSleepingTime(long date, double sleepingTime){
+    public void insertSleepingTime(long date, int sleepingTime){
         Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
         if(cursor.moveToFirst()){
-            double tmpSleepingTime = cursor.getDouble(cursor.getColumnIndex("sleepingTime"));
+            int tmpSleepingTime = cursor.getInt(cursor.getColumnIndex("sleepingTime"));
             if(sleepingTime > tmpSleepingTime){
                 ContentValues cv = new ContentValues();
                 cv.put("sleepingTime", sleepingTime);
@@ -121,10 +121,10 @@ public class Database {
     public double getSleepingTime(final long date){
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        double res = 0.0;
+        int res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getDouble(cursor.getColumnIndex("sleepingTime"));
+            res = cursor.getInt(cursor.getColumnIndex("sleepingTime"));
 
         cursor.close();
         return res;

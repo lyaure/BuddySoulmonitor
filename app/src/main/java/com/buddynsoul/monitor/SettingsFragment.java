@@ -107,7 +107,8 @@ public class SettingsFragment extends Fragment {
         final SharedPreferences preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
         old_from_hour = preferences.getInt("fromHour", 20);
         old_from_min = preferences.getInt("fromMinute", 0);
-        fromTime.setText(String.format("%02d", preferences.getInt("fromHour", 20)) + ":" + String.format("%02d", preferences.getInt("fromMinute", 0)));
+        //fromTime.setText(String.format("%02d", preferences.getInt("fromHour", 20)) + ":" + String.format("%02d", preferences.getInt("fromMinute", 0)));
+        fromTime.setText(String.format("%s:%s %s", String.format("%02d", preferences.getInt("fromHour", 20)), String.format("%02d", preferences.getInt("fromMinute", 0)), preferences.getString("am_pm_from", "pm")));
         fromTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,7 +124,8 @@ public class SettingsFragment extends Fragment {
         //preferences = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
         old_to_hour = preferences.getInt("toHour", 8);
         old_to_min = preferences.getInt("toMinute", 0);
-        toTime.setText(String.format("%02d", preferences.getInt("toHour", 8)) + ":" + String.format("%02d", preferences.getInt("toMinute", 0)));
+        //toTime.setText(String.format("%02d", preferences.getInt("toHour", 8)) + ":" + String.format("%02d", preferences.getInt("toMinute", 0)));
+        toTime.setText(String.format("%s:%s %s", String.format("%02d", preferences.getInt("toHour", 8)), String.format("%02d", preferences.getInt("toMinute", 0)), preferences.getString("am_pm_to", "am")));
         toTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

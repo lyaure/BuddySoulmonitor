@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 
 import java.util.Calendar;
 
@@ -71,4 +72,6 @@ public abstract class Util {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+    public static boolean hasLollipop() { return Build.VERSION.SDK_INT >= 21; }
 }
