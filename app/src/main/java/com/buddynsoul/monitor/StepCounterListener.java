@@ -128,7 +128,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     ///////////////////// lyaure's changes ///////////////////
                     long tmpLight = last[0];
-                    last[1] = System.currentTimeMillis();
 
                     long lightDuration = System.currentTimeMillis() - tmpLight;
                     lightDuration /= 1000; // convert time to sec
@@ -141,6 +140,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     String str = "Duration darkRoom: " + lightDuration + " sec";
                     if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
+
+                    last[1] = last[0] + lightDuration * 1000;
                 }
             }
         }
@@ -161,16 +162,16 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 ///////////////////// lyaure's changes ///////////////////
                 long tmpStationary = last[0];
 
+
+
                 if (BuildConfig.DEBUG)
                     Log.d("DebugStepCounter", "tmp stationary: " + tmpStationary);
-
-                Toast.makeText(getApplicationContext(), "moving", Toast.LENGTH_SHORT).show();
 
                 // get the stationary duration time
                 long stationaryDuration = System.currentTimeMillis() - tmpStationary;
 
                 // if more than one second
-//                if (stationaryDuration >= 1000) {
+                if (stationaryDuration >= 1000) {
                     stationaryDuration /= 1000; // convert time to sec
 
                     if (BuildConfig.DEBUG)
@@ -180,7 +181,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 //                    long[] interval = {tmpStationary, endCounterStationary};
 //                    stationaryInterval.add(interval);
 
-                    last[1] = endCounterStationary;
+                    last[1] = last[0] + stationaryDuration * 1000;
 
                     // add the current stationary duration our stationary variable
                     stationaryDuration += sp.getLong("stationary", 0);
@@ -191,8 +192,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
                     // update the tmpStationary for the next time (event)
                     editor.putLong("tmpStationary", endCounterStationary);
                     editor.apply();
-
-                    stationaryInterval.add(new long[]{endCounterStationary, 0});
 
                     String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t"
                             + "tmpStationary: " + tmpStationary + "\n\t\t\t\t\t"
@@ -205,7 +204,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     if (BuildConfig.DEBUG)
                         Log.d("DebugStepCounter", "Duration stationary: " + stationaryDuration + " sec");
-//                }
+
+                    ///////////////////// lyaure's changes ///////////////////
+                    stationaryInterval.add(new long[]{System.currentTimeMillis(), 0});
+                }
 
             }
 

@@ -39,9 +39,7 @@ public class ScreenReceiver extends BroadcastReceiver {
 
             ///////////////////// lyaure's changes ///////////////////
             long[] last = screenInterval.get(screenInterval.size() - 1);
-            last[1] = System.currentTimeMillis();
 
-            addToSharedPreference(sp, screenInterval);
 
 
             long durationScreenOff = System.currentTimeMillis() - tmpScreenOff;
@@ -56,6 +54,10 @@ public class ScreenReceiver extends BroadcastReceiver {
             String str = "Duration screen off: " + screenOff + " sec";
 
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
+
+            last[1] = last[0] + durationScreenOff;
+
+            addToSharedPreference(sp, screenInterval);
         }
 
         else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
