@@ -162,29 +162,6 @@ public class SettingsFragment extends Fragment {
                     editor.commit();
                 }
 
-                Fragment fragment;
-
-                if(fromFragment.equals("pedometer"))
-                    fragment = new PedometerCurrentFragment();
-                else
-                    fragment = new WeatherFragment();
-
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.container, fragment, "tag")
-//                        .addToBackStack(null)
-//                        .commit();
-
-//                Fragment fragment;
-//
-//                if(from.equals("pedometer"))
-//                    fragment = new PedometerFragment();
-//                else
-//                    fragment = new WeatherFragment();
-//
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.container, fragment, "tag")
-//                        .addToBackStack(null)
-//                        .commit();
                 Toast.makeText(getContext(), "Changes have been successfully completed", Toast.LENGTH_SHORT).show();
 
                 if ((old_from_hour != preferences.getInt("fromHour", 20))
@@ -196,6 +173,21 @@ public class SettingsFragment extends Fragment {
                     getActivity().stopService(myService);
                     getActivity().startService(myService);
                 }
+
+                Fragment fragment;
+
+                if(fromFragment.equals("pedometer"))
+                    fragment = new PedometerFragment();
+                else
+                    if(fromFragment.equals("weather"))
+                    fragment = new WeatherFragment();
+                    else
+                        fragment = new SleepingTimeFragment();
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, fragment, "tag")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

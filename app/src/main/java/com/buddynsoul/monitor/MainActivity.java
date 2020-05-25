@@ -57,10 +57,13 @@ public class MainActivity extends FragmentActivity {
                             Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container);
                             Bundle bundle = new Bundle();
 
-                            if(tmp instanceof PedometerCurrentFragment)
+                            if(tmp instanceof PedometerFragment)
                                 bundle.putString("from", "pedometer");
                             else
-                                bundle.putString("from", "weather");
+                                if(tmp instanceof WeatherFragment)
+                                    bundle.putString("from", "weather");
+                                else
+                                    bundle.putString("from", "sleep");
 
                             fragment.setArguments(bundle);
                             loadFragment(fragment);
