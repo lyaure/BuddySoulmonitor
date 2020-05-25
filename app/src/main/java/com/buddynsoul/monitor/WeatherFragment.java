@@ -188,6 +188,9 @@ public class WeatherFragment extends Fragment {
     }
 
     private void forecast(ArrayList<String> forecast_data) {
+        if(forecast_data == null) {
+            return;
+        }
         // add forecast data to fragment view
         final int forecast_size = 5;
 
@@ -208,6 +211,9 @@ public class WeatherFragment extends Fragment {
     }
 
     private void currentConditions(ArrayList<String> currentConditions_data, ArrayList<String> hourlyForecast_data) {
+        if(currentConditions_data == null || hourlyForecast_data == null) {
+            return;
+        }
 //         add background according to time in day
         sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
         boolean bool = sp.getBoolean("IsDayTime", true);
