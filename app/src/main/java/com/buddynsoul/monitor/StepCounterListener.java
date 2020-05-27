@@ -281,21 +281,25 @@ public class StepCounterListener extends Service implements SensorEventListener 
         SharedPreferences.Editor editor = sp.edit();
 
         SharedPreferences settings_preferences = this.getSharedPreferences("prefTime", MODE_PRIVATE);
+//        SharedPreferences.Editor editor1 = settings_preferences.edit();
+//        editor1.clear();
+//        editor1.commit();
 
-        startHour = settings_preferences.getInt("fromHour", 20);
+
+        startHour = settings_preferences.getInt("fromHour", 8);
         startMin = settings_preferences.getInt("fromMinute", 0);
 
         endHour = settings_preferences.getInt("toHour", 8);
         endMin = settings_preferences.getInt("toMinute", 0);
 
         String am_pm_from = settings_preferences.getString("am_pm_from", "pm");
-        String am_pm_to = settings_preferences.getString("am_pm_to", "pm");
+        String am_pm_to = settings_preferences.getString("am_pm_to", "am");
 
-        if(am_pm_from.equals("pm")) {
+        if(am_pm_from.equals("pm") && startHour != 12) {
             startHour += 12;
         }
 
-        if(am_pm_to.equals("pm")) {
+        if(am_pm_to.equals("pm") && endHour != 12){
             endHour += 12;
         }
 
@@ -330,8 +334,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                 ArrayList<long[]>  screenInterval = retrieveArrayList(sp);
                 screenInterval.clear();
-                screenInterval.add(new long[]{System.currentTimeMillis(), 0});
-                addToSharedPreference(sp, screenInterval);
+                PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                boolean isScreenOn = Util.hasLollipop() ? pm.isInteractive() : pm.isScreenOn();
+                if(!isScreenOn){
+                    screenInterval.add(new long[]{System.currentTimeMillis(), 0});
+                    addToSharedPreference(sp, screenInterval);
+                }
 
                 String txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t"
                         + "tmpStationary: " + sp.getLong("tmpStationary", System.currentTimeMillis()) + "\n\t\t\t\t\t"
