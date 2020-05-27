@@ -104,7 +104,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float luxVal = event.values[0];
                 long[] last = lightInterval.get(lightInterval.size() - 1);
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
-                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
+                if (luxVal <= 100 && !inDarkRoom) { // dark room - light off
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
@@ -113,11 +113,11 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     if(last[1] != 0)
                         lightInterval.add(new long[]{System.currentTimeMillis(), 0});
-
+ 
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
-                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
-
+                } else if (luxVal > 100 && inDarkRoom) { // bright room - light on
+                    Toast.makeText(getApplicationContext(), "ON", Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor editor = sp.edit();
 
 //                    long tmpLight = sp.getLong("tmpLight", System.currentTimeMillis());
@@ -142,6 +142,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                     if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
 
                     last[1] = last[0] + lightDuration * 1000;
+//                    lightInterval.add(new long[]{System.currentTimeMillis(), 0});
                 }
             }
         }
@@ -324,6 +325,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 editor.putLong("tmpScreenOff", System.currentTimeMillis());
 
                 editor.putLong("light", 0);
+                editor.putBoolean("inDarkRoom", true);
                 editor.putLong("tmpLight", System.currentTimeMillis());
                 editor.putString("json_data", "");
                 editor.apply();
