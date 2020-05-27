@@ -46,8 +46,14 @@ public class TimePickerFragment extends DialogFragment {
                 calendar.set(Calendar.MINUTE, minute);
                 String am_pm = calendar.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm";
 
-                if(hourOfDay >= 12)
+                if(hourOfDay > 12)
                     hourOfDay -= 12;
+
+                if(hourOfDay == 0 && am_pm.equals("am"))
+                    hourOfDay = 0;
+
+                if(hourOfDay == 0 && am_pm.equals("pm"))
+                    hourOfDay = 12;
 
                 if(!from.equals("null")){
                     TextView time;
