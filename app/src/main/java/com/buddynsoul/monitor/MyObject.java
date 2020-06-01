@@ -23,7 +23,7 @@ public class MyObject {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(this.date);
 
-        String d = c.get(Calendar.DATE) + "/" + c.get(Calendar.MONTH);
+        String d = c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH) + 1);
         return d;
     }
 
