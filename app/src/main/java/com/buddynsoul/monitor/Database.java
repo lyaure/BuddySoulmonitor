@@ -15,7 +15,7 @@ public class Database {
     public Database(Context context){
         db = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
 
-        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "( date INTEGER, steps INTEGER, sleepingTime INTEGER," +
+        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "(date INTEGER, steps INTEGER, sleepingTime INTEGER, " +
                 "morning_location STRING, night_location STRING)";
         db.execSQL(query);
     }
@@ -32,7 +32,6 @@ public class Database {
             cv.put("sleepingTime", 0);
             cv.put("morning_location", "");
             cv.put("night_location", "");
-
 
             db.insert(DB_NAME, null, cv);
 
@@ -53,9 +52,12 @@ public class Database {
             if(sleepingTime > tmpSleepingTime){
                 ContentValues cv = new ContentValues();
                 cv.put("sleepingTime", sleepingTime);
+                
                 db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
             }
         }
+
+        cursor.close();
 
         if (BuildConfig.DEBUG) {
             Log.d("debug","insertSleepingTime " + date + " / " + sleepingTime);
@@ -74,6 +76,8 @@ public class Database {
                 db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
             }
         }
+
+        cursor.close();
 
         if (BuildConfig.DEBUG) {
             Log.d("debug","insertLocation " + date + " / " + location);
