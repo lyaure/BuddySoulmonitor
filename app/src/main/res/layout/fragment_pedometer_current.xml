@@ -39,6 +39,7 @@
             android:id="@+id/distanceTxtv_ID"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:gravity="center"
             android:text="0 km"
             android:textAlignment="center"

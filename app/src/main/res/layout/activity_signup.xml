@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".SignupActivity">
 
     <ImageView
@@ -44,8 +45,8 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                app:startIconDrawable="@drawable/ic_user_gray_24dp"
-                app:errorEnabled="true">
+                app:errorEnabled="true"
+                app:startIconDrawable="@drawable/ic_user_gray_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/txtv_firstName_ID"
@@ -62,15 +63,15 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                app:startIconDrawable="@drawable/ic_user_gray_24dp"
-                app:errorEnabled="true">
+                app:errorEnabled="true"
+                app:startIconDrawable="@drawable/ic_user_gray_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/txtv_lastName_ID"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Last name"
-                    android:inputType="textPersonName"/>
+                    android:inputType="textPersonName" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -80,15 +81,15 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                app:startIconDrawable="@drawable/ic_email_gray_24dp"
-                app:errorEnabled="true">
+                app:errorEnabled="true"
+                app:startIconDrawable="@drawable/ic_email_gray_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/txtv_email_ID"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Email"
-                    android:inputType="textEmailAddress"/>
+                    android:inputType="textEmailAddress" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -99,9 +100,9 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                app:errorEnabled="true"
                 app:passwordToggleEnabled="true"
-                app:startIconDrawable="@drawable/ic_lock_gray_24dp"
-                app:errorEnabled="true">
+                app:startIconDrawable="@drawable/ic_lock_gray_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/txtv_password_ID"
@@ -117,9 +118,9 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
+                app:errorEnabled="true"
                 app:passwordToggleEnabled="true"
-                app:startIconDrawable="@drawable/ic_lock_gray_24dp"
-                app:errorEnabled="true">
+                app:startIconDrawable="@drawable/ic_lock_gray_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/txtv_confirmPassword_ID"
