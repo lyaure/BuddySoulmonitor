@@ -310,7 +310,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //slepping time mode
 
-            if (!sp.getBoolean("initializedSensorsValue", true)) {
+            if (!sp.contains("initializedSensorsValue") || !sp.getBoolean("initializedSensorsValue", true)) {
 
                 editor.putBoolean("initializedSensorsValue", true);
                 editor.putBoolean("inDarkRoom", false);
