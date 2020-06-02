@@ -38,8 +38,8 @@ public class PedometerRecentFragment extends Fragment {
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
         int  goal = sp.getInt("goal", 10000);
 
-        Database db = new Database(getActivity());
-
+//        Database db = new Database(getActivity());
+        Database db = Database.getInstance(getActivity());
         int maxSteps = db.getRecord();
         String maxSteps_txt = "Max steps:\n" + maxSteps;
         maxSteps_txtv.setText(maxSteps_txt);

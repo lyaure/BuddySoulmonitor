@@ -71,11 +71,14 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     private ArrayList<long[]> lightInterval = new ArrayList<>();
     private ArrayList<long[]> stationaryInterval = new ArrayList<>();
+    private static ArrayList<long[]> finalIntervals = new ArrayList<>();
+
 
     private float oldPitch, oldRoll, oldAzimuth;
 
     //private int startHour = 20, startMin = 00, endHour = 8, endMin = 00;
     int startHour, startMin, endHour, endMin;
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -104,7 +107,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float luxVal = event.values[0];
                 long[] last = lightInterval.get(lightInterval.size() - 1);
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
-                if (luxVal <= 100 && !inDarkRoom) { // dark room - light off
+                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
@@ -113,10 +116,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     if(last[1] != 0)
                         lightInterval.add(new long[]{System.currentTimeMillis(), 0});
- 
+
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
-                } else if (luxVal > 100 && inDarkRoom) { // bright room - light on
+                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
                     Toast.makeText(getApplicationContext(), "ON", Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor editor = sp.edit();
 
@@ -235,8 +238,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter",
                     "saving steps: steps=" + steps + " lastSave=" + lastSaveSteps +
                             " lastSaveTime=" + new Date(lastSaveTime));
-            Database db = new Database(this);
-            //Database db = Database.getInstance(this);
+//            Database db = new Database(this);
+            Database db = Database.getInstance(this);
             if (db.getSteps(Util.getToday()) == Integer.MIN_VALUE) {
                 int pauseDifference = steps -
                         getSharedPreferences("pedometer", Context.MODE_PRIVATE)
@@ -355,8 +358,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 String lastLocation = getLocation.getLastLocation(null, this);
 
                 if (!lastLocation.equals("")) {
-                    Database db = new Database(this);
-
+//                    Database db = new Database(this);
+                    Database db = Database.getInstance(this);
                     // if it's after or equal to midnight, we need to select the date of the day before
                     long update_date = -1;
                     if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 8) {
@@ -382,9 +385,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                 Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
 
-                Database db = new Database(this);
+                Database db = Database.getInstance(this);
 
-                db.insertSleepingTime(Util.getYesterday(), sleepingTime);
+                if(!finalIntervals.isEmpty())
+                    db.insertSleepingTime(Util.getYesterday(), sleepingTime, finalIntervals.get(0)[0], finalIntervals.get(finalIntervals.size()-1)[1]);
+                else
+                    db.insertSleepingTime(Util.getYesterday(), sleepingTime, 0, 0);
                 //db.insertSleepingTime(Util.getYesterday(), sp.getLong("stat", 0));
 
                 editor.putInt("sleepingTime", sleepingTime);
@@ -399,7 +405,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
             // find the last location and add it to the db
             String lastLocation = getLocation.getLastLocation(null, this);
             if (!sp.getBoolean("morningLocationSavedInDb", false) && !lastLocation.equals("")) {
-                Database db = new Database(this);
+//                Database db = new Database(this);
+                Database db = Database.getInstance(this);
                 db.insertLocation(Util.getToday(), lastLocation, "morning_location");
 
                 editor.putBoolean("morningLocationSavedInDb", true);
@@ -581,8 +588,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
         SharedPreferences sp_pedometer = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
         int goal = sp_pedometer.getInt("goal", 10000);
 
-        Database db = new Database(context);
-        //Database db = Database.getInstance(context);
+//        Database db = new Database(context);
+        Database db = Database.getInstance(context);
         int today_offset = db.getSteps(Util.getToday());
         if (steps == 0)
             steps = db.getCurrentSteps(); // use saved value if we haven't anything better
@@ -888,7 +895,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
                                            ArrayList<long[]> list_3) {
 
         ArrayList<long[]> first_result = new ArrayList<>();
-        ArrayList<long[]> relevantIntervals = new ArrayList<>();
 
         for (long[] interval_1: list_1) {
             for (long[] interval_2: list_2) {
@@ -912,14 +918,14 @@ public class StepCounterListener extends Service implements SensorEventListener 
                         break;
                     }
                     else {
-                        relevantIntervals.add(res);
+                        finalIntervals.add(res);
                     }
                 }
             }
         }
 
         long sleeping_time = 0;
-        for (long[] interval : relevantIntervals) {
+        for (long[] interval : finalIntervals) {
             sleeping_time += interval[1] - interval[0];
         }
         // convert sleeping time to sec

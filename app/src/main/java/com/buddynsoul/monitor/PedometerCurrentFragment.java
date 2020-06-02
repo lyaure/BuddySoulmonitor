@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import static android.content.Context.MODE_PRIVATE;
 
 public class PedometerCurrentFragment extends Fragment implements SensorEventListener {
+//    private final int PEDOMETER = 0;
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     private TextView distance_txtv;
@@ -111,7 +112,9 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
 
         progSteps.setMax(goal);
 
-        Database db = new Database(getActivity());
+//        Database db = new Database(getActivity());
+        Database db = Database.getInstance(getActivity());
+
 //        final int sleepingTimeDb = (int)db.getSleepingTime(Util.getToday());
 //
 //        Button sleepingTimeBtn = findViewById(R.id.sleepingTimeBtn_ID);
@@ -147,6 +150,7 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels, height = dm.heightPixels;
         graph = (GraphChartView)v.findViewById(R.id.graph_ID);
+//        graph.setType(PEDOMETER);
         graph.setScreenDimensions(width, height);
         graph.setGoal(goal);
 
@@ -264,8 +268,8 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
                 // initializing them with -STEPS_SINCE_BOOT
                 todayOffset = -(int) event.values[0];
 //                todayOffset = (int) event.values[0];
-                //Database db = Database.getInstance(this);
-                Database db = new Database(getActivity());
+                Database db = Database.getInstance(getActivity());
+//                Database db = new Database(getActivity());
                 db.insertNewDay(Util.getToday(), (int) event.values[0]);
                 //db.close();
             }
@@ -302,8 +306,8 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
 
        // this.getActionBar().setDisplayHomeAsUpEnabled(false);
 
-        //Database db = Database.getInstance(this);
-        Database db = new Database(getActivity());
+        Database db = Database.getInstance(getActivity());
+//        Database db = new Database(getActivity());
 
         //if (BuildConfig.DEBUG) db.logState();
         // read todays offset
@@ -377,8 +381,8 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         } catch (Exception e) {
             //if (BuildConfig.DEBUG) Logger.log(e);
         }
-        //Database db = Database.getInstance(this);
-        Database db = new Database(getActivity());
+        Database db = Database.getInstance(getActivity());
+//        Database db = new Database(getActivity());
         db.saveCurrentSteps(since_boot);
         //db.close();
     }
@@ -441,7 +445,8 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         SharedPreferences sp = this.getActivity().getSharedPreferences("user", MODE_PRIVATE);
 
         String timestamps = "" + Util.getToday();
-        Database db = new Database(this.getActivity());
+//        Database db = new Database(this.getActivity());
+        Database db = Database.getInstance(getActivity());
         String steps = ""+ db.getSteps(Util.getToday());
         String sleepingTime = "" + db.getSleepingTime(Util.getToday());
         String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");

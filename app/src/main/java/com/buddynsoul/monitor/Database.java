@@ -4,23 +4,48 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.buddynsoul.monitor.Utils.Util;
 
-public class Database {
-    private SQLiteDatabase db;
-    private final String DB_NAME = "monitor";
+public class Database extends SQLiteOpenHelper {
+//    private SQLiteDatabase db;
+    private static final String DB_NAME = "monitor";
+    private static final int DB_VERSION = 1;
+    public static Database instance;
 
-    public Database(Context context){
-        db = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
 
+    @Override
+    public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "(date INTEGER, steps INTEGER, sleepingTime INTEGER, " +
-                "morning_location STRING, night_location STRING)";
+                "morning_location STRING, night_location STRING, " +
+                "asleep INTEGER, wokeUp INTEGER)";
         db.execSQL(query);
     }
 
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+//        if(oldVersion == 1){
+//            db.execSQL("ALTER TABLE " + DB_NAME + " ADD COLUMN asleep INTEGER DEFAULT 0");
+//            db.execSQL("ALTER TABLE " + DB_NAME + " ADD COLUMN wokeUp INTEGER DEFAULT 0");
+//        }
+    }
+
+    public Database(Context context){
+        super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    // ensures that only one Database will ever exist at any given time
+    public static synchronized Database getInstance(Context context){
+        if(instance == null)
+            instance = new Database(context.getApplicationContext());
+
+        return instance;
+    }
+
     public void insertNewDay(long date, int steps){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
         if(!cursor.moveToFirst() && steps >= 0){
@@ -32,6 +57,9 @@ public class Database {
             cv.put("sleepingTime", 0);
             cv.put("morning_location", "");
             cv.put("night_location", "");
+            cv.put("asleep", "");
+            cv.put("wokeUp", "");
+
 
             db.insert(DB_NAME, null, cv);
 
@@ -43,7 +71,8 @@ public class Database {
         }
     }
 
-    public void insertSleepingTime(long date, int sleepingTime){
+    public void insertSleepingTime(long date, int sleepingTime, long asleep, long wokeUp){
+        SQLiteDatabase db = getWritableDatabase();
         Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
@@ -52,7 +81,8 @@ public class Database {
             if(sleepingTime > tmpSleepingTime){
                 ContentValues cv = new ContentValues();
                 cv.put("sleepingTime", sleepingTime);
-                
+                cv.put("asleep", asleep);
+                cv.put("wokeUp", wokeUp);
                 db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
             }
         }
@@ -65,6 +95,7 @@ public class Database {
     }
 
     public void insertLocation(long date, String location, String params){
+        SQLiteDatabase db = getWritableDatabase();
         Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
@@ -85,6 +116,7 @@ public class Database {
     }
 
     public void addToLastEntry(int steps){
+        SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " ORDER BY date DESC", null );
 
         if(cursor.moveToFirst()){
@@ -101,6 +133,7 @@ public class Database {
     }
 
     public int getTotalWithoutToday(){
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT SUM(steps) FROM " + DB_NAME + " WHERE steps > 0 AND date > 0 AND date < " + Util.getToday(), null);
 
         cursor.moveToFirst();
@@ -111,6 +144,7 @@ public class Database {
     }
 
     public int getSteps(final long date){
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
         int res = Integer.MIN_VALUE;
@@ -123,6 +157,7 @@ public class Database {
     }
 
     public double getSleepingTime(final long date){
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
         int res = 0;
@@ -135,6 +170,7 @@ public class Database {
     }
 
     public double getLocation(final long date, String columnName){
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
         double res = 0.0;
@@ -147,10 +183,12 @@ public class Database {
     }
 
     public void removeNegativeEntries(){
+        SQLiteDatabase db = getWritableDatabase();
         db.delete(DB_NAME, "steps < ?", new String[]{"0"});
     }
 
     public int getDaysWithoutToday(){
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE steps > 0 AND date > 0 AND date < " + Util.getToday(), null);
         cursor.moveToFirst();
 
@@ -165,6 +203,8 @@ public class Database {
     }
 
     public void saveCurrentSteps(int steps){
+        SQLiteDatabase db = getWritableDatabase();
+
         ContentValues cv = new ContentValues();
         cv.put("steps", steps);
 
@@ -183,7 +223,9 @@ public class Database {
         return res == Integer.MIN_VALUE ? 0 : res;
     }
 
-    public long[] getDates(){
+    public long[] getStepsDates(){
+        SQLiteDatabase db = getReadableDatabase();
+
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE steps >= 0 AND date > 0", null);
         cursor.moveToFirst();
 
@@ -209,12 +251,41 @@ public class Database {
         return dates;
     }
 
+    public long[] getSleepinTimeDates(){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE sleepingTime >= 0 AND date > 0", null);
+        cursor.moveToFirst();
+
+        int t = cursor.getInt(0);
+
+        cursor = db.rawQuery("SELECT * FROM " + DB_NAME, null);
+        long[] dates = new long[t];
+        int index = 0;
+
+        if(cursor.moveToFirst()){
+            do{
+                long date = cursor.getLong(cursor.getColumnIndex("date"));
+                int sleep = cursor.getInt(cursor.getColumnIndex("sleepingTime"));
+                if(date != -1 && sleep >=0){
+                    dates[index] = date;
+                    index++;
+                }
+
+            }while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return dates;
+    }
+
     /**
      * Get the maximum of steps walked in one day
      *
      * @return the maximum number of steps walked in one day
      */
     public int getRecord() {
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT MAX(steps) FROM " + DB_NAME + " WHERE steps >= 0 AND date > 0", null);
 
         cursor.moveToFirst();
@@ -235,6 +306,7 @@ public class Database {
      * entry might have negative value
      */
     public int getSteps(final long start, final long end) {
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT SUM(steps) FROM " + DB_NAME + " WHERE steps >= 0 AND date >= " + start +
                 " AND date <= "+ end, null);
         int res = 0;
@@ -243,4 +315,5 @@ public class Database {
         cursor.close();
         return res;
     }
+
 }

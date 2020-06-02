@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        android:allowBackup="true">
         <activity android:name=".MainActivity"/>
         <activity android:name=".ResetPasswordActivity"/>
         <activity android:name=".SettingsFragment" />

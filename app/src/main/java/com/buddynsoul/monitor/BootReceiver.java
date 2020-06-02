@@ -16,9 +16,8 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
 
-            //Database db = Database.getInstance(context);
-            Database db = new Database(context);
-
+            Database db = Database.getInstance(context);
+//            Database db = new Database(context);
             if (!prefs.getBoolean("correctShutdown", false)) {
                 if (BuildConfig.DEBUG) Log.d("debug","Incorrect shutdown");
                 // can we at least recover some steps?
