@@ -43,7 +43,7 @@ import org.json.JSONObject;
 import static android.content.Context.MODE_PRIVATE;
 
 public class PedometerCurrentFragment extends Fragment implements SensorEventListener {
-//    private final int PEDOMETER = 0;
+    private final int PEDOMETER = 0;
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     private TextView distance_txtv;
@@ -142,15 +142,16 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
 //            }
 //        });
 
-        hs = (HorizontalScrollView) v.findViewById(R.id.horizontal_scrollview_ID);
+
+        hs = (HorizontalScrollView) v.findViewById(R.id.pedometer_horizontal_scrollview_ID);
         hs.setHorizontalScrollBarEnabled(false);
 
         DisplayMetrics dm = new DisplayMetrics();
 
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels, height = dm.heightPixels;
-        graph = (GraphChartView)v.findViewById(R.id.graph_ID);
-//        graph.setType(PEDOMETER);
+        graph = (GraphChartView)v.findViewById(R.id.pedometer_graph_ID);
+        graph.setType(PEDOMETER);
         graph.setScreenDimensions(width, height);
         graph.setGoal(goal);
 
@@ -162,13 +163,13 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
                     @Override
                     public void onScrollChanged() {
                         graph.setScrollPosition(hs.getScrollX());
-                        tmp = hs.getScrollX();
+//                        tmp = hs.getScrollX();
                     }
                 });
             }
         });
 
-        Button changeGraph = (Button)v.findViewById(R.id.change_graph_btn_ID);
+        Button changeGraph = (Button)v.findViewById(R.id.pedometer_change_graph_btn_ID);
         changeGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

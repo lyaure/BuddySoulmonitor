@@ -50,14 +50,14 @@
     </FrameLayout>
 
     <HorizontalScrollView
-        android:id="@+id/horizontal_scrollview_ID"
+        android:id="@+id/pedometer_horizontal_scrollview_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="5dp"
         android:paddingRight="5dp">
 
         <com.buddynsoul.monitor.GraphChartView
-            android:id="@+id/graph_ID"
+            android:id="@+id/pedometer_graph_ID"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginTop="40dp"
@@ -72,7 +72,7 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/change_graph_btn_ID"
+            android:id="@+id/pedometer_change_graph_btn_ID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

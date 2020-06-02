@@ -72,7 +72,7 @@ public class PedometerRecentFragment extends Fragment {
 
         double distanceAverage = stepsAverage * stepToKilometre;
         distanceAverage = Math.round(distanceAverage * 1000d) / 1000d;
-        String stepsAverage_txt = "Average distance:\n" + distanceAverage + " (km)";
+        String stepsAverage_txt = "Average\ndistance:\n" + distanceAverage + " (km)";
         distanceAverage_txtv.setText(stepsAverage_txt);
 
         distanceAverage_bar.setMax(maxDistance);

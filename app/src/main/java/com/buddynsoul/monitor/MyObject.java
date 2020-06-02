@@ -6,10 +6,10 @@ import java.util.Calendar;
 
 public class MyObject {
     private long date;
-    private double data;
+    private int data;
     private Point point;
 
-    public MyObject(long date, double data){
+    public MyObject(long date, int data){
         this.date = date;
         this.data = data;
         this.point = new Point();
@@ -27,7 +27,13 @@ public class MyObject {
         return d;
     }
 
-    public double getData(){
+    public long getDateInMillis(){
+        return this.date;
+    }
+
+
+
+    public int getData(){
         return this.data;
     }
 

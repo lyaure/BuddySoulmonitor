@@ -12,26 +12,25 @@ import java.util.ArrayList;
 
 
 public class GraphChartView extends View {
+    private final int PEDOMETER = 0, SLEEP = 1, TWELVE_IN_SEC = 43200;
     private final Paint pWhite, pRED, pPrimary, pBlack;
     private int canvasHeight, canvasWidth;
     private int screenWidth, screenHeight;
     private int scrollPosition;
+    private int type;
     private ArrayList<MyObject> objects;
-    private int width, height, graphHeight, barWidth, space, radius;
+    private int width, height, graphHeight, barWidth, space, radius, position;
     private boolean bars;
     private int goal;
+    private Context context;
 
     public GraphChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        this.context = context;
         objects = new ArrayList<>();
 
         bars = true;
-
-        Database db = new Database(context);
-        long[] dates = db.getDates();
-
-        for(int i=0; i<dates.length; i++)
-            objects.add(new MyObject(dates[i], (db.getSteps(dates[i]))));
 
         barWidth = 50;
         space = 250;
@@ -57,14 +56,14 @@ public class GraphChartView extends View {
     protected void onDraw(Canvas canvas){
         canvas.drawColor(Color.parseColor("#9ed4d5"));
         pWhite.setTextAlign(Paint.Align.CENTER);
-        int x = screenWidth/2, y = canvasHeight / 2;
+//        int x = screenWidth/2, y = canvasHeight / 2;
 
         graphHeight = canvasHeight - (canvasHeight/10) * 3;
 
         int index = 0;
 
         for(MyObject o : objects){
-            int tmp = Math.round((float)((o.getData()/goal)*graphHeight));
+            int tmp = Math.round((((float)o.getData()/goal)*graphHeight));
             if(tmp > graphHeight)
                 tmp = graphHeight;
 
@@ -73,11 +72,6 @@ public class GraphChartView extends View {
         }
 
         canvas.drawRect(0, canvasHeight - (canvasHeight/10), canvasWidth, canvasHeight, pPrimary);
-
-        for(int i=0; i<width; i++){
-            if(i%20 == 0)
-                canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
-        }
 
         if(!objects.isEmpty()){
            if(bars)
@@ -88,22 +82,55 @@ public class GraphChartView extends View {
         else
             canvas.drawText("No data yet", canvasWidth/2, canvasHeight/2, pBlack);
 
-        pWhite.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText("Goal: " + goal, scrollPosition + screenWidth - 50, canvasHeight/15, pWhite);
-        pWhite.setTextAlign(Paint.Align.CENTER);
+        if(this.type == PEDOMETER){
+            for(int i=0; i<width; i++){
+                if(i%20 == 0)
+                    canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
+            }
+
+            pWhite.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText("Goal: " + goal, scrollPosition + screenWidth - 50, canvasHeight / 15, pWhite);
+            pWhite.setTextAlign(Paint.Align.CENTER);
+        }
 
         invalidate();
     }
 
+    public void setType(int type){
+        this.type = type;
+        loadData();
+
+        if(type == SLEEP)
+            this.goal = TWELVE_IN_SEC;
+    }
+
+    private void loadData(){
+//        Database db = new Database(context);
+        Database db = Database.getInstance(context);
+        long[] dates;
+
+        if(this.type == PEDOMETER){
+            dates = db.getStepsDates();
+            for(int i=0; i<dates.length; i++)
+                objects.add(new MyObject(dates[i], (db.getSteps(dates[i]))));
+        }
+        else{
+            dates = db.getSleepingTimeDates();
+            for(int i=0; i<dates.length; i++)
+                objects.add(new MyObject(dates[i], (db.getSleepingTime(dates[i]))));
+        }
+    }
+
+
     private void drawBars(Canvas canvas){
         for(MyObject o: objects) {
-            int pos = (int) Math.round(scrollPosition / space);
 
-            if (pos == objects.indexOf(o)) {
+            if (position == objects.indexOf(o)) {
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) + (graphHeight - o.getPoint().y),
                         o.getPoint().x + barWidth, canvasHeight - (canvasHeight / 10) * 2, pRED);
                 canvas.drawText(o.getDate(), o.getPoint().x, canvasHeight - (canvasHeight / 30), pRED);
-                canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) - 5, pBlack);
+                if(type == PEDOMETER)
+                    canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) - 5, pBlack);
             }
             else {
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) +(graphHeight - o.getPoint().y),
@@ -126,12 +153,12 @@ public class GraphChartView extends View {
         }
 
         for(int i=0; i<points.length; i++){
-            int pos = (int) Math.round(scrollPosition / space);
 
-            if (pos == i) {
+            if (position == i) {
                 canvas.drawCircle(points[i].x, points[i].y, radius, pRED);
                 canvas.drawText(objects.get(i).getDate(), points[i].x, canvasHeight - (canvasHeight / 30), pRED);
-                canvas.drawText(Integer.toString((int)objects.get(i).getData()), points[i].x, points[i].y + canvasHeight/10, pBlack);
+                if(type == PEDOMETER)
+                    canvas.drawText(Integer.toString((int)objects.get(i).getData()), points[i].x, points[i].y + canvasHeight/10, pBlack);
             }
             else {
                 canvas.drawCircle(points[i].x, points[i].y, radius, pWhite);
@@ -176,6 +203,12 @@ public class GraphChartView extends View {
 
     public void setScrollPosition(int position){
         this.scrollPosition = position;
+        this.position = (int) Math.round(position / space);
+
+    }
+
+    public long getDatePosition(){
+        return objects.get(position).getDateInMillis();
     }
 
     public void changeGraph(){
