@@ -123,7 +123,7 @@ public class WeatherFragment extends Fragment {
             public void onClick(View v) {
                 Fragment search = new CitySearchFragment();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.container, search ); // give your fragment container id in first parameter
+                transaction.replace(R.id.container_ID, search ); // give your fragment container id in first parameter
                 transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
                 transaction.commit();
             }

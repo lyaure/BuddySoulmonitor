@@ -2,14 +2,9 @@ package com.buddynsoul.monitor;
 
 import androidx.fragment.app.Fragment;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -185,7 +180,7 @@ public class SettingsFragment extends Fragment {
                         fragment = new SleepingTimeFragment();
 
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, fragment, "tag")
+                        .replace(R.id.container_ID, fragment, "tag")
                         .addToBackStack(null)
                         .commit();
             }

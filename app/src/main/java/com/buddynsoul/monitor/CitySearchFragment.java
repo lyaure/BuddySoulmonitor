@@ -114,7 +114,7 @@ public class CitySearchFragment extends Fragment {
                 weather.setArguments(bundle);
 
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.container, weather); // give your fragment container id in first parameter
+                transaction.replace(R.id.container_ID, weather); // give your fragment container id in first parameter
                 transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
                 transaction.commit();
             }
@@ -133,7 +133,7 @@ public class CitySearchFragment extends Fragment {
     private void loadFragment(Fragment fragment) {
         // load fragment
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment);
+        transaction.replace(R.id.container_ID, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }

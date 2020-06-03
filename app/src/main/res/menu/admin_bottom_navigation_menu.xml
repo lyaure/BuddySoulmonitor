@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_users"
+        android:icon="@drawable/users"
+        android:title="Users" />
+    <item
+        android:id="@+id/navigation_statistics"
+        android:icon="@drawable/statistics"
+        android:title="Statistics" />
+<!--    <item-->
+<!--        android:id="@+id/navigation_sleep"-->
+<!--        android:icon="@drawable/sleep_black"-->
+<!--        android:title="Sleep" />-->
+</menu>
