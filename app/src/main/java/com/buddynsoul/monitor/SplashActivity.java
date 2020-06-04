@@ -3,6 +3,8 @@ package com.buddynsoul.monitor;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -30,9 +32,27 @@ public class SplashActivity extends AppCompatActivity {
 //                    activityToLaunch = LoginActivity.class;
 //                }
 //                Intent i = new Intent(SplashActivity.this, activityToLaunch);
-                Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(i);
-                finish();
+
+                new AlertDialog.Builder(SplashActivity.this)
+                        .setTitle("Admin")
+                        .setMessage("Do you want to access your admin account?")
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent i = new Intent(SplashActivity.this, AdminActivity.class);
+                                startActivity(i);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                                startActivity(i);
+                                finish();
+                            }
+                        })
+                        .show();
             }
         }, 3000);
 

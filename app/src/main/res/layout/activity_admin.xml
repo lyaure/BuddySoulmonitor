@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".AdminActivity">
 
     <FrameLayout
-        android:id="@+id/container_ID"
+        android:id="@+id/admin_container_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.93">
-        <!-- Main content -->
+
     </FrameLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -24,5 +24,5 @@
         android:background="@color/colorWhite"
         app:itemIconTint="@drawable/bottom_navigation_selector"
         app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:menu="@menu/admin_bottom_navigation_menu" />
 </LinearLayout>

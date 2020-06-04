@@ -30,7 +30,7 @@ public class MainActivity extends FragmentActivity {
     private void loadFragment(Fragment fragment) {
         // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment);
+        transaction.replace(R.id.container_ID, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -54,7 +54,7 @@ public class MainActivity extends FragmentActivity {
                         case R.id.navigation_settings:
                             fragment = new SettingsFragment();
 
-                            Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container);
+                            Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container_ID);
                             Bundle bundle = new Bundle();
 
                             if(tmp instanceof PedometerFragment)

@@ -17,16 +17,19 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:allowBackup="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true"
-        android:allowBackup="false">
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".ResetPasswordActivity"/>
+        android:usesCleartextTraffic="true">
+        <activity android:name=".AdminActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ResetPasswordActivity" />
         <activity android:name=".SettingsFragment" />
         <activity android:name=".PedometerCurrentFragment" />
         <activity android:name=".WeatherFragment" />

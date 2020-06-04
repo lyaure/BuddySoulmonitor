@@ -23,7 +23,7 @@ public class SleepingTimeFragment extends Fragment {
     View v;
     private GraphChartView graph;
     private HorizontalScrollView hs;
-    private TextView asleep, wokeUp, duration, average;
+    private TextView asleep, wokeUp, deepSleep, lightSleep, duration, average;
     private Database db;
 
     public SleepingTimeFragment() {
@@ -49,32 +49,15 @@ public class SleepingTimeFragment extends Fragment {
         graph.setType(SLEEP);
         graph.setScreenDimensions(width, height);
 
-        long time;
 
         asleep = (TextView)v.findViewById(R.id.asleep_txtv_ID);
         wokeUp = (TextView)v.findViewById(R.id.wokeUpe_txtv_ID);
+        deepSleep = (TextView)v.findViewById(R.id.deepSleep_txtv_ID);
+        lightSleep = (TextView)v.findViewById(R.id.lightSleep_txtv_ID);
         duration = (TextView)v.findViewById(R.id.duration_txtv_ID);
         average = (TextView)v.findViewById(R.id.average_txtv_ID);
 
-        int count = db.getDaysWithoutToday() >= 7 ? 7 : db.getDaysWithoutToday();
-
-        if(count > 0){
-            time = db.getAsleep(graph.getDatePosition());
-            if(time >= 0)
-                asleep.setText(getTime(time));
-
-            time = db.getWokeUp(graph.getDatePosition());
-            if(time >= 0)
-                wokeUp.setText(getTime(time));
-
-
-            int dur = db.getSleepingTime(graph.getDatePosition());
-            if(dur >= 0)
-                duration.setText(getSleepingTime(dur));
-
-            average.setText(getSleepingTime((db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday())) / count));
-        }
-
+        update();
 
         hs.post(new Runnable() {
             @Override
@@ -85,9 +68,10 @@ public class SleepingTimeFragment extends Fragment {
                     public void onScrollChanged() {
                         graph.setScrollPosition(hs.getScrollX());
 //                        tmp = hs.getScrollX();
-                        asleep.setText(getTime(db.getAsleep(graph.getDatePosition())));
-                        wokeUp.setText(getTime(db.getWokeUp(graph.getDatePosition())));
-                        duration.setText(getSleepingTime(db.getSleepingTime(graph.getDatePosition())));
+//                        asleep.setText(getTime(db.getAsleep(graph.getDatePosition())));
+//                        wokeUp.setText(getTime(db.getWokeUp(graph.getDatePosition())));
+//                        duration.setText(getSleepingTime(db.getSleepingTime(graph.getDatePosition())));
+                        update();
                     }
                 });
             }
@@ -139,5 +123,40 @@ public class SleepingTimeFragment extends Fragment {
         int minutes = (time % 3600) / 60;
 
         return String.valueOf(hours) + "h" + String.format("%02d", minutes);
+    }
+
+    private void update(){
+        long time;
+        int count = db.getDaysWithoutToday() >= 7 ? 7 : db.getDaysWithoutToday();
+
+        if(count > 0){
+            long dur = 0;
+
+            time = db.getWokeUp(graph.getDatePosition());
+            if(time >= 0)
+                wokeUp.setText(getTime(time));
+
+            dur = time;
+
+            time = db.getAsleep(graph.getDatePosition());
+            if(time >= 0)
+                asleep.setText(getTime(time));
+
+            dur -= time;
+            dur /= 1000; // millisec to sec
+
+            if(dur >= 0)
+                duration.setText(getSleepingTime((int)dur));
+
+            int deep = db.getSleepingTime(graph.getDatePosition());
+            if(deep >= 0)
+                deepSleep.setText(getSleepingTime(deep));
+
+            if(dur - deep >= 0)
+                lightSleep.setText(getSleepingTime((int)(dur - deep)));
+
+            average.setText(getSleepingTime((db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday())) / count));
+        }
+
     }
 }
