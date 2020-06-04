@@ -65,6 +65,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private static int steps;
     private static int lastSaveSteps;
     private static long lastSaveTime;
+    private static boolean inSleepingTime;
 
     private final BroadcastReceiver shutdownReceiver = new ShutdownReceiver();
     private final BroadcastReceiver screenReceiver = new ScreenReceiver();
@@ -312,6 +313,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
             if (!sp.contains("initializedSensorsValue") || !sp.getBoolean("initializedSensorsValue", true)) {
 
+                inSleepingTime = true;
+
                 editor.putBoolean("initializedSensorsValue", true);
                 editor.putBoolean("inDarkRoom", false);
 
@@ -379,8 +382,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
             }
         }
         else {            // not sleeping time mode
+
+            inSleepingTime = false;
+
             // calculate sleeping time and add it to the db
             if (!sp.getBoolean("sleepingTimeSavedInDb", false)) {
+
                 int sleepingTime = calculateSleepingTime();
 
                 Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
@@ -630,7 +637,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
         filter.addAction(Intent.ACTION_SHUTDOWN);
         registerReceiver(shutdownReceiver, filter);
 
-        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) {
+        //if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) {
+        if (inSleepingTime) {
             if (Build.VERSION.SDK_INT >= 23) {
                 filter = new IntentFilter();
                 filter.addAction(ACTION_CHARGING);
@@ -671,7 +679,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                 SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
 
-        if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) { //night
+        //if (isTimeBetweenTwoHours(startHour, startMin, endHour, endMin)) {
+        if (inSleepingTime) { //night
             // in this hour interval we enable the light and the accelerometer sensor
 
             editor.putBoolean("sleepingTimeSavedInDb", false);
