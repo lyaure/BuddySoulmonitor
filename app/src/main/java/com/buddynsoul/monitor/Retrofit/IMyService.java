@@ -68,6 +68,23 @@ public interface IMyService {
     Call<String> sendData(@Path("refreshToken") String refreshToken,
                                 @Field("data") String data);
 
+    @POST("listusers/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> listusers(@Path("refreshToken") String refreshToken);
+
+    @POST("databetweentwodates/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> databetweentwodates(@Path("refreshToken") String refreshToken,
+                                     @Field("email") String email,
+                                     @Field("start") String start,
+                                     @Field("end") String end);
+
+    @POST("updatepermission/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> updatepermission(@Path("refreshToken") String refreshToken,
+                                     @Field("email") String email,
+                                     @Field("allow") String allow);
+
     // AccuWeather Request
 
     @GET("locations/v1/cities/geoposition/search")
