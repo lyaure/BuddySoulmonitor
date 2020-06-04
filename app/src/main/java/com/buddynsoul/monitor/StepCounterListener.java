@@ -25,9 +25,14 @@ import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,6 +48,9 @@ import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import androidx.annotation.RequiresApi;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
@@ -313,6 +321,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
             if (!sp.contains("initializedSensorsValue") || !sp.getBoolean("initializedSensorsValue", true)) {
 
+                SharedPreferences user_sp = getSharedPreferences("user", MODE_PRIVATE);
+                SharedPreferences.Editor user_editor = user_sp.edit();
+                user_editor.putBoolean("sendToServer", false);
+                user_editor.apply();
+
+
                 inSleepingTime = true;
 
                 editor.putBoolean("initializedSensorsValue", true);
@@ -426,6 +440,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
             editor.commit();
 
             // todo send data to the server
+            if(!getSharedPreferences("user", MODE_PRIVATE).getBoolean("sendToServer", true)) {
+                try {
+                    sendData();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
 
@@ -940,6 +961,55 @@ public class StepCounterListener extends Service implements SensorEventListener 
         // convert sleeping time to sec
         sleeping_time /= 1000;
         return (int) sleeping_time;
+    }
+
+    private void sendData() throws JSONException {
+
+        SharedPreferences sp = this.getSharedPreferences("user", MODE_PRIVATE);
+        String refreshToken = sp.getString("refreshToken", "");
+
+        String dataToSend = preprocessData();
+
+        IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
+
+        Call<String> todoCall = iMyService.sendData(refreshToken, dataToSend);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean("sendToServer", true);
+                editor.apply();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private String preprocessData() throws JSONException {
+
+        SharedPreferences sp = this.getSharedPreferences("user", MODE_PRIVATE);
+
+        String timestamps = "" + Util.getToday();
+        Database db = Database.getInstance(this);
+        String steps = ""+ db.getSteps(Util.getToday());
+        String sleepingTime = "" + db.getSleepingTime(Util.getToday());
+        String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");
+        String night_location = "" + db.getLocation(Util.getToday(), "night_location");
+
+
+        JSONObject json = new JSONObject();
+        json.put("timestamps", timestamps);
+        json.put("steps", steps);
+        json.put("sleeping_time", sleepingTime);
+        json.put("morning_location", morning_location);
+        json.put("night_location", night_location);
+
+        return json.toString();
     }
 
 }
