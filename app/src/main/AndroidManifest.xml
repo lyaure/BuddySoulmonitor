@@ -25,8 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".AdminActivity"></activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".AdminActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".ResetPasswordActivity" />
         <activity android:name=".SettingsFragment" />
         <activity android:name=".PedometerCurrentFragment" />
