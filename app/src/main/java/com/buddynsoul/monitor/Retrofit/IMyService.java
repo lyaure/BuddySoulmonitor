@@ -36,6 +36,7 @@
 
 package com.buddynsoul.monitor.Retrofit;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import retrofit2.Call;
@@ -56,7 +57,7 @@ public interface IMyService {
 
     @POST("login")
     @FormUrlEncoded
-    Call<String> loginUser(@Field("email") String email,
+    Call<JsonElement> loginUser(@Field("email") String email,
                                     @Field("password") String password);
 
     @POST("sendresetmail")
@@ -68,16 +69,15 @@ public interface IMyService {
     Call<String> sendData(@Path("refreshToken") String refreshToken,
                                 @Field("data") String data);
 
-    @POST("listusers/{refreshToken}")
-    @FormUrlEncoded
-    Call<String> listusers(@Path("refreshToken") String refreshToken);
+    @GET("listusers/{refreshToken}")
+    Call<JsonElement> listusers(@Path("refreshToken") String refreshToken);
 
     @POST("databetweentwodates/{refreshToken}")
     @FormUrlEncoded
-    Call<String> databetweentwodates(@Path("refreshToken") String refreshToken,
+    Call<JsonElement> databetweentwodates(@Path("refreshToken") String refreshToken,
                                      @Field("email") String email,
-                                     @Field("start") String start,
-                                     @Field("end") String end);
+                                     @Field("start") long start,
+                                     @Field("end") long end);
 
     @POST("updatepermission/{refreshToken}")
     @FormUrlEncoded
