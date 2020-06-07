@@ -23,36 +23,41 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                 boolean remember = sp.getBoolean("logged", false);
-//                Class activityToLaunch;
-//
-//                if (remember) {
-//                    activityToLaunch = MainActivity.class;
-//                }
-//                else {
-//                    activityToLaunch = LoginActivity.class;
-//                }
-//                Intent i = new Intent(SplashActivity.this, activityToLaunch);
+                boolean admin = sp.getBoolean("admin", false);
+                Class activityToLaunch;
 
-                new AlertDialog.Builder(SplashActivity.this)
-                        .setTitle("Admin")
-                        .setMessage("Do you want to access your admin account?")
-                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent i = new Intent(SplashActivity.this, AdminActivity.class);
-                                startActivity(i);
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                                startActivity(i);
-                                finish();
-                            }
-                        })
-                        .show();
+                if (remember) {
+                    if (admin) {
+                        new AlertDialog.Builder(SplashActivity.this)
+                                .setTitle("Admin")
+                                .setMessage("Do you want to access your admin account?")
+                                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent i = new Intent(SplashActivity.this, AdminActivity.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+                                })
+                                .show();
+                    }
+                    else {
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(i);
+                    }
+                }
+                else {
+                    Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+                    startActivity(i);
+                }
             }
         }, 3000);
 

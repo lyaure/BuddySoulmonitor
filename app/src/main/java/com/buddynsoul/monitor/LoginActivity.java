@@ -30,6 +30,7 @@ import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.buddynsoul.monitor.Utils.Util;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.JsonElement;
 
 public class LoginActivity extends AppCompatActivity {
     private TextView email;
@@ -171,54 +172,29 @@ public class LoginActivity extends AppCompatActivity {
     private void loginUser(final String email, String password, LoadingDialog loadingDialog) {
         final Intent i = new Intent(LoginActivity.this, MainActivity.class);
 
-//        compositeDisposable.add(iMyService.loginUser(email, password)
-//        .subscribeOn(Schedulers.io())
-//        .observeOn(AndroidSchedulers.mainThread())
-//        .subscribe(new Consumer<String>() {
-//            @Override
-//            public void accept(String response) throws Exception {
-//                //Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-//                //Log.d("Response", response);
-//                Log.d("Response", response);
-//                if (!response.equals("\"Wrong password\"") && !response.equals("\"Your account doesn\'t exist\"")) {
-//                    SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sp.edit();
-//                    editor.putString("email", email);
-//                    editor.putString("refreshToken", response);
-//
-//                    response = response.substring(1, response.length()-1);
-//                    Log.d("Response", "After substring:" + response);
-//
-//                    editor.putBoolean("logged", true);
-//                    editor.commit();
-//
-//                    startActivity(i);
-//                }
-//                else {
-//                    Toast.makeText(LoginActivity.this, ""+response, Toast.LENGTH_SHORT).show();
-//                }
-//
-//            }
-//        }));
-
-        Call<String> todoCall = iMyService.loginUser(email, password);
-        todoCall.enqueue(new Callback<String>() {
+        Call<JsonElement> todoCall = iMyService.loginUser(email, password);
+        todoCall.enqueue(new Callback<JsonElement>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.code() == 200) {
                     if(response.body().equals("Please confirm your email")) {
                         loadingDialog.dismissDialog();
                         Toast.makeText(LoginActivity.this, "Please confirm your email", Toast.LENGTH_SHORT).show();
                     }
                     else {
+
+                        String refreshToken = response.body().getAsJsonObject().get("refreshToken").getAsString();
+                        boolean admin = Boolean.parseBoolean(response.body().getAsJsonObject().get("admin").getAsString());
+
                         SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putString("email", email);
-                        editor.putString("refreshToken", response.body());
-                        Log.d("Response", "After substring: " + response.body());
-
+                        editor.putString("refreshToken", refreshToken);
+                        editor.putBoolean("admin", admin);
                         editor.putBoolean("logged", true);
-                        editor.commit();
+                        editor.apply();
+
+                        //Log.d("Response", "After substring: " + response.body());
 
                         startActivity(i);
                         loadingDialog.dismissDialog();
@@ -235,7 +211,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<JsonElement> call, Throwable t) {
                 loadingDialog.dismissDialog();
                 Toast.makeText(LoginActivity.this, "Something wrong happened", Toast.LENGTH_SHORT).show();
                 Log.d("Response", "onFailure: "+t.getLocalizedMessage());

@@ -36,6 +36,7 @@
 
 package com.buddynsoul.monitor.Retrofit;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import retrofit2.Call;
@@ -56,7 +57,7 @@ public interface IMyService {
 
     @POST("login")
     @FormUrlEncoded
-    Call<String> loginUser(@Field("email") String email,
+    Call<JsonElement> loginUser(@Field("email") String email,
                                     @Field("password") String password);
 
     @POST("sendresetmail")
@@ -67,6 +68,22 @@ public interface IMyService {
     @FormUrlEncoded
     Call<String> sendData(@Path("refreshToken") String refreshToken,
                                 @Field("data") String data);
+
+    @GET("listusers/{refreshToken}")
+    Call<JsonElement> listusers(@Path("refreshToken") String refreshToken);
+
+    @POST("databetweentwodates/{refreshToken}")
+    @FormUrlEncoded
+    Call<JsonElement> databetweentwodates(@Path("refreshToken") String refreshToken,
+                                     @Field("email") String email,
+                                     @Field("start") long start,
+                                     @Field("end") long end);
+
+    @POST("updatepermission/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> updatepermission(@Path("refreshToken") String refreshToken,
+                                     @Field("email") String email,
+                                     @Field("allow") String allow);
 
     // AccuWeather Request
 
