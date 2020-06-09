@@ -3,9 +3,9 @@ package com.buddynsoul.monitor;
 public class User {
     private String name;
     private String email;
-    private long registrationDate;
+    private String registrationDate;
 
-    public User(String name, String email, long registrationDate) {
+    public User(String name, String email, String registrationDate) {
         this.name = name;
         this.email = email;
         this.registrationDate = registrationDate;
@@ -27,11 +27,11 @@ public class User {
         this.email = email;
     }
 
-    public long getRegistrationDate() {
+    public String getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(long registrationDate) {
+    public void setRegistrationDate(String registrationDate) {
         this.registrationDate = registrationDate;
     }
 }

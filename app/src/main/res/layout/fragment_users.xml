@@ -10,11 +10,17 @@
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="Users"
         android:textColor="@color/colorBlue"
         android:textSize="36sp"
         android:textStyle="normal" />
+
+    <ListView
+        android:id="@+id/userList_ID"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="10dp" />
 
 </LinearLayout>

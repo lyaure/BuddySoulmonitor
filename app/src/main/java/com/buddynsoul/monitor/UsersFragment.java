@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -13,13 +14,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,6 +39,9 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class UsersFragment extends Fragment {
 
+    private ArrayList<User> userList = new ArrayList<>();
+    private UserAdapter adapter;
+
     public UsersFragment() {
         // Required empty public constructor
     }
@@ -39,17 +50,18 @@ public class UsersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_users, container, false);
 
+        ListView userListView = (ListView) v.findViewById(R.id.userList_ID);
+        adapter = new UserAdapter(getContext(), userList);
+        userListView.setAdapter(adapter);
         getUserList(getActivity());
 
-
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_users, container, false);
+        return v;
     }
 
-    private static ArrayList<User> getUserList(Activity activity) {
-
-        ArrayList<User> userList = new ArrayList<>();
+    private void getUserList(Activity activity) {
 
         SharedPreferences sp = activity.getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
@@ -67,22 +79,25 @@ public class UsersFragment extends Fragment {
                         String name = usersArray.get(i).getAsJsonObject().get("name").getAsString();
                         String email = usersArray.get(i).getAsJsonObject().get("email").getAsString();
                         long registrationDate = usersArray.get(i).getAsJsonObject().get("registration_date").getAsLong();
-                        User user = new User(name, email, registrationDate);
+                        String registrationStr = convertTimeInMillisToDate(registrationDate);
+                        User user = new User(name, email, registrationStr);
 
                         userList.add(user);
                     }
+                    adapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                //loadingDialog.dismissDialog();
                 Log.d("Response", "onFailure: " + t.getLocalizedMessage());
             }
         });
+        //return userList;
+    }
 
-        return userList;
-
-
+    private String convertTimeInMillisToDate(long timeInMillis) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(new Date(timeInMillis));
     }
 }
