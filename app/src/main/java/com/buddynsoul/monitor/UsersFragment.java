@@ -1,6 +1,7 @@
 package com.buddynsoul.monitor;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -20,6 +21,7 @@ import android.widget.ListView;
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.buddynsoul.monitor.Utils.WeatherUtils;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -40,6 +42,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class UsersFragment extends Fragment {
 
     private ArrayList<User> userList = new ArrayList<>();
+    private ArrayList<String> userEmailList = new ArrayList<>();
     private UserAdapter adapter;
 
     public UsersFragment() {
@@ -85,6 +88,14 @@ public class UsersFragment extends Fragment {
                         userList.add(user);
                     }
                     adapter.notifyDataSetChanged();
+
+                    Gson gson = new Gson();
+                    String emailList_str = gson.toJson(createUserEmailArrayList(userList));
+
+                    SharedPreferences sp = getContext().getSharedPreferences("admin", MainActivity.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("emailList", emailList_str);
+                    editor.apply();
                 }
             }
 
@@ -99,5 +110,14 @@ public class UsersFragment extends Fragment {
     private String convertTimeInMillisToDate(long timeInMillis) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         return sdf.format(new Date(timeInMillis));
+    }
+
+    private ArrayList<String> createUserEmailArrayList(ArrayList<User> userList) {
+        ArrayList<String> userEmailList = new ArrayList<>();
+
+        for(User user: userList) {
+            userEmailList.add(user.getEmail());
+        }
+        return userEmailList;
     }
 }
