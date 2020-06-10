@@ -54,6 +54,7 @@ public class UsersFragment extends Fragment {
         ListView userListView = (ListView) v.findViewById(R.id.userList_ID);
         adapter = new UserAdapter(getContext(), userList);
         userListView.setAdapter(adapter);
+        userList.clear();
         getUserList(getActivity());
 
         userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
