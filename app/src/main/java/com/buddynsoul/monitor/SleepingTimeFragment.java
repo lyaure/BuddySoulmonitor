@@ -1,6 +1,5 @@
 package com.buddynsoul.monitor;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -118,11 +117,11 @@ public class SleepingTimeFragment extends Fragment {
         return time;
     }
 
-    private String getSleepingTime(int time){
-        int hours = time / 3600;
-        int minutes = (time % 3600) / 60;
+    private String getSleepingTime(long time){
+        int hours = (int)time / 3600;
+        int minutes = ((int)time % 3600) / 60;
 
-        return String.valueOf(hours) + "h" + String.format("%02d", minutes);
+        return hours + "h" + String.format("%02d", minutes);
     }
 
     private void update(){
@@ -130,32 +129,33 @@ public class SleepingTimeFragment extends Fragment {
         int count = db.getDaysWithoutToday() >= 7 ? 7 : db.getDaysWithoutToday();
 
         if(count > 0){
-            long dur = 0;
-
             time = db.getWokeUp(graph.getDatePosition());
             if(time >= 0)
                 wokeUp.setText(getTime(time));
 
-            dur = time;
 
             time = db.getAsleep(graph.getDatePosition());
             if(time >= 0)
                 asleep.setText(getTime(time));
 
-            dur -= time;
+            long dur = db.getSleepDuration(graph.getDatePosition());
             dur /= 1000; // millisec to sec
 
             if(dur >= 0)
                 duration.setText(getSleepingTime((int)dur));
 
-            int deep = db.getSleepingTime(graph.getDatePosition());
+            long deep = db.getDeepSleep(graph.getDatePosition());
             if(deep >= 0)
                 deepSleep.setText(getSleepingTime(deep));
 
-            if(dur - deep >= 0)
-                lightSleep.setText(getSleepingTime((int)(dur - deep)));
+            long light = db.getlightSleep(graph.getDatePosition());
+            light /= 1000;
+            if(light >= 0)
+                lightSleep.setText(getSleepingTime(light));
 
-            average.setText(getSleepingTime((db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday())) / count));
+            int avrg = db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday()) / count;
+            avrg /= 1000;
+            average.setText(getSleepingTime(avrg));
         }
 
     }

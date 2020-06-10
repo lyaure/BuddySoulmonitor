@@ -22,7 +22,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
@@ -40,14 +39,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import androidx.annotation.RequiresApi;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -336,6 +332,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                 editor.putLong("stationary", 0);
                 editor.putLong("tmpStationary", System.currentTimeMillis());
+
+                finalIntervals.clear();
 
                 ///////////////////// lyaure's changes ///////////////////
                 stationaryInterval.clear();
@@ -997,7 +995,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         String timestamps = "" + Util.getToday();
         Database db = Database.getInstance(this);
         String steps = ""+ db.getSteps(Util.getToday());
-        String sleepingTime = "" + db.getSleepingTime(Util.getToday());
+        String sleepingTime = "" + db.getSleepDuration(Util.getToday());
         String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");
         String night_location = "" + db.getLocation(Util.getToday(), "night_location");
 

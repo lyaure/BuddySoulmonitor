@@ -117,7 +117,7 @@ public class GraphChartView extends View {
         else{
             dates = db.getSleepingTimeDates();
             for(int i=0; i<dates.length; i++)
-                objects.add(new MyObject(dates[i], (db.getSleepingTime(dates[i]))));
+                objects.add(new MyObject(dates[i], (db.getSleepDuration(dates[i]))));
         }
     }
 

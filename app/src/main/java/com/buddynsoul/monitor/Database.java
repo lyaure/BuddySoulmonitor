@@ -20,18 +20,19 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "(date INTEGER, steps INTEGER, sleepingTime INTEGER, " +
+        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "(date INTEGER, steps INTEGER, " +
                 "morning_location STRING, night_location STRING, " +
-                "asleep INTEGER, wokeUp INTEGER)";
+                "sleepDuration INTEGER, asleep INTEGER, wokeUp INTEGER, " +
+                "deepSleep INTEGER, lightSleep INTEGER)";
         db.execSQL(query);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if(oldVersion == 1){
-            db.execSQL("ALTER TABLE " + DB_NAME + " ADD COLUMN asleep INTEGER DEFAULT -1");
-            db.execSQL("ALTER TABLE " + DB_NAME + " ADD COLUMN wokeUp INTEGER DEFAULT -1");
-        }
+//        if(oldVersion == 1){
+//            db.execSQL("ALTER TABLE " + DB_NAME + " ADD COLUMN asleep INTEGER DEFAULT -1");
+//            db.execSQL("ALTER TABLE " + DB_NAME + " ADD COLUMN wokeUp INTEGER DEFAULT -1");
+//        }
     }
 
     public Database(Context context){
@@ -56,11 +57,13 @@ public class Database extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put("date", date);
             cv.put("steps", -steps);
-            cv.put("sleepingTime", -1);
             cv.put("morning_location", "");
             cv.put("night_location", "");
-            cv.put("asleep", "-1");
-            cv.put("wokeUp", "-1");
+            cv.put("sleepDuration", -1);
+            cv.put("asleep", -1);
+            cv.put("wokeUp", -1);
+            cv.put("deepSleep", -1);
+            cv.put("lightSleep", -1);
 
 
             db.insert(DB_NAME, null, cv);
@@ -73,18 +76,21 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void insertSleepingTime(long date, int sleepingTime, long asleep, long wokeUp){
+    public void insertSleepingTime(long date, int deepSleep, long asleep, long wokeUp){
         SQLiteDatabase db = getWritableDatabase();
         Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
         if(cursor.moveToFirst()){
-            int tmpSleepingTime = cursor.getInt(cursor.getColumnIndex("sleepingTime"));
-            if(sleepingTime > tmpSleepingTime){
+            int duration = (int)(wokeUp - asleep);
+            int tmpSleep = cursor.getInt(cursor.getColumnIndex("deepSleep"));
+            if(deepSleep > tmpSleep){
                 ContentValues cv = new ContentValues();
-                cv.put("sleepingTime", sleepingTime);
+                cv.put("sleepDuration", duration);
                 cv.put("asleep", asleep);
                 cv.put("wokeUp", wokeUp);
+                cv.put("deepSleep", deepSleep);
+                cv.put("lightSleep", duration - deepSleep);
                 db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
             }
         }
@@ -92,7 +98,7 @@ public class Database extends SQLiteOpenHelper {
         cursor.close();
 
         if (BuildConfig.DEBUG) {
-            Log.d("debug","insertSleepingTime " + date + " / " + sleepingTime);
+            Log.d("debug","insertSleepingTime " + date + " / " + deepSleep);
         }
     }
 
@@ -158,14 +164,14 @@ public class Database extends SQLiteOpenHelper {
         return res;
     }
 
-    public int getSleepingTime(final long date){
+    public int getSleepDuration(final long date){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
         int res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getInt(cursor.getColumnIndex("sleepingTime"));
+            res = cursor.getInt(cursor.getColumnIndex("sleepDuration"));
 
         cursor.close();
         return res;
@@ -192,6 +198,32 @@ public class Database extends SQLiteOpenHelper {
 
         if(cursor.moveToFirst())
             res = cursor.getLong(cursor.getColumnIndex("wokeUp"));
+
+        cursor.close();
+        return res;
+    }
+
+    public long getDeepSleep(long date){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        long res = 0;
+
+        if(cursor.moveToFirst())
+            res = cursor.getLong(cursor.getColumnIndex("deepSleep"));
+
+        cursor.close();
+        return res;
+    }
+
+    public long getlightSleep(long date){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        long res = 0;
+
+        if(cursor.moveToFirst())
+            res = cursor.getLong(cursor.getColumnIndex("lightSleep"));
 
         cursor.close();
         return res;
@@ -283,7 +315,7 @@ public class Database extends SQLiteOpenHelper {
     public long[] getSleepingTimeDates(){
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE sleepingTime >= 0 AND date > 0", null);
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE sleepDuration >= 0 AND date > 0", null);
         cursor.moveToFirst();
 
         int t = cursor.getInt(0);
@@ -295,7 +327,7 @@ public class Database extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             do{
                 long date = cursor.getLong(cursor.getColumnIndex("date"));
-                int sleep = cursor.getInt(cursor.getColumnIndex("sleepingTime"));
+                int sleep = cursor.getInt(cursor.getColumnIndex("sleepDuration"));
                 if(date != -1 && sleep >=0){
                     dates[index] = date;
                     index++;
@@ -347,7 +379,7 @@ public class Database extends SQLiteOpenHelper {
 
     public int getSleepingTimes(final long start, final long end) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT SUM(sleepingTime) FROM " + DB_NAME + " WHERE sleepingTime >= 0 AND date >= " + start +
+        Cursor cursor = db.rawQuery("SELECT SUM(sleepDuration) FROM " + DB_NAME + " WHERE sleepDuration >= 0 AND date >= " + start +
                 " AND date <= "+ end, null);
         int res = 0;
         cursor.moveToFirst();
