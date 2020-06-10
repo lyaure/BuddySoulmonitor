@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:context=".UsersFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="User info"
+        android:textColor="@color/colorBlue"
+        android:textSize="36sp"
+        android:layout_marginBottom="50dp"
+        android:textStyle="normal" />
+
+    <TextView
+        android:id="@+id/userNameInfo_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="user's name"
+        android:textAlignment="center"
+        android:textSize="26sp"
+        android:layout_marginBottom="20dp"
+        android:textStyle="normal" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingLeft="30dp"
+        android:text="Admin permission" />
+
+
+</LinearLayout>

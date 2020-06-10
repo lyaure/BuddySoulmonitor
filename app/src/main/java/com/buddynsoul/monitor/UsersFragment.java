@@ -1,7 +1,6 @@
 package com.buddynsoul.monitor;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -20,16 +19,13 @@ import android.widget.ListView;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
-import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -42,7 +38,6 @@ import static android.content.Context.MODE_PRIVATE;
 public class UsersFragment extends Fragment {
 
     private ArrayList<User> userList = new ArrayList<>();
-    private ArrayList<String> userEmailList = new ArrayList<>();
     private UserAdapter adapter;
 
     public UsersFragment() {
@@ -60,6 +55,25 @@ public class UsersFragment extends Fragment {
         adapter = new UserAdapter(getContext(), userList);
         userListView.setAdapter(adapter);
         getUserList(getActivity());
+
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                User user = userList.get(position);
+
+                Fragment userInfo = new UserInfoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("userName", user.getName());
+                bundle.putString("userEmail", user.getEmail());
+                userInfo.setArguments(bundle);
+
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.admin_container_ID, userInfo); // give your fragment container id in first parameter
+                transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+                transaction.commit();
+            }
+        });
 
         return v;
     }
