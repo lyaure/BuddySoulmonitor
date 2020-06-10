@@ -66,6 +66,7 @@ public class UsersFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("userName", user.getName());
                 bundle.putString("userEmail", user.getEmail());
+                bundle.putBoolean("admin", user.isAdmin());
                 userInfo.setArguments(bundle);
 
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -97,7 +98,8 @@ public class UsersFragment extends Fragment {
                         String email = usersArray.get(i).getAsJsonObject().get("email").getAsString();
                         long registrationDate = usersArray.get(i).getAsJsonObject().get("registration_date").getAsLong();
                         String registrationStr = convertTimeInMillisToDate(registrationDate);
-                        User user = new User(name, email, registrationStr);
+                        boolean admin = usersArray.get(i).getAsJsonObject().get("admin").getAsBoolean();
+                        User user = new User(name, email, registrationStr, admin);
 
                         userList.add(user);
                     }

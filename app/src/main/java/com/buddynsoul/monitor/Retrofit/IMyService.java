@@ -36,7 +36,6 @@
 
 package com.buddynsoul.monitor.Retrofit;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 import retrofit2.Call;
@@ -83,7 +82,7 @@ public interface IMyService {
     @FormUrlEncoded
     Call<String> updatepermission(@Path("refreshToken") String refreshToken,
                                      @Field("email") String email,
-                                     @Field("allow") String allow);
+                                     @Field("allow") boolean allow);
 
     // AccuWeather Request
 

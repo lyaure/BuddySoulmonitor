@@ -29,7 +29,7 @@
         android:textStyle="normal" />
 
     <Switch
-        android:id="@+id/switch1"
+        android:id="@+id/userAdminPermission_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:paddingLeft="30dp"
