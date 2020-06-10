@@ -39,20 +39,13 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_setting, container, false);
 
-//        Intent intent = getIntent();
-//        val = intent.getStringExtra("from");
-
         Bundle bundle = this.getArguments();
         if(bundle != null)
             fromFragment = bundle.getString("from", "pedometer");
 
-
-
         sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
 
         oldGoal = sp.getInt("goal", 10000);
-
-
 
         goal = v.findViewById(R.id.goalTxtv_ID);
         goal.setText(Integer.toString(oldGoal));
@@ -143,7 +136,7 @@ public class SettingsFragment extends Fragment {
                     sp = getActivity().getSharedPreferences("pedometer", MODE_PRIVATE);
                     editor = sp.edit();
                     editor.putInt("goal", Integer.parseInt(goal.getText().toString()));
-                    editor.commit();
+                    editor.apply();
                 }
 
                 if(unitTemperature.getCheckedRadioButtonId() != oldButton.getId()){
@@ -194,7 +187,7 @@ public class SettingsFragment extends Fragment {
                 sp = getActivity().getSharedPreferences("pedometer", MODE_PRIVATE);
                 editor = sp.edit();
                 editor.putInt("goal", 10000);
-                editor.commit();
+                editor.apply();
 
                 goal.setText("10000");
 
@@ -223,7 +216,7 @@ public class SettingsFragment extends Fragment {
                 SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean("logged", false);
-                editor.commit();
+                editor.apply();
 
                 getActivity().stopService(myService);
 
@@ -231,39 +224,6 @@ public class SettingsFragment extends Fragment {
                 startActivity(i); // open rules activity
             }
         });
-
-
-//        ImageButton pedometer_btn = (ImageButton)v.findViewById(R.id.pedometer_btn_ID);
-//        pedometer_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(SettingsFragment.this, PedometerFragment.class);
-//                startActivity(i);
-//            }
-//        });
-//
-//        ImageButton weather_btn = (ImageButton)findViewById(R.id.weather_btn_ID);
-//        weather_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(SettingsFragment.this, WeatherActivity.class);
-//                startActivity(i);
-//            }
-//        });
-//
-//        ImageButton sleep_btn = (ImageButton)findViewById(R.id.sleep_btn_ID);
-//        sleep_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
         return v;
     }
-
-//    @Override
-//    protected void onStop(){
-//        super.onStop();
-//        finish();
-//    }
 }
