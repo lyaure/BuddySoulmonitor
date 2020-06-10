@@ -23,6 +23,8 @@ public class AdminActivity extends FragmentActivity {
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        fragment = new UsersFragment();
+        loadFragment(fragment);
     }
 
     private void loadFragment(Fragment fragment) {

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,18 +31,21 @@ public class UserAdapter extends ArrayAdapter<User> {
         View listItem = convertView;
 
         if(listItem == null)
-            listItem = LayoutInflater.from(context).inflate(R.layout.user_list_item, parent, false);
+            listItem = LayoutInflater.from(context).inflate(R.layout.users_list_item, parent, false);
 
         final User user = users.get(position);
 
-        TextView userName = (TextView)listItem.findViewById(R.id.userName_ID);
+        TextView userName = (TextView)listItem.findViewById(R.id.user_name_ID);
         userName.setText(user.getName());
 
-        TextView userEmail = (TextView)listItem.findViewById(R.id.userEmail_ID);
-        userEmail.setText(String.valueOf(user.getEmail()));
+        ImageView icon = (ImageView)listItem.findViewById(R.id.user_list_icon_ID);
+        icon.setImageResource(R.drawable.users_list_icon);
 
-        TextView userRegistration = (TextView)listItem.findViewById(R.id.userRegistration_ID);
-        userRegistration.setText(user.getRegistrationDate());
+//        TextView userEmail = (TextView)listItem.findViewById(R.id.userEmail_ID);
+//        userEmail.setText(String.valueOf(user.getEmail()));
+//
+//        TextView userRegistration = (TextView)listItem.findViewById(R.id.userRegistration_ID);
+//        userRegistration.setText(user.getRegistrationDate());
 
         return listItem;
     }
