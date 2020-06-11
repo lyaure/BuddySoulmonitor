@@ -1,5 +1,6 @@
 package com.buddynsoul.monitor;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 //import io.reactivex.android.schedulers.AndroidSchedulers;
 //import io.reactivex.disposables.CompositeDisposable;
@@ -214,8 +215,9 @@ public class SignupActivity extends AppCompatActivity {
             public void onResponse(Call<String> call, Response<String> response) {
                 if(response.code() == 200) {
                     loadingDialog.dismissDialog();
-                    Toast.makeText(SignupActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, response.body(), Toast.LENGTH_LONG).show();
                     startActivity(i);
+                    finish();
                 }
                 else if(response.code() == 409) {
                     loadingDialog.dismissDialog();

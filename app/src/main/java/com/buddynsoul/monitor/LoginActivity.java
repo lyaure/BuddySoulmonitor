@@ -198,6 +198,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         startActivity(i);
                         loadingDialog.dismissDialog();
+                        finish();
                     }
                 }
                 else if(response.code() == 404){
