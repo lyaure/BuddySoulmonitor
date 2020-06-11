@@ -26,14 +26,6 @@
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/profile_lastName_ID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Last name"
-        android:textSize="18sp" />
-
-    <TextView
         android:id="@+id/profile_email_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -101,7 +102,7 @@ public class UsersListFragment extends Fragment {
                         String name = usersArray.get(i).getAsJsonObject().get("name").getAsString();
                         String email = usersArray.get(i).getAsJsonObject().get("email").getAsString();
                         long registrationDate = usersArray.get(i).getAsJsonObject().get("registration_date").getAsLong();
-                        String registrationStr = convertTimeInMillisToDate(registrationDate);
+                        String registrationStr = Util.convertTimeInMillisToDate(registrationDate);
                         boolean admin = usersArray.get(i).getAsJsonObject().get("admin").getAsBoolean();
                         User user = new User(name, email, registrationStr, admin);
 
@@ -125,11 +126,6 @@ public class UsersListFragment extends Fragment {
             }
         });
         //return userList;
-    }
-
-    private String convertTimeInMillisToDate(long timeInMillis) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        return sdf.format(new Date(timeInMillis));
     }
 
     private ArrayList<String> createUserEmailArrayList(ArrayList<User> userList) {

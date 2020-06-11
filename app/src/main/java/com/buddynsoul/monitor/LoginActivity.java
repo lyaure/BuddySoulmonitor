@@ -182,19 +182,20 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Please confirm your email", Toast.LENGTH_SHORT).show();
                     }
                     else {
-
                         String refreshToken = response.body().getAsJsonObject().get("refreshToken").getAsString();
-                        boolean admin = Boolean.parseBoolean(response.body().getAsJsonObject().get("admin").getAsString());
+                        boolean admin = response.body().getAsJsonObject().get("admin").getAsBoolean();
+                        String name = response.body().getAsJsonObject().get("name").getAsString();
+                        long registrationDate = response.body().getAsJsonObject().get("registration_date").getAsLong();
 
                         SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putString("email", email);
+                        editor.putString("name", name);
+                        editor.putLong("registrationDate", registrationDate);
                         editor.putString("refreshToken", refreshToken);
                         editor.putBoolean("admin", admin);
                         editor.putBoolean("logged", true);
                         editor.apply();
-
-                        //Log.d("Response", "After substring: " + response.body());
 
                         startActivity(i);
                         loadingDialog.dismissDialog();

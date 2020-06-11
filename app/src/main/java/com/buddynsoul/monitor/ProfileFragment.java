@@ -13,10 +13,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.buddynsoul.monitor.Utils.Util;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
-    TextView name, lastName, email, registration;
+    TextView name, email, registration;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -28,14 +30,19 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_profile, container, false);
 
-        name = (TextView)v.findViewById(R.id.profile_name_ID);
-        lastName = (TextView)v.findViewById(R.id.profile_lastName_ID);
-        email = (TextView)v.findViewById(R.id.profile_email_ID);
-        registration = (TextView)v.findViewById(R.id.profile_registrationDate_ID);
-
         SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
-        boolean isAdmin = sp.getBoolean("admin", false);
 
+        name = (TextView)v.findViewById(R.id.profile_name_ID);
+        name.setText(sp.getString("name", ""));
+
+        email = (TextView)v.findViewById(R.id.profile_email_ID);
+        email.setText(sp.getString("email", ""));
+
+        registration = (TextView)v.findViewById(R.id.profile_registrationDate_ID);
+        String registrationStr = Util.convertTimeInMillisToDate(sp.getLong("registrationDate", 0));
+        registration.setText(registrationStr);
+
+        boolean isAdmin = sp.getBoolean("admin", false);
 
         LinearLayout settings = (LinearLayout) v.findViewById(R.id.profile_settings_layout_ID);
         settings.setOnClickListener(new View.OnClickListener() {
