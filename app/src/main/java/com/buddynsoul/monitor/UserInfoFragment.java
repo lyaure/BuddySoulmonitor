@@ -1,6 +1,8 @@
 package com.buddynsoul.monitor;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -61,7 +63,33 @@ import static android.content.Context.MODE_PRIVATE;
             userAdminPermissionSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    updateUserPermission(getActivity());
+                    userAdminPermissionSwitch.setChecked(userAdminPermission);
+
+                    String msg;
+                    if(!userAdminPermission) {
+                        msg = "Are you sure to grant admin permission to this user?";
+                    }
+                    else {
+                        msg = "Are you sure to remove admin permission to this user?";
+                    }
+
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Admin")
+                            .setMessage(msg)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    updateUserPermission(getActivity());
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+
                 }
             });
 

@@ -31,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
                         new AlertDialog.Builder(SplashActivity.this)
                                 .setTitle("Admin")
                                 .setMessage("Do you want to access your admin account?")
-                                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent i = new Intent(SplashActivity.this, AdminActivity.class);
