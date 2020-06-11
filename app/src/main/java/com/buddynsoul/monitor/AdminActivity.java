@@ -1,7 +1,6 @@
 package com.buddynsoul.monitor;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -40,12 +39,12 @@ public class AdminActivity extends FragmentActivity {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.navigation_users:
-                            fragment = new UsersFragment();
+                            fragment = new UsersListFragment();
                             loadFragment(fragment);
                             return true;
 
                         case R.id.navigation_statistics:
-                            fragment = new StatisticsFragment();
+                            fragment = new UsersSearchFragment();
                             loadFragment(fragment);
                             return true;
                     }

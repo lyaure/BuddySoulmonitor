@@ -25,7 +25,7 @@ public class PedometerFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_pedometer, container, false);
 
-        viewPager = (ViewPager) v.findViewById(R.id.viewpager_ID);
+        viewPager = (ViewPager) v.findViewById(R.id.pedometer_viewpager_ID);
         adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
         viewPager.setAdapter(adapter);
 

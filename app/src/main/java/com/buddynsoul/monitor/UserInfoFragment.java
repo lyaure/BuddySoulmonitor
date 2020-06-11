@@ -31,6 +31,7 @@ import static android.content.Context.MODE_PRIVATE;
         private String userEmail;
         private boolean userAdminPermission;
         private Switch userAdminPermissionSwitch;
+        private String userDateRegistration;
 
         public UserInfoFragment() {
             // Required empty public constructor
@@ -48,6 +49,7 @@ import static android.content.Context.MODE_PRIVATE;
                 userName = bundle.getString("userName", "");
                 userEmail = bundle.getString("userEmail", "");
                 userAdminPermission = bundle.getBoolean("admin", false);
+                userDateRegistration = bundle.getString("registration", "");
             }
 
             TextView userNameView = (TextView) v.findViewById(R.id.userNameInfo_ID);
@@ -62,6 +64,12 @@ import static android.content.Context.MODE_PRIVATE;
                     updateUserPermission(getActivity());
                 }
             });
+
+            TextView mail = (TextView)v.findViewById(R.id.userEmail_ID);
+            mail.setText(userEmail);
+
+            TextView registration = (TextView)v.findViewById(R.id.userRegistration_ID);
+            registration.setText(userDateRegistration);
 
             return v;
         }

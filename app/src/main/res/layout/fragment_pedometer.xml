@@ -18,7 +18,7 @@
         android:textStyle="normal" />
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewpager_ID"
+        android:id="@+id/pedometer_viewpager_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.95"/>

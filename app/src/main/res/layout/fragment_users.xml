@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="5dp"
     tools:context=".UsersFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/textView8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_margin="10dp"
         android:gravity="center_horizontal"
         android:text="Users"
         android:textColor="@color/colorBlue"
         android:textSize="36sp"
         android:textStyle="normal" />
 
-    <ListView
-        android:id="@+id/userList_ID"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/users_viewpager_ID"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10.0sp" />
+        android:layout_height="0dp"
+        android:layout_weight="0.95" />
 
+    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+        android:id="@+id/dots_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_weight="0.05"
+        app:dotsColor="#CCC"
+        app:dotsSize="7dp"
+        app:dotsWidthFactor="3"
+        app:selectedDotColor="@color/colorPrimary" />
 </LinearLayout>
