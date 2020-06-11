@@ -96,6 +96,9 @@ public class UsersListFragment extends Fragment {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.code() == 200) {
+
+                    ArrayList<String> emailList = new ArrayList<>();
+
                     JsonArray usersArray = response.body().getAsJsonArray();
 
                     for (int i = 0; i < usersArray.size(); i++) {
@@ -106,12 +109,13 @@ public class UsersListFragment extends Fragment {
                         boolean admin = usersArray.get(i).getAsJsonObject().get("admin").getAsBoolean();
                         User user = new User(name, email, registrationStr, admin);
 
+                        emailList.add(email);
                         userList.add(user);
                     }
                     adapter.notifyDataSetChanged();
 
                     Gson gson = new Gson();
-                    String emailList_str = gson.toJson(createUserEmailArrayList(userList));
+                    String emailList_str = gson.toJson(emailList);
 
                     SharedPreferences sp = getContext().getSharedPreferences("admin", MainActivity.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
@@ -126,14 +130,5 @@ public class UsersListFragment extends Fragment {
             }
         });
         //return userList;
-    }
-
-    private ArrayList<String> createUserEmailArrayList(ArrayList<User> userList) {
-        ArrayList<String> userEmailList = new ArrayList<>();
-
-        for(User user: userList) {
-            userEmailList.add(user.getEmail());
-        }
-        return userEmailList;
     }
 }
