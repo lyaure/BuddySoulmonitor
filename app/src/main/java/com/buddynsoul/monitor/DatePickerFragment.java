@@ -38,11 +38,11 @@ public class DatePickerFragment extends DialogFragment {
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 if(from.equals("fromDate")){
                     TextView fromDate = (TextView)getActivity().findViewById(R.id.fromDate_txtv_ID);
-                    fromDate.setText(dayOfMonth + "/" + month + "/" + year);
+                    fromDate.setText(dayOfMonth + "/" + (month+1) + "/" + year);
                 }
                 else{
                     TextView toDate = (TextView)getActivity().findViewById(R.id.toDate_txtv_ID);
-                    toDate.setText(dayOfMonth + "/" + month + "/" + year);
+                    toDate.setText(dayOfMonth + "/" + (month+1) + "/" + year);
                 }
 
             }
