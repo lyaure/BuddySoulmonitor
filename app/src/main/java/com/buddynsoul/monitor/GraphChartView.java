@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 
 public class GraphChartView extends View {
-    private final int PEDOMETER = 0, SLEEP = 1, TWELVE_IN_SEC = 43200;
+    private final int PEDOMETER = 0, SLEEP = 1, TWELVE_IN_SEC = 43200000;
     private final Paint pWhite, pRED, pPrimary, pBlack;
     private int canvasHeight, canvasWidth;
     private int screenWidth, screenHeight;
