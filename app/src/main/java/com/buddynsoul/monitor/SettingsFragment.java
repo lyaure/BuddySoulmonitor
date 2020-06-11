@@ -39,10 +39,6 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_setting, container, false);
 
-        Bundle bundle = this.getArguments();
-        if(bundle != null)
-            fromFragment = bundle.getString("from", "pedometer");
-
         sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
 
         oldGoal = sp.getInt("goal", 10000);
@@ -162,15 +158,7 @@ public class SettingsFragment extends Fragment {
                     getActivity().startService(myService);
                 }
 
-                Fragment fragment;
-
-                if(fromFragment.equals("pedometer"))
-                    fragment = new PedometerFragment();
-                else
-                    if(fromFragment.equals("weather"))
-                    fragment = new WeatherFragment();
-                    else
-                        fragment = new SleepingTimeFragment();
+                Fragment fragment = new PedometerFragment();
 
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container_ID, fragment, "tag")
@@ -205,25 +193,6 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-
-        final Intent myService = new Intent(getActivity(), StepCounterListener.class);
-
-        ImageButton logOut = (ImageButton) v.findViewById(R.id.logOutBtn_ID);
-        logOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putBoolean("logged", false);
-                editor.apply();
-
-                getActivity().stopService(myService);
-
-                Intent i = new Intent(getActivity(), LoginActivity.class);
-                startActivity(i); // open rules activity
-            }
-        });
         return v;
     }
 }

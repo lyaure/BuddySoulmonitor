@@ -51,8 +51,8 @@ public class MainActivity extends FragmentActivity {
                             fragment = new SleepingTimeFragment();
                             loadFragment(fragment);
                             return true;
-                        case R.id.navigation_settings:
-                            fragment = new SettingsFragment();
+                        case R.id.navigation_profile:
+                            fragment = new ProfileFragment();
 
                             Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container_ID);
                             Bundle bundle = new Bundle();

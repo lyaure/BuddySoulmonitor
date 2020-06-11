@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="10dp"
         android:gravity="center"
         android:text="Pedometer"
         android:textColor="@color/colorPrimary"
@@ -21,19 +21,18 @@
         android:id="@+id/pedometer_viewpager_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.95"/>
+        android:layout_weight="0.95" />
 
     <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
         android:id="@+id/dots_indicator"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="0.05"
-        android:layout_gravity="center"
         android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_weight="0.05"
         app:dotsColor="#CCC"
-        app:selectedDotColor="@color/colorPrimary"
         app:dotsSize="7dp"
         app:dotsWidthFactor="3"
-        />
+        app:selectedDotColor="@color/colorPrimary" />
 
 </LinearLayout>

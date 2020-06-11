@@ -13,7 +13,7 @@
         android:icon="@drawable/sleep_black"
         android:title="Sleep" />
     <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/settings_black"
-        android:title="Setting" />
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/profile_black"
+        android:title="Profile" />
 </menu>
