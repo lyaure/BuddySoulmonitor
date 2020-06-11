@@ -81,6 +81,31 @@ public class UsersSearchFragment extends Fragment {
             }
         });
 
+        Button fromDate = (Button)v.findViewById(R.id.fromDate_ID);
+        fromDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerFragment dialogFragment = new DatePickerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("from", "fromDate");
+                dialogFragment.setArguments(bundle);
+                dialogFragment.show(getActivity().getSupportFragmentManager(), "date");
+            }
+        });
+
+        Button toDate = (Button)v.findViewById(R.id.toDate_ID);
+        toDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerFragment dialogFragment = new DatePickerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("from", "toDate");
+                dialogFragment.setArguments(bundle);
+                dialogFragment.show(getActivity().getSupportFragmentManager(), "date");
+            }
+        });
+
+
         return v;
     }
 
