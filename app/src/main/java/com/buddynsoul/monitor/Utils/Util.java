@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -78,7 +79,17 @@ public abstract class Util {
     public static boolean hasLollipop() { return Build.VERSION.SDK_INT >= 21; }
 
     public static String convertTimeInMillisToDate(long timeInMillis) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        return sdf.format(new Date(timeInMillis));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return dateFormat.format(new Date(timeInMillis));
+    }
+
+    public static long convertDateToTimeInMillis(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date parsedDate = dateFormat.parse(date);
+            return parsedDate.getTime();
+        } catch (ParseException e) {
+            return -1;
+        }
     }
 }

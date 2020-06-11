@@ -17,10 +17,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
+import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -77,7 +79,27 @@ public class UsersSearchFragment extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getUserData(getActivity());
+
+                userStatList.clear();
+                adapter.notifyDataSetChanged();
+
+                String email = autoCompleteTextView.getText().toString().trim();
+
+                if(email.equals("")) {
+                    Toast.makeText(getContext(), "User's mail is empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                TextView fromDate = (TextView)getActivity().findViewById(R.id.fromDate_txtv_ID);
+                TextView toDate = (TextView)getActivity().findViewById(R.id.toDate_txtv_ID);
+
+                long start = -1, end = -1;
+
+                if(!fromDate.getText().equals("") && !toDate.getText().equals("")) {
+                    start = Util.convertDateToTimeInMillis((String) fromDate.getText());
+                    end = Util.convertDateToTimeInMillis((String) toDate.getText());
+                }
+                getUserData(getActivity(), email, start, end);
             }
         });
 
@@ -109,16 +131,12 @@ public class UsersSearchFragment extends Fragment {
         return v;
     }
 
-    private void getUserData(Activity activity) {
+    private void getUserData(Activity activity, String email, long start, long end) {
 
         SharedPreferences sp = activity.getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
 
         IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
-
-        String email = autoCompleteTextView.getText().toString().trim();
-        long start = -1;
-        long end = -1;
 
         Call<JsonElement> todoCall = iMyService.databetweentwodates(refreshToken, email, start, end);
         todoCall.enqueue(new Callback<JsonElement>() {
@@ -132,21 +150,32 @@ public class UsersSearchFragment extends Fragment {
                         Toast.makeText(getActivity(), "User's email doesn't exist", Toast.LENGTH_LONG).show();
                     }
                     else {
-                        JsonArray statsArray = response.body().getAsJsonArray();
+                        String res = response.body().toString();
+                        res = res.substring(1, res.length()-1);
 
-                        for (int i = 0; i < statsArray.size(); i++) {
-                            long date = statsArray.get(i).getAsJsonObject().get("timestamps").getAsLong();
-                            String dateStr = convertTimeInMillisToDate(date);
-                            int steps = statsArray.get(i).getAsJsonObject().get("steps").getAsInt();
-                            int sleepingTime = statsArray.get(i).getAsJsonObject().get("sleeping_time").getAsInt();
-                            String morning_location = statsArray.get(i).getAsJsonObject().get("morning_location").getAsString();
-                            String night_location = statsArray.get(i).getAsJsonObject().get("night_location").getAsString();
-                            UserStat stat = new UserStat(dateStr, steps, sleepingTime, morning_location, night_location);
+                        if (res.equals("No data between these dates")) {
+                            Toast.makeText(getContext(), "No data between these dates", Toast.LENGTH_SHORT).show();
+                        }
+                        else if (res.equals("Still no data")) {
+                            Toast.makeText(getContext(), "Still no data", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            JsonArray statsArray = response.body().getAsJsonArray();
 
-                            userStatList.add(stat);
+                            for (int i = 0; i < statsArray.size(); i++) {
+                                long date = statsArray.get(i).getAsJsonObject().get("timestamps").getAsLong();
+                                String dateStr = convertTimeInMillisToDate(date);
+                                int steps = statsArray.get(i).getAsJsonObject().get("steps").getAsInt();
+                                int sleepingTime = statsArray.get(i).getAsJsonObject().get("sleeping_time").getAsInt();
+                                String morning_location = statsArray.get(i).getAsJsonObject().get("morning_location").getAsString();
+                                String night_location = statsArray.get(i).getAsJsonObject().get("night_location").getAsString();
+                                UserStat stat = new UserStat(dateStr, steps, sleepingTime, morning_location, night_location);
+
+                                userStatList.add(stat);
+                            }
+                            adapter.notifyDataSetChanged();
                         }
                     }
-                    adapter.notifyDataSetChanged();
                 }
             }
 
