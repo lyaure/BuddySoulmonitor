@@ -33,6 +33,9 @@ public class ProfileFragment extends Fragment {
         email = (TextView)v.findViewById(R.id.profile_email_ID);
         registration = (TextView)v.findViewById(R.id.profile_registrationDate_ID);
 
+        SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
+        boolean isAdmin = sp.getBoolean("admin", false);
+
 
         LinearLayout settings = (LinearLayout) v.findViewById(R.id.profile_settings_layout_ID);
         settings.setOnClickListener(new View.OnClickListener() {
@@ -56,6 +59,9 @@ public class ProfileFragment extends Fragment {
                 getActivity().finish();
             }
         });
+
+        if(isAdmin)
+            admin.setVisibility(View.VISIBLE);
 
         LinearLayout lougout = (LinearLayout) v.findViewById(R.id.profile_logout_layout_ID);
         lougout.setOnClickListener(new View.OnClickListener() {
