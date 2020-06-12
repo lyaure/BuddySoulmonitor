@@ -28,6 +28,7 @@ import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
@@ -439,11 +440,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
             // todo send data to the server
             if(!getSharedPreferences("user", MODE_PRIVATE).getBoolean("sendToServer", true)) {
-                try {
-                    sendData();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                sendData();
             }
         }
 
@@ -961,7 +958,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         return (int) sleeping_time;
     }
 
-    private void sendData() throws JSONException {
+    private void sendData() {
 
         SharedPreferences sp = this.getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
@@ -988,25 +985,26 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     }
 
-    private String preprocessData() throws JSONException {
+    private String preprocessData() {
 
-        SharedPreferences sp = this.getSharedPreferences("user", MODE_PRIVATE);
-
-        String timestamps = "" + Util.getToday();
+        long timestamps = Util.getYesterday();
         Database db = Database.getInstance(this);
-        String steps = ""+ db.getSteps(Util.getToday());
-        String sleepingTime = "" + db.getSleepDuration(Util.getToday());
-        String morning_location = "" + db.getLocation(Util.getToday(), "morning_location");
-        String night_location = "" + db.getLocation(Util.getToday(), "night_location");
-
+        String steps = String.valueOf(db.getSteps(timestamps));
+        String sleepingTime = String.valueOf(db.getSleepDuration(timestamps));
+        String morning_location = String.valueOf(db.getLocation(timestamps, "morning_location"));
+        String night_location = String.valueOf(db.getLocation(timestamps, "night_location"));
 
         JSONObject json = new JSONObject();
-        json.put("timestamps", timestamps);
-        json.put("steps", steps);
-        json.put("sleeping_time", sleepingTime);
-        json.put("morning_location", morning_location);
-        json.put("night_location", night_location);
 
+        try {
+            json.put("timestamps", String.valueOf(timestamps));
+            json.put("steps", steps);
+            json.put("sleeping_time", sleepingTime);
+            json.put("morning_location", morning_location);
+            json.put("night_location", night_location);
+        } catch (JSONException e) {
+           //e.printStackTrace();
+        }
         return json.toString();
     }
 
