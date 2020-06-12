@@ -1,11 +1,6 @@
 package com.buddynsoul.monitor;
 
 import androidx.appcompat.app.AppCompatActivity;
-//import io.reactivex.android.schedulers.AndroidSchedulers;
-//import io.reactivex.disposables.CompositeDisposable;
-//import io.reactivex.disposables.Disposable;
-//import io.reactivex.functions.Consumer;
-//import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,13 +30,11 @@ import com.google.gson.JsonElement;
 public class LoginActivity extends AppCompatActivity {
     private TextView email;
     private TextView password;
-//    private Boolean hide;
 
     private static final String EMAIL_PATTERN =
             "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
                     + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
-//    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
 //    @Override
@@ -56,8 +49,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Init Service
-        //Retrofit retrofitClient = RetrofitClient.getInstance();
-        //iMyService = retrofitClient.create(IMyService.class);
         iMyService = RetrofitClient.getClient().create(IMyService.class);
 
         // Init view
@@ -177,7 +168,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.code() == 200) {
-                    if(response.body().equals("Please confirm your email")) {
+                    String res = response.body().toString();
+                    res = res.substring(1, res.length()-1);
+                    if(res.equals("Please confirm your email")) {
                         loadingDialog.dismissDialog();
                         Toast.makeText(LoginActivity.this, "Please confirm your email", Toast.LENGTH_SHORT).show();
                     }

@@ -906,9 +906,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
         if(interval_1[START] > interval_2[END]) {
             return null;
         }
-        else if(interval_2[START] > interval_1[END]) {
-            return new long[] {Long.MIN_VALUE, Long.MIN_VALUE};
-        }
+//        else if(interval_2[START] > interval_1[END]) {
+//            return new long[] {Long.MIN_VALUE, Long.MIN_VALUE};
+//        }
         else {
             return new long[] { Math.max(interval_1[START], interval_2[START]),
                     Math.min(interval_1[END], interval_2[END])};
@@ -925,12 +925,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
             for (long[] interval_2: list_2) {
                 long[] res = isThereOverlap(interval_1, interval_2);
                 if(res != null) {
-                    if(res[0] == Long.MIN_VALUE) {
-                        break;
-                    }
-                    else {
-                        first_result.add(res);
-                    }
+//                    if(res[0] == Long.MIN_VALUE) {
+//                        break;
+//                    }
+//                    else {
+//                        first_result.add(res);
+//                    }
+                    first_result.add(res);
                 }
             }
         }

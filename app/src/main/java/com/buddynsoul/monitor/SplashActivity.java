@@ -27,32 +27,32 @@ public class SplashActivity extends AppCompatActivity {
                 Class activityToLaunch;
 
                 if (remember) {
-                    if (admin) {
-                        new AlertDialog.Builder(SplashActivity.this)
-                                .setTitle("Admin")
-                                .setMessage("Do you want to access your admin account?")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent i = new Intent(SplashActivity.this, AdminActivity.class);
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                })
-                                .show();
-                    }
-                    else {
+//                    if (admin) {
+//                        new AlertDialog.Builder(SplashActivity.this)
+//                                .setTitle("Admin")
+//                                .setMessage("Do you want to access your admin account?")
+//                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        Intent i = new Intent(SplashActivity.this, AdminActivity.class);
+//                                        startActivity(i);
+//                                        finish();
+//                                    }
+//                                })
+//                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+//                                        startActivity(i);
+//                                        finish();
+//                                    }
+//                                })
+//                                .show();
+//                    }
+//                    else {
                         Intent i = new Intent(SplashActivity.this, MainActivity.class);
                         startActivity(i);
-                    }
+//                    }
                 }
                 else {
                     Intent i = new Intent(SplashActivity.this, LoginActivity.class);
