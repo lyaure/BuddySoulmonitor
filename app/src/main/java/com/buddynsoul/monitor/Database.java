@@ -76,7 +76,7 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void insertSleepingTime(long date, int deepSleep, long asleep, long wokeUp){
+    public void insertSleepingTime(long date, long deepSleep, long asleep, long wokeUp){
         SQLiteDatabase db = getWritableDatabase();
         Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );

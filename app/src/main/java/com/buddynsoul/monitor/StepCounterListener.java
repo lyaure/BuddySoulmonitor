@@ -401,7 +401,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             // calculate sleeping time and add it to the db
             if (!sp.getBoolean("sleepingTimeSavedInDb", false)) {
 
-                int sleepingTime = calculateSleepingTime();
+                long sleepingTime = calculateSleepingTime();
 
                 Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
 
@@ -413,7 +413,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                     db.insertSleepingTime(Util.getYesterday(), sleepingTime, 0, 0);
                 //db.insertSleepingTime(Util.getYesterday(), sp.getLong("stat", 0));
 
-                editor.putInt("sleepingTime", sleepingTime);
+                editor.putLong("sleepingTime", sleepingTime);
 
                 editor.putBoolean("sleepingTimeSavedInDb", true);
                 editor.commit();
@@ -475,7 +475,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     }
 
     // calculate sleeping time in sec
-    private int calculateSleepingTime() {
+    private long calculateSleepingTime() {
         // TODO remove if not necessary
         if(lightInterval.isEmpty() || stationaryInterval.isEmpty())
             return 0;
@@ -915,7 +915,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
     }
 
-    private static int calculateTimeDifference(ArrayList<long[]> list_1,
+    private static long calculateTimeDifference(ArrayList<long[]> list_1,
                                            ArrayList<long[]> list_2,
                                            ArrayList<long[]> list_3) {
 
@@ -955,8 +955,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
             sleeping_time += interval[1] - interval[0];
         }
         // convert sleeping time to sec
-        sleeping_time /= 1000;
-        return (int) sleeping_time;
+//        sleeping_time /= 1000;
+        return sleeping_time;
     }
 
     private void sendData() {

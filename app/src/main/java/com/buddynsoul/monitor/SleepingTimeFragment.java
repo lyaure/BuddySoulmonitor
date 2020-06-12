@@ -117,9 +117,10 @@ public class SleepingTimeFragment extends Fragment {
         return time;
     }
 
-    private String getSleepingTime(long time){
-        int hours = (int)time / 3600;
-        int minutes = ((int)time % 3600) / 60;
+    private String getDurationTime(long time){
+        int t = (int)Math.ceil(time/1000); // convert millis to sec
+        int hours = (int)Math.ceil(t / 3600);
+        int minutes = (int)Math.ceil((t % 3600) / 60);
 
         return hours + "h" + String.format("%02d", minutes);
     }
@@ -133,29 +134,24 @@ public class SleepingTimeFragment extends Fragment {
             if(time >= 0)
                 wokeUp.setText(getTime(time));
 
-
             time = db.getAsleep(graph.getDatePosition());
             if(time >= 0)
                 asleep.setText(getTime(time));
 
             long dur = db.getSleepDuration(graph.getDatePosition());
-            dur /= 1000; // millisec to sec
-
             if(dur >= 0)
-                duration.setText(getSleepingTime((int)dur));
+                duration.setText(getDurationTime((int)dur));
 
             long deep = db.getDeepSleep(graph.getDatePosition());
             if(deep >= 0)
-                deepSleep.setText(getSleepingTime(deep));
+                deepSleep.setText(getDurationTime(deep));
 
             long light = db.getlightSleep(graph.getDatePosition());
-            light /= 1000;
             if(light >= 0)
-                lightSleep.setText(getSleepingTime(light));
+                lightSleep.setText(getDurationTime(light));
 
             int avrg = db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday()) / count;
-            avrg /= 1000;
-            average.setText(getSleepingTime(avrg));
+            average.setText(getDurationTime(avrg));
         }
 
     }
