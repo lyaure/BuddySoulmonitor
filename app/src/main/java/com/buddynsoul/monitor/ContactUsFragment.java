@@ -1,4 +1,4 @@
-package com.buddynsoul.monitor.Utils;
+package com.buddynsoul.monitor;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,9 +33,9 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class ContactFragment extends Fragment {
+public class ContactUsFragment extends Fragment {
 
-    public ContactFragment() {
+    public ContactUsFragment() {
         // Required empty public constructor
     }
 
@@ -97,14 +97,16 @@ public class ContactFragment extends Fragment {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 loadingDialog.dismissDialog();
-                Toast.makeText(getContext(), "Message have been send", Toast.LENGTH_SHORT).show();
+                if (response.code() == 200) {
+                    Toast.makeText(getContext(), "Message have been send", Toast.LENGTH_SHORT).show();
 
-                Fragment fragment = new ProfileFragment();
+                    Fragment fragment = new ProfileFragment();
 
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container_ID, fragment, "tag")
-                        .addToBackStack(null)
-                        .commit();
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container_ID, fragment, "tag")
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
 
             @Override

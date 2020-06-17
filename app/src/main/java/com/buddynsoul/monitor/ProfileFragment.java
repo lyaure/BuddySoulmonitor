@@ -9,12 +9,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.buddynsoul.monitor.Utils.ContactFragment;
 import com.buddynsoul.monitor.Utils.Util;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -76,7 +73,7 @@ public class ProfileFragment extends Fragment {
         contactUs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = new ContactFragment();
+                Fragment fragment = new ContactUsFragment();
 
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container_ID, fragment, "tag")

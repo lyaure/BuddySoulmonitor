@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
@@ -99,6 +101,29 @@ import static android.content.Context.MODE_PRIVATE;
             TextView registration = (TextView)v.findViewById(R.id.userRegistration_ID);
             registration.setText(userDateRegistration);
 
+            ImageButton deleteUserBtn = (ImageButton)v.findViewById(R.id.deleteUser_ID);
+            deleteUserBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Delete")
+                            .setMessage("Are you sure to delete this user?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    deleteUser(getActivity());
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                }
+            });
+
             return v;
         }
 
@@ -115,6 +140,35 @@ import static android.content.Context.MODE_PRIVATE;
                     if (response.code() == 200) {
                         userAdminPermission = !userAdminPermission;
                         userAdminPermissionSwitch.setChecked(userAdminPermission);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+        }
+
+        private void deleteUser(Activity activity) {
+            SharedPreferences sp = activity.getSharedPreferences("user", MODE_PRIVATE);
+            String refreshToken = sp.getString("refreshToken", "");
+
+            IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
+
+            Call<String> todoCall = iMyService.deleteUser(refreshToken, userEmail);
+            todoCall.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    if (response.code() == 200) {
+                        Toast.makeText(getContext(), "User has been deleted", Toast.LENGTH_SHORT).show();
+
+                        Fragment fragment = new UsersListFragment();
+
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.admin_container_ID, fragment, "tag")
+                                .addToBackStack(null)
+                                .commit();
                     }
                 }
 

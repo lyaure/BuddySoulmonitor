@@ -89,6 +89,11 @@ public interface IMyService {
                                      @Field("email") String email,
                                      @Field("allow") boolean allow);
 
+    @POST("deleteuser/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> deleteUser(@Path("refreshToken") String refreshToken,
+                                  @Field("email") String email);
+
     // AccuWeather Request
 
     @GET("locations/v1/cities/geoposition/search")
