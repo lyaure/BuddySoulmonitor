@@ -117,7 +117,7 @@ public class SleepingTimeFragment extends Fragment {
         return time;
     }
 
-    private String getSleepingTime(long time){
+    private String getSleepingTime(int time){
         int hours = (int)time / 3600;
         int minutes = ((int)time % 3600) / 60;
 
@@ -138,17 +138,17 @@ public class SleepingTimeFragment extends Fragment {
             if(time >= 0)
                 asleep.setText(getTime(time));
 
-            long dur = db.getSleepDuration(graph.getDatePosition());
+            int dur = db.getSleepDuration(graph.getDatePosition());
             dur /= 1000; // millisec to sec
 
             if(dur >= 0)
                 duration.setText(getSleepingTime((int)dur));
 
-            long deep = db.getDeepSleep(graph.getDatePosition());
+            int deep = db.getDeepSleep(graph.getDatePosition());
             if(deep >= 0)
                 deepSleep.setText(getSleepingTime(deep));
 
-            long light = db.getlightSleep(graph.getDatePosition());
+            int light = db.getLightSleep(graph.getDatePosition());
             light /= 1000;
             if(light >= 0)
                 lightSleep.setText(getSleepingTime(light));

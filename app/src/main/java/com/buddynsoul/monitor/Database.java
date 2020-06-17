@@ -82,9 +82,9 @@ public class Database extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
 
         if(cursor.moveToFirst()){
-            int duration = (int)(wokeUp - asleep);
+            int duration = (int)(wokeUp - asleep)/1000;
             int tmpSleep = cursor.getInt(cursor.getColumnIndex("deepSleep"));
-            if(deepSleep > tmpSleep){
+//            if(deepSleep > tmpSleep){
                 ContentValues cv = new ContentValues();
                 cv.put("sleepDuration", duration);
                 cv.put("asleep", asleep);
@@ -92,7 +92,7 @@ public class Database extends SQLiteOpenHelper {
                 cv.put("deepSleep", deepSleep);
                 cv.put("lightSleep", duration - deepSleep);
                 db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
-            }
+//            }
         }
 
         cursor.close();
@@ -203,27 +203,27 @@ public class Database extends SQLiteOpenHelper {
         return res;
     }
 
-    public long getDeepSleep(long date){
+    public int getDeepSleep(long date){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        long res = 0;
+        int res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getLong(cursor.getColumnIndex("deepSleep"));
+            res = cursor.getInt(cursor.getColumnIndex("deepSleep"));
 
         cursor.close();
         return res;
     }
 
-    public long getlightSleep(long date){
+    public int getLightSleep(long date){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        long res = 0;
+        int res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getLong(cursor.getColumnIndex("lightSleep"));
+            res = cursor.getInt(cursor.getColumnIndex("lightSleep"));
 
         cursor.close();
         return res;
