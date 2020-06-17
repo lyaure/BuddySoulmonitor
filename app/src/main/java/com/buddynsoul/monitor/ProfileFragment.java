@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.buddynsoul.monitor.Utils.ContactFragment;
 import com.buddynsoul.monitor.Utils.Util;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -70,8 +72,21 @@ public class ProfileFragment extends Fragment {
         if(isAdmin)
             admin.setVisibility(View.VISIBLE);
 
-        LinearLayout lougout = (LinearLayout) v.findViewById(R.id.profile_logout_layout_ID);
-        lougout.setOnClickListener(new View.OnClickListener() {
+        LinearLayout contactUs = (LinearLayout) v.findViewById(R.id.profile_contactUs_layout_ID);
+        contactUs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new ContactFragment();
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container_ID, fragment, "tag")
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        LinearLayout logout = (LinearLayout) v.findViewById(R.id.profile_logout_layout_ID);
+        logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Intent myService = new Intent(getActivity(), StepCounterListener.class);

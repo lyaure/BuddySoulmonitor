@@ -68,6 +68,11 @@ public interface IMyService {
     Call<String> sendData(@Path("refreshToken") String refreshToken,
                                 @Field("data") String data);
 
+    @POST("contactus/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> contactUs(@Path("refreshToken") String refreshToken,
+                          @Field("message") String message);
+
     @GET("listusers/{refreshToken}")
     Call<JsonElement> listusers(@Path("refreshToken") String refreshToken);
 

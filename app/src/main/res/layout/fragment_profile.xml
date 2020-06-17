@@ -99,9 +99,31 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/profile_contactUs_layout_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@color/colorWhite"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/profile_contactUs_btn_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/contact_us"
+            android:drawablePadding="10dp"
+            android:text="Contact us"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/profile_logout_layout_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:background="@color/colorWhite"
         android:gravity="center"
         android:orientation="vertical"
