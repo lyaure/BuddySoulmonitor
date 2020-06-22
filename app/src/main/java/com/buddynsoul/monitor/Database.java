@@ -340,6 +340,15 @@ public class Database extends SQLiteOpenHelper {
         return dates;
     }
 
+    public int getSleepingTimeDatesCount(){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + DB_NAME + " WHERE sleepDuration >= 0 AND date > 0", null);
+        cursor.moveToFirst();
+
+        return cursor.getInt(0);
+    }
+
     /**
      * Get the maximum of steps walked in one day
      *

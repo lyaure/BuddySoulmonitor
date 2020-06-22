@@ -126,7 +126,7 @@ public class SleepingTimeFragment extends Fragment {
 
     private void update(){
         long time;
-        int count = db.getDaysWithoutToday() >= 7 ? 7 : db.getDaysWithoutToday();
+        int count = db.getSleepingTimeDatesCount() >= 7 ? 7 : db.getSleepingTimeDatesCount();
 
         if(count > 0){
             time = db.getWokeUp(graph.getDatePosition());
