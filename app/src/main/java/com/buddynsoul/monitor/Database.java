@@ -230,14 +230,14 @@ public class Database extends SQLiteOpenHelper {
     }
 
 
-    public double getLocation(final long date, String columnName){
+    public String getLocation(final long date, String columnName){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        double res = 0.0;
+        String res = "";
 
         if(cursor.moveToFirst())
-            res = cursor.getDouble(cursor.getColumnIndex(columnName));
+            res = cursor.getString(cursor.getColumnIndex(columnName));
 
         cursor.close();
         return res;
