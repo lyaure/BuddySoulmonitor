@@ -906,9 +906,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
         if(interval_1[START] > interval_2[END]) {
             return null;
         }
-//        else if(interval_2[START] > interval_1[END]) {
-//            return new long[] {Long.MIN_VALUE, Long.MIN_VALUE};
-//        }
+        else if(interval_2[START] > interval_1[END]) {
+            return new long[] {Long.MIN_VALUE, Long.MIN_VALUE};
+        }
         else {
             return new long[] { Math.max(interval_1[START], interval_2[START]),
                     Math.min(interval_1[END], interval_2[END])};
@@ -925,13 +925,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
             for (long[] interval_2: list_2) {
                 long[] res = isThereOverlap(interval_1, interval_2);
                 if(res != null) {
-//                    if(res[0] == Long.MIN_VALUE) {
-//                        break;
-//                    }
-//                    else {
-//                        first_result.add(res);
-//                    }
-                    first_result.add(res);
+                    if(res[0] == Long.MIN_VALUE) {
+                        break;
+                    }
+                    else {
+                        first_result.add(res);
+                    }
                 }
             }
         }
@@ -954,9 +953,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         for (long[] interval : finalIntervals) {
             sleeping_time += interval[1] - interval[0];
         }
-        // convert sleeping time to sec
-        sleeping_time /= 1000;
-        return (int) sleeping_time;
+        return (int) sleeping_time / 1000;
     }
 
     private void sendData() {
@@ -992,8 +989,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
         Database db = Database.getInstance(this);
         String steps = String.valueOf(db.getSteps(timestamps));
         String sleepingTime = String.valueOf(db.getSleepDuration(timestamps));
-        String morning_location = String.valueOf(db.getLocation(timestamps, "morning_location"));
-        String night_location = String.valueOf(db.getLocation(timestamps, "night_location"));
+        String morning_location = db.getLocation(timestamps, "morning_location");
+        String night_location = db.getLocation(timestamps, "night_location");
 
         JSONObject json = new JSONObject();
 
