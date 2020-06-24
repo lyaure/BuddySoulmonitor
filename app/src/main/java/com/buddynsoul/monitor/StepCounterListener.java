@@ -988,7 +988,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
         long timestamps = Util.getYesterday();
         Database db = Database.getInstance(this);
         String steps = String.valueOf(db.getSteps(timestamps));
-        String sleepingTime = String.valueOf(db.getSleepDuration(timestamps));
+        //String sleepingTime = String.valueOf(db.getSleepDuration(timestamps));
+        String asleepTime = String.valueOf(db.getAsleep(timestamps));
+        String wokeUpTime = String.valueOf(db.getWokeUp(timestamps));
+        String deepSleep = String.valueOf(db.getDeepSleep(timestamps));
         String morning_location = db.getLocation(timestamps, "morning_location");
         String night_location = db.getLocation(timestamps, "night_location");
 
@@ -997,7 +1000,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
         try {
             json.put("timestamps", String.valueOf(timestamps));
             json.put("steps", steps);
-            json.put("sleeping_time", sleepingTime);
+            json.put("asleep_time", asleepTime);
+            json.put("woke_up_time", wokeUpTime);
+            json.put("deep_sleep", deepSleep);
             json.put("morning_location", morning_location);
             json.put("night_location", night_location);
         } catch (JSONException e) {

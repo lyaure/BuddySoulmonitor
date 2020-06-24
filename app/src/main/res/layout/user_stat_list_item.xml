@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:text="TextView"
+        android:text="Date:"
         android:textSize="18sp" />
 
     <TextView
@@ -18,15 +18,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:text="TextView"
+        android:text="Steps:"
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/userStatSleeping_ID"
+        android:id="@+id/userStatAsleep_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:text="TextView"
+        android:text="Asleep:"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/userStatWokeUp_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="Woke up:"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/userStatDeepSleep_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="Deep sleep:"
         android:textSize="18sp" />
 
     <TextView
@@ -34,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:text="TextView"
+        android:text="Morning location:"
         android:textSize="18sp" />
 
     <TextView
@@ -42,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:text="TextView"
+        android:text="Night location:"
         android:textSize="18sp" />
 
 </LinearLayout>

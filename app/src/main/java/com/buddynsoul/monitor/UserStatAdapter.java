@@ -35,19 +35,26 @@ public class UserStatAdapter extends ArrayAdapter<UserStat> {
         final UserStat userStat = userStatList.get(position);
 
         TextView userStatDate = (TextView)listItem.findViewById(R.id.userStatDate_ID);
-        userStatDate.setText(userStat.getDate());
+        userStatDate.setText(String.format("%s%s", "Date: ", String.valueOf(userStat.getDate())));
+
 
         TextView userStatSteps = (TextView)listItem.findViewById(R.id.userStatSteps_ID);
-        userStatSteps.setText(String.valueOf(userStat.getSteps()));
+        userStatSteps.setText(String.format("%s%s", "Steps: ", String.valueOf(userStat.getSteps())));
 
-        TextView userStatSleeping = (TextView)listItem.findViewById(R.id.userStatSleeping_ID);
-        userStatSleeping.setText(String.valueOf(userStat.getSleepingTime()));
+        TextView userStatAsleep = (TextView)listItem.findViewById(R.id.userStatAsleep_ID);
+        userStatAsleep.setText(String.format("%s%s", "Asleep: ", String.valueOf(userStat.getAsleepTime())));
+
+        TextView userStatWokeUp = (TextView)listItem.findViewById(R.id.userStatWokeUp_ID);
+        userStatWokeUp.setText(String.format("%s%s", "Woke up: ", String.valueOf(userStat.getWokeUpTime())));
+
+        TextView userStatDeepSleep = (TextView)listItem.findViewById(R.id.userStatDeepSleep_ID);
+        userStatDeepSleep.setText(String.format("%s%s", "Deep sleep: ", String.valueOf(userStat.getDeepSleep())));
 
         TextView userStatMorningLocation = (TextView)listItem.findViewById(R.id.userStatMorningLocation_ID);
-        userStatMorningLocation.setText(userStat.getMorning_location());
+        userStatMorningLocation.setText(String.format("%s%s", "Morning location: ", String.valueOf(userStat.getMorning_location())));
 
         TextView userStatNightLocation = (TextView)listItem.findViewById(R.id.userStatNightLocation_ID);
-        userStatNightLocation.setText(userStat.getNight_location());
+        userStatNightLocation.setText(String.format("%s%s", "Night location: ", String.valueOf(userStat.getNight_location())));
 
         return listItem;
     }

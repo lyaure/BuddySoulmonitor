@@ -26,6 +26,7 @@ import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -163,13 +164,17 @@ public class UsersSearchFragment extends Fragment {
                             JsonArray statsArray = response.body().getAsJsonArray();
 
                             for (int i = 0; i < statsArray.size(); i++) {
-                                long date = statsArray.get(i).getAsJsonObject().get("timestamps").getAsLong();
+                                JsonObject jsonObject = statsArray.get(i).getAsJsonObject();
+                                long date = jsonObject.get("timestamps").getAsLong();
                                 String dateStr = convertTimeInMillisToDate(date);
-                                int steps = statsArray.get(i).getAsJsonObject().get("steps").getAsInt();
-                                int sleepingTime = statsArray.get(i).getAsJsonObject().get("sleeping_time").getAsInt();
-                                String morning_location = statsArray.get(i).getAsJsonObject().get("morning_location").getAsString();
-                                String night_location = statsArray.get(i).getAsJsonObject().get("night_location").getAsString();
-                                UserStat stat = new UserStat(dateStr, steps, sleepingTime, morning_location, night_location);
+                                int steps = jsonObject.get("steps").getAsInt();
+                                int asleepTime = jsonObject.get("asleep_time").getAsInt();
+                                int wokeUpTime = jsonObject.get("woke_up_time").getAsInt();
+                                int deepSleep = jsonObject.get("deep_sleep").getAsInt();
+                                String morning_location = jsonObject.get("morning_location").getAsString();
+                                String night_location = jsonObject.get("night_location").getAsString();
+                                UserStat stat = new UserStat(dateStr, steps, asleepTime, wokeUpTime,
+                                        deepSleep, morning_location, night_location);
 
                                 userStatList.add(stat);
                             }
