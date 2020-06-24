@@ -139,7 +139,7 @@ public class SleepingTimeFragment extends Fragment {
                 asleep.setText(getTime(time));
 
             int dur = db.getSleepDuration(graph.getDatePosition());
-            dur /= 1000; // millisec to sec
+//            dur /= 1000; // millisec to sec
 
             if(dur >= 0)
                 duration.setText(getSleepingTime((int)dur));
@@ -149,12 +149,12 @@ public class SleepingTimeFragment extends Fragment {
                 deepSleep.setText(getSleepingTime(deep));
 
             int light = db.getLightSleep(graph.getDatePosition());
-            light /= 1000;
+//            light /= 1000;
             if(light >= 0)
                 lightSleep.setText(getSleepingTime(light));
 
             int avrg = db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday()) / count;
-            avrg /= 1000;
+//            avrg /= 1000;
             average.setText(getSleepingTime(avrg));
         }
 
