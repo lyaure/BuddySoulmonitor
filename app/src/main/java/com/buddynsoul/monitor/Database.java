@@ -76,6 +76,37 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
+    public void insertBackupDay(long date, int steps, String morningLocation, String nightLocation,
+                                int sleepDuration, int asleep, int wokeUp,
+                                int deepSleep, int lightSleep){
+
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
+
+        if(!cursor.moveToFirst()){
+
+            ContentValues cv = new ContentValues();
+            cv.put("date", date);
+            cv.put("steps", steps);
+            cv.put("morning_location", morningLocation);
+            cv.put("night_location", nightLocation);
+            cv.put("sleepDuration", sleepDuration);
+            cv.put("asleep", asleep);
+            cv.put("wokeUp", wokeUp);
+            cv.put("deepSleep", deepSleep);
+            cv.put("lightSleep", lightSleep);
+
+            db.insert(DB_NAME, null, cv);
+
+            cursor.close();
+
+            if (BuildConfig.DEBUG) {
+                Log.d("debug","insertBackUpDay " + date + " / " + steps);
+            }
+        }
+
+    }
+
     public void insertSleepingTime(long date, int deepSleep, long asleep, long wokeUp){
         SQLiteDatabase db = getWritableDatabase();
         Log.d("DebugStepCounter: ", "Db Update Sleeping Time");
@@ -395,6 +426,10 @@ public class Database extends SQLiteOpenHelper {
         res = cursor.getInt(0);
         cursor.close();
         return res;
+    }
+
+    public boolean isTableEmpty(Cursor cursor) {
+        return !(cursor.getCount() > 0);
     }
 
 }

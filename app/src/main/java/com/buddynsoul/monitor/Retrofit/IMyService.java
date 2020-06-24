@@ -83,6 +83,9 @@ public interface IMyService {
                                      @Field("start") long start,
                                      @Field("end") long end);
 
+    @POST("backupuserdata/{refreshToken}")
+    Call<JsonElement> backupuserdata(@Path("refreshToken") String refreshToken);
+
     @POST("updatepermission/{refreshToken}")
     @FormUrlEncoded
     Call<String> updatepermission(@Path("refreshToken") String refreshToken,
