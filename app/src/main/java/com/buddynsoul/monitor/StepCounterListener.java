@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -67,6 +68,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
 
+    private final static int TWENTY_SEC_TO_MILLISEC = 1200000;
+
     private static int steps;
     private static int lastSaveSteps;
     private static long lastSaveTime;
@@ -75,9 +78,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final BroadcastReceiver shutdownReceiver = new ShutdownReceiver();
     private final BroadcastReceiver screenReceiver = new ScreenReceiver();
 
-    private ArrayList<long[]> lightInterval = new ArrayList<>();
-    private ArrayList<long[]> stationaryInterval = new ArrayList<>();
-    private static ArrayList<long[]> finalIntervals = new ArrayList<>();
+    private CopyOnWriteArrayList<long[]> lightInterval = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<long[]> stationaryInterval = new CopyOnWriteArrayList<>();
+    private static CopyOnWriteArrayList<long[]> finalIntervals = new CopyOnWriteArrayList<>();
 
 
     private float oldPitch, oldRoll, oldAzimuth;
@@ -113,7 +116,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float luxVal = event.values[0];
                 long[] last = lightInterval.get(lightInterval.size() - 1);
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
-                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
+                if (luxVal <= 5 && !inDarkRoom) { // dark room - light off
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
@@ -125,7 +128,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
-                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
+                } else if (luxVal > 5 && inDarkRoom) { // bright room - light on
+                    last[1] = System.currentTimeMillis();
                     Toast.makeText(getApplicationContext(), "ON", Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor editor = sp.edit();
 
@@ -150,7 +154,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                     String str = "Duration darkRoom: " + lightDuration + " sec";
                     if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
 
-                    last[1] = last[0] + lightDuration * 1000;
+
 //                    lightInterval.add(new long[]{System.currentTimeMillis(), 0});
                 }
             }
@@ -353,7 +357,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 lightInterval.clear();
                 lightInterval.add(new long[]{System.currentTimeMillis(), 0});
 
-                ArrayList<long[]>  screenInterval = retrieveArrayList(sp);
+                CopyOnWriteArrayList<long[]>  screenInterval = retrieveArrayList(sp);
                 screenInterval.clear();
                 PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
                 boolean isScreenOn = Util.hasLollipop() ? pm.isInteractive() : pm.isScreenOn();
@@ -513,7 +517,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         // add last interval for screen sensor
         long tmp2 = sp.getLong("screenOff", 0);
 
-        ArrayList<long[]> screenIntervals = retrieveArrayList(sp);
+        CopyOnWriteArrayList<long[]> screenIntervals = retrieveArrayList(sp);
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn = Util.hasLollipop() ? pm.isInteractive() : pm.isScreenOn();
@@ -860,22 +864,22 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
     }
 
-    private ArrayList<long[]> retrieveArrayList(SharedPreferences sp) {
+    private CopyOnWriteArrayList<long[]> retrieveArrayList(SharedPreferences sp) {
         Gson gson = new Gson();
         String json_data = sp.getString("json_data", "");
 
         if (json_data.equals("")) {
-            return new ArrayList<long[]>();
+            return new CopyOnWriteArrayList<long[]>();
         }
 
         Type type = new TypeToken<ArrayList<long[]>>() {
         }.getType();
-        ArrayList<long[]> screenInterval = gson.fromJson(json_data, type);
+        CopyOnWriteArrayList<long[]> screenInterval = gson.fromJson(json_data, type);
 
         return screenInterval;
     }
 
-    private void addToSharedPreference(SharedPreferences sp, ArrayList<long[]> screenInterval) {
+    private void addToSharedPreference(SharedPreferences sp, CopyOnWriteArrayList<long[]> screenInterval) {
         SharedPreferences.Editor editor = sp.edit();
         Gson gson = new Gson();
         String json_data = gson.toJson(screenInterval);
@@ -883,7 +887,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         editor.commit();
     }
 
-    private StringBuilder arrayListToString(ArrayList<long[]> arrayListToConvert) {
+    private StringBuilder arrayListToString(CopyOnWriteArrayList<long[]> arrayListToConvert) {
         StringBuilder str = new StringBuilder();
         str.append("[ ");
         for (int i = 0; i < arrayListToConvert.size(); i++) {
@@ -915,9 +919,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
     }
 
-    private static int calculateTimeDifference(ArrayList<long[]> list_1,
-                                           ArrayList<long[]> list_2,
-                                           ArrayList<long[]> list_3) {
+    private static int calculateTimeDifference(CopyOnWriteArrayList<long[]> list_1,
+                                               CopyOnWriteArrayList<long[]> list_2,
+                                               CopyOnWriteArrayList<long[]> list_3) {
+        
+        cleanData(list_1);
+        cleanData(list_2);
+        cleanData(list_3);
 
         ArrayList<long[]> first_result = new ArrayList<>();
 
@@ -1009,6 +1017,17 @@ public class StepCounterListener extends Service implements SensorEventListener 
            //e.printStackTrace();
         }
         return json.toString();
+    }
+
+
+    private static void cleanData(CopyOnWriteArrayList<long[]> data){
+        long diff = 0;
+
+        for(long[] inter : data){
+            diff += inter[1] - inter[0];
+            if(diff < TWENTY_SEC_TO_MILLISEC)
+                data.remove(inter);
+        }
     }
 
 }
