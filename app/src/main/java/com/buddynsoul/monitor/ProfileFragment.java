@@ -1,5 +1,7 @@
 package com.buddynsoul.monitor;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -86,17 +88,33 @@ public class ProfileFragment extends Fragment {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent myService = new Intent(getActivity(), StepCounterListener.class);
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Log out")
+                        .setMessage("Are you sure you want to log out?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                final Intent myService = new Intent(getActivity(), StepCounterListener.class);
 
-                SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putBoolean("logged", false);
-                editor.apply();
+                                SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sp.edit();
+                                editor.putBoolean("logged", false);
+                                editor.apply();
 
-                getActivity().stopService(myService);
+                                getActivity().stopService(myService);
 
-                Intent i = new Intent(getActivity(), LoginActivity.class);
-                startActivity(i);
+                                Intent i = new Intent(getActivity(), LoginActivity.class);
+                                startActivity(i);
+                                getActivity().finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
             }
         });
 
