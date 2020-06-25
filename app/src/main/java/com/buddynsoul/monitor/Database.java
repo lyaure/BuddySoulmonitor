@@ -208,27 +208,27 @@ public class Database extends SQLiteOpenHelper {
         return res;
     }
 
-    public long getAsleep(long date){
+    public int getAsleep(long date){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        long res = 0;
+        int res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getLong(cursor.getColumnIndex("asleep"));
+            res = cursor.getInt(cursor.getColumnIndex("asleep"));
 
         cursor.close();
         return res;
     }
 
-    public long getWokeUp(long date){
+    public int getWokeUp(long date){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        long res = 0;
+        int res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getLong(cursor.getColumnIndex("wokeUp"));
+            res = cursor.getInt(cursor.getColumnIndex("wokeUp"));
 
         cursor.close();
         return res;

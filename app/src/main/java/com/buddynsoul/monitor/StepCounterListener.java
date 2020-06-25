@@ -116,7 +116,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float luxVal = event.values[0];
                 long[] last = lightInterval.get(lightInterval.size() - 1);
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
-                if (luxVal <= 5 && !inDarkRoom) { // dark room - light off
+                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
+//                if (luxVal <= 5 && !inDarkRoom) { // dark room - light off
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
@@ -128,9 +129,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
-                } else if (luxVal > 5 && inDarkRoom) { // bright room - light on
+                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
+//                } else if (luxVal > 5 && inDarkRoom) { // bright room - light on
                     last[1] = System.currentTimeMillis();
-                    Toast.makeText(getApplicationContext(), "ON", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), "ON", Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor editor = sp.edit();
 
 //                    long tmpLight = sp.getLong("tmpLight", System.currentTimeMillis());
@@ -995,11 +997,11 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         long timestamps = Util.getYesterday();
         Database db = Database.getInstance(this);
-        String steps = String.valueOf(db.getSteps(timestamps));
-        //String sleepingTime = String.valueOf(db.getSleepDuration(timestamps));
-        String asleepTime = String.valueOf(db.getAsleep(timestamps));
-        String wokeUpTime = String.valueOf(db.getWokeUp(timestamps));
-        String deepSleep = String.valueOf(db.getDeepSleep(timestamps));
+        int steps = db.getSteps(timestamps);
+        //int sleepingTime = db.getSleepDuration(timestamps);
+        int asleepTime = db.getAsleep(timestamps);
+        int wokeUpTime = db.getWokeUp(timestamps);
+        int deepSleep = db.getDeepSleep(timestamps);
         String morning_location = db.getLocation(timestamps, "morning_location");
         String night_location = db.getLocation(timestamps, "night_location");
 
