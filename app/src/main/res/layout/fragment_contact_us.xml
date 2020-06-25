@@ -12,6 +12,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="0.02"
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="Contact us"
@@ -22,6 +23,7 @@
         android:id="@+id/contact_us_subject_layout_ID"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_weight="0.03"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         app:startIconDrawable="@drawable/ic_subject_black_24dp"
@@ -37,35 +39,47 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
-    <EditText
-        android:id="@+id/contact_us_message_ID"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="432dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:background="@drawable/back"
-        android:gravity="start"
-        android:hint="Your message..."
-        android:maxLength="1000"
-        android:inputType="textMultiLine"
-        android:padding="20dp"
-        android:textAlignment="viewStart">
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:fillViewport="true">
 
-    </EditText>
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/contact_us_sendButton_ID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginTop="50dp"
-        android:text="Send"
-        android:layout_gravity="center"
-        android:background="@drawable/rounded_button"
-        android:textColor="@color/colorWhite"
-        />
+            <EditText
+                android:id="@+id/contact_us_message_ID"
+                android:layout_width="match_parent"
+                android:layout_height="432dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/back"
+                android:gravity="start"
+                android:hint="Your message..."
+                android:inputType="textMultiLine"
+                android:maxLength="1000"
+                android:padding="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:textAlignment="viewStart"/>
+
+            <Button
+                android:id="@+id/contact_us_sendButton_ID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/rounded_button"
+                android:padding="10dp"
+                android:text="Send"
+                android:textColor="@color/colorWhite" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
 
 </LinearLayout>
