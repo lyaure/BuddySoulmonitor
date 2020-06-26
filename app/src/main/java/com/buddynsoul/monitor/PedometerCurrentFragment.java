@@ -3,6 +3,9 @@ package com.buddynsoul.monitor;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
@@ -19,6 +22,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +38,9 @@ import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.buddynsoul.monitor.Utils.Util;
 import com.buddynsoul.monitor.Utils.WeatherUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +52,12 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     private TextView distance_txtv;
+    final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
     private GraphChartView graph;
     private HorizontalScrollView hs;
-    private final double STEP_TO_KM = 0.000762;
+    double tmp;
+    final double stepToKilometre = 0.000762;
 
     //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
@@ -269,7 +278,7 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
                 progSteps.setProgress(steps_today);
             }
             steps.setText(String.valueOf(steps_today + "\nsteps"));
-            double distance = steps_today * STEP_TO_KM;
+            double distance = steps_today * stepToKilometre;
             distance = Math.round(distance * 1000d) / 1000d;
             distance_txtv.setText(String.valueOf(distance + "\nKm"));
         }
