@@ -22,6 +22,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,9 +41,13 @@ import com.buddynsoul.monitor.Utils.WeatherUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class PedometerCurrentFragment extends Fragment implements SensorEventListener {
+    private final int PERMISSION_REQUEST_CODE = 10;
     private final int PEDOMETER = 0;
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
@@ -66,25 +71,10 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         View v = inflater.inflate(R.layout.fragment_pedometer_current, container, false);
         iMyService = RetrofitClient.getClient().create(IMyService.class);
 
-        if (Build.VERSION.SDK_INT >= 29) {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                boolean isGranted = false;
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
-                        MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION);
-                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getActivity(), "Turn on Activity Recognition to enable steps counter", Toast.LENGTH_LONG).show();
-                }
-                else {
-                    isGranted = true;
-                }
+        // Request all the permissions
+        requestPermissions();
 
-            }
-        }
-
+        // get the location and the weather data
         WeatherUtils.cityNameAndKeyFromLocation(getActivity(), getActivity());
 
 
@@ -386,6 +376,34 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
 //        Database db = new Database(getActivity());
         db.saveCurrentSteps(since_boot);
         //db.close();
+    }
+
+    private void requestPermissions() {
+
+        List<String> appPermissions = new ArrayList<>();
+
+        if (Build.VERSION.SDK_INT >= 29) {
+            appPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
+        }
+        appPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        appPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        //TODO just for testing
+        appPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        // Check which permissions are granted
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for(String perm: appPermissions)
+        {
+            if (ContextCompat.checkSelfPermission(getActivity(), perm) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(perm);
+            }
+        }
+
+        // Ask for non-granted permissions
+        if(!listPermissionsNeeded.isEmpty()) {
+            String[] listPermissions = listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]);
+            ActivityCompat.requestPermissions(getActivity(), listPermissions, PERMISSION_REQUEST_CODE);
+        }
     }
 
 }

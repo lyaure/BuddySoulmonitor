@@ -1,14 +1,21 @@
 package com.buddynsoul.monitor;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends FragmentActivity {
@@ -23,8 +30,6 @@ public class MainActivity extends FragmentActivity {
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         fragment = new PedometerFragment();
         loadFragment(fragment);
-
-        //WeatherUtils.cityNameAndKeyFromLocation(MainActivity.this, MainActivity.this);
 
     }
     private void loadFragment(Fragment fragment) {
