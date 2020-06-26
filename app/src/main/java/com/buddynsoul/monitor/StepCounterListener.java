@@ -68,7 +68,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
 
-    private final static int TWENTY_SEC_TO_MILLISEC = 1200000;
+    private final static int FIVE_MIN_TO_MILLISEC = 300000;
 
     private static int steps;
     private static int lastSaveSteps;
@@ -116,8 +116,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 float luxVal = event.values[0];
                 long[] last = lightInterval.get(lightInterval.size() - 1);
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
-                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
-//                if (luxVal <= 5 && !inDarkRoom) { // dark room - light off
+//                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
+                if (luxVal <= 10 && !inDarkRoom) { // dark room - light off
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
@@ -129,8 +129,9 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
-                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
-//                } else if (luxVal > 5 && inDarkRoom) { // bright room - light on
+//                } else if (luxVal != 0 && inDarkRoom) { // bright room - light on
+                } else if (luxVal > 10 && inDarkRoom) { // bright room - light on
+//                    if(last[1] == 0)
                     last[1] = System.currentTimeMillis();
 //                    Toast.makeText(getApplicationContext(), "ON", Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor editor = sp.edit();
@@ -874,7 +875,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             return new CopyOnWriteArrayList<long[]>();
         }
 
-        Type type = new TypeToken<ArrayList<long[]>>() {
+        Type type = new TypeToken<CopyOnWriteArrayList<long[]>>() {
         }.getType();
         CopyOnWriteArrayList<long[]> screenInterval = gson.fromJson(json_data, type);
 
@@ -929,7 +930,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         cleanData(list_2);
         cleanData(list_3);
 
-        ArrayList<long[]> first_result = new ArrayList<>();
+        CopyOnWriteArrayList<long[]> first_result = new CopyOnWriteArrayList<>();
 
         for (long[] interval_1: list_1) {
             for (long[] interval_2: list_2) {
@@ -999,8 +1000,8 @@ public class StepCounterListener extends Service implements SensorEventListener 
         Database db = Database.getInstance(this);
         int steps = db.getSteps(timestamps);
         //int sleepingTime = db.getSleepDuration(timestamps);
-        int asleepTime = db.getAsleep(timestamps);
-        int wokeUpTime = db.getWokeUp(timestamps);
+        long asleepTime = db.getAsleep(timestamps);
+        long wokeUpTime = db.getWokeUp(timestamps);
         int deepSleep = db.getDeepSleep(timestamps);
         String morning_location = db.getLocation(timestamps, "morning_location");
         String night_location = db.getLocation(timestamps, "night_location");
@@ -1027,8 +1028,18 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         for(long[] inter : data){
             diff += inter[1] - inter[0];
-            if(diff < TWENTY_SEC_TO_MILLISEC)
+            if(diff < FIVE_MIN_TO_MILLISEC) {
                 data.remove(inter);
+                break;
+            }
+        }
+
+        for(int i=data.size()-1; i>=0; i--){
+            diff = data.get(i)[1] - data.get(i)[0];
+            if(diff < FIVE_MIN_TO_MILLISEC) {
+                data.remove(i);
+                break;
+            }
         }
     }
 
