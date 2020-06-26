@@ -409,6 +409,15 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
                 int sleepingTime = calculateSleepingTime();
 
+                String debug_txt_body = "Final intervals: " + arrayListToString(finalIntervals) + "\n\t\t\t\t\t"
+                        + "Sleeping Time (sec): " + sleepingTime + "\n";
+
+                generateNoteOnSD(this, "buddynsoul_debug_sleeping", debug_txt_body);
+
+
+                // add final intervals
+                // add in external file results
+
                 Log.d("DebugStepCounter", "########## Saving sleepingTime ############");
 
                 Database db = Database.getInstance(this);
@@ -444,10 +453,10 @@ public class StepCounterListener extends Service implements SensorEventListener 
             editor.putBoolean("initializedSensorsValue", false);
             editor.commit();
 
-            // todo send data to the server
-            if(!getSharedPreferences("user", MODE_PRIVATE).getBoolean("sendToServer", true)) {
-                sendData();
-            }
+//            // todo send data to the server
+//            if(!getSharedPreferences("user", MODE_PRIVATE).getBoolean("sendToServer", true)) {
+//                sendData();
+//            }
         }
 
 
@@ -482,12 +491,23 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
     // calculate sleeping time in sec
     private int calculateSleepingTime() {
+
+        SharedPreferences sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+
+        String debug_txt_body = new Date(System.currentTimeMillis()).toLocaleString() + ":" + "\n\t\t\t\t\t";
+
+        debug_txt_body += "Stationary interval: " + arrayListToString(stationaryInterval) + "\n\t\t\t\t\t"
+                + "Dark room interval: " + arrayListToString(lightInterval) + "\n\t\t\t\t\t"
+                + "Screen off interval: " + arrayListToString(retrieveArrayList(sp)) + "\n";
+
+        generateNoteOnSD(this, "buddynsoul_debug_sleeping", debug_txt_body);
+
+
         // TODO remove if not necessary
         if(lightInterval.isEmpty() || stationaryInterval.isEmpty())
             return 0;
 
-        SharedPreferences sp = this.getSharedPreferences("tempData", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
 
         // add last interval for stationary sensor
 //        long startCounterStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
@@ -874,8 +894,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
             return new CopyOnWriteArrayList<long[]>();
         }
 
-        Type type = new TypeToken<ArrayList<long[]>>() {
-        }.getType();
+        Type type = new TypeToken<CopyOnWriteArrayList<long[]>>() {}.getType();
         CopyOnWriteArrayList<long[]> screenInterval = gson.fromJson(json_data, type);
 
         return screenInterval;
@@ -998,7 +1017,6 @@ public class StepCounterListener extends Service implements SensorEventListener 
         long timestamps = Util.getYesterday();
         Database db = Database.getInstance(this);
         int steps = db.getSteps(timestamps);
-        //int sleepingTime = db.getSleepDuration(timestamps);
         int asleepTime = db.getAsleep(timestamps);
         int wokeUpTime = db.getWokeUp(timestamps);
         int deepSleep = db.getDeepSleep(timestamps);
