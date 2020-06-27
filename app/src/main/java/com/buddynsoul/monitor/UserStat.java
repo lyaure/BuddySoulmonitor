@@ -3,13 +3,13 @@ package com.buddynsoul.monitor;
 public class UserStat {
     private String date;
     private int steps;
-    private int asleepTime;
-    private int wokeUpTime;
+    private long asleepTime;
+    private long wokeUpTime;
     private int deepSleep;
     private String morning_location;
     private String night_location;
 
-    public UserStat(String date, int steps, int asleepTime, int wokeUpTime, int deepSleep, String morning_location, String night_location) {
+    public UserStat(String date, int steps, long asleepTime, long wokeUpTime, int deepSleep, String morning_location, String night_location) {
         this.date = date;
         this.steps = steps;
         this.asleepTime = asleepTime;
@@ -35,19 +35,19 @@ public class UserStat {
         this.steps = steps;
     }
 
-    public int getAsleepTime() {
+    public long getAsleepTime() {
         return asleepTime;
     }
 
-    public void setAsleepTime(int asleepTime) {
+    public void setAsleepTime(long asleepTime) {
         this.asleepTime = asleepTime;
     }
 
-    public int getWokeUpTime() {
+    public long getWokeUpTime() {
         return wokeUpTime;
     }
 
-    public void setWokeUpTime(int wokeUpTime) {
+    public void setWokeUpTime(long wokeUpTime) {
         this.wokeUpTime = wokeUpTime;
     }
 

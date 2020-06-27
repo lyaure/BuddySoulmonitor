@@ -171,8 +171,8 @@ public class UsersSearchFragment extends Fragment {
                                 long date = jsonObject.get("timestamps").getAsLong();
                                 String dateStr = convertTimeInMillisToDate(date);
                                 int steps = jsonObject.get("steps").getAsInt();
-                                int asleepTime = jsonObject.get("asleep_time").getAsInt();
-                                int wokeUpTime = jsonObject.get("woke_up_time").getAsInt();
+                                long asleepTime = jsonObject.get("asleep_time").getAsInt();
+                                long wokeUpTime = jsonObject.get("woke_up_time").getAsInt();
                                 int deepSleep = jsonObject.get("deep_sleep").getAsInt();
                                 String morning_location = jsonObject.get("morning_location").getAsString();
                                 String night_location = jsonObject.get("night_location").getAsString();
