@@ -15,14 +15,17 @@ import android.widget.TextView;
 
 import com.buddynsoul.monitor.Utils.Util;
 
+import java.time.DayOfWeek;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class SleepingTimeFragment extends Fragment {
     private final int SLEEP = 1;
     View v;
     private GraphChartView graph;
     private HorizontalScrollView hs;
-    private TextView asleep, wokeUp, deepSleep, lightSleep, duration, average;
+    private TextView date, asleep, wokeUp, deepSleep, lightSleep, duration, average;
     private Database db;
 
     public SleepingTimeFragment() {
@@ -49,6 +52,7 @@ public class SleepingTimeFragment extends Fragment {
         graph.setScreenDimensions(width, height);
 
 
+        date = (TextView)v.findViewById(R.id.date_txtv_ID);
         asleep = (TextView)v.findViewById(R.id.asleep_txtv_ID);
         wokeUp = (TextView)v.findViewById(R.id.wokeUpe_txtv_ID);
         deepSleep = (TextView)v.findViewById(R.id.deepSleep_txtv_ID);
@@ -108,6 +112,9 @@ public class SleepingTimeFragment extends Fragment {
     }
 
     private String getTime(long date){
+        if(date == 0)
+            return "No data for this day";
+
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(date);
 
@@ -125,6 +132,16 @@ public class SleepingTimeFragment extends Fragment {
     }
 
     private void update(){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(graph.getDatePosition());
+
+        String d = c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", "
+                + c.get(Calendar.DAY_OF_MONTH) + " "
+                + c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " "
+                + c.get(Calendar.YEAR);
+
+        date.setText(d);
+
         long time;
         int count = db.getSleepingTimeDatesCount() >= 7 ? 7 : db.getSleepingTimeDatesCount();
 

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 
 public class GraphChartView extends View {
-    private final int PEDOMETER = 0, SLEEP = 1, TWELVE_IN_SEC = 43200000;
+    private final int PEDOMETER = 0, SLEEP = 1, TWELVE_IN_SEC = 43200;
     private final Paint pWhite, pRED, pPrimary, pBlack;
     private int canvasHeight, canvasWidth;
     private int screenWidth, screenHeight;
@@ -82,16 +82,18 @@ public class GraphChartView extends View {
         else
             canvas.drawText("No data yet", canvasWidth/2, canvasHeight/2, pBlack);
 
-        if(this.type == PEDOMETER){
-            for(int i=0; i<width; i++){
-                if(i%20 == 0)
-                    canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
-            }
-
-            pWhite.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText("Goal: " + goal, scrollPosition + screenWidth - 50, canvasHeight / 15, pWhite);
-            pWhite.setTextAlign(Paint.Align.CENTER);
+        for(int i=0; i<width; i++){
+            if(i%20 == 0)
+                canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
         }
+
+
+        pWhite.setTextAlign(Paint.Align.RIGHT);
+        if(this.type == PEDOMETER)
+            canvas.drawText("Goal: " + goal, scrollPosition + screenWidth - 50, canvasHeight / 15, pWhite);
+        else
+            canvas.drawText("12 hours", scrollPosition + screenWidth - 50, canvasHeight / 15, pWhite);
+        pWhite.setTextAlign(Paint.Align.CENTER);
 
         invalidate();
     }

@@ -23,11 +23,12 @@
         android:id="@+id/sleepingTime_horizontal_scrollview_ID"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.4">
+        android:layout_weight="0.35">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical">
 
             <com.buddynsoul.monitor.GraphChartView
@@ -51,12 +52,23 @@
             android:layout_gravity="right"
             android:drawableLeft="@drawable/bars"
             android:text="Change graph" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/date_txtv_ID"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:gravity="center"
+        android:text="TextView"
+        android:textSize="24sp"
+        android:textStyle="normal" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.4"
+        android:layout_weight="0.35"
         android:orientation="vertical">
 
         <LinearLayout

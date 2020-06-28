@@ -215,7 +215,7 @@ public class Database extends SQLiteOpenHelper {
         long res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getInt(cursor.getColumnIndex("asleep"));
+            res = cursor.getLong(cursor.getColumnIndex("asleep"));
 
         cursor.close();
         return res;
@@ -228,7 +228,7 @@ public class Database extends SQLiteOpenHelper {
         long res = 0;
 
         if(cursor.moveToFirst())
-            res = cursor.getInt(cursor.getColumnIndex("wokeUp"));
+            res = cursor.getLong(cursor.getColumnIndex("wokeUp"));
 
         cursor.close();
         return res;
