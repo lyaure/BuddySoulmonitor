@@ -52,11 +52,13 @@ public class SplashActivity extends AppCompatActivity {
 //                    else {
                         Intent i = new Intent(SplashActivity.this, MainActivity.class);
                         startActivity(i);
+                        finish();
 //                    }
                 }
                 else {
                     Intent i = new Intent(SplashActivity.this, LoginActivity.class);
                     startActivity(i);
+                    finish();
                 }
             }
         }, 3000);
