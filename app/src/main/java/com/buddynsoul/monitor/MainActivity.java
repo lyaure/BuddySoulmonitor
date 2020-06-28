@@ -21,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends FragmentActivity {
     private BottomNavigationView bottomNavigation;
     private Fragment fragment;
+    private int fragmentID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +59,6 @@ public class MainActivity extends FragmentActivity {
                             return true;
                         case R.id.navigation_profile:
                             fragment = new ProfileFragment();
-
-                            Fragment tmp = getSupportFragmentManager().findFragmentById(R.id.container_ID);
-                            Bundle bundle = new Bundle();
-
-                            if(tmp instanceof PedometerFragment)
-                                bundle.putString("from", "pedometer");
-                            else
-                                if(tmp instanceof WeatherFragment)
-                                    bundle.putString("from", "weather");
-                                else
-                                    bundle.putString("from", "sleep");
-
-                            fragment.setArguments(bundle);
                             loadFragment(fragment);
                             return true;
                     }
@@ -78,24 +66,22 @@ public class MainActivity extends FragmentActivity {
                 }
             };
 
+    public void setFragmentID(int id){
+        this.fragmentID = id;
+    }
+
     @Override
     public void onBackPressed(){
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
+        if(fragmentID == R.layout.fragment_setting || fragmentID == R.layout.fragment_contact_us){
+            fragment = new ProfileFragment();
+            loadFragment(fragment);
+        }
+        else {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
-
-    @Override
-    protected void onStop(){
-        super.onStop();
-
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
-    }
-
 }

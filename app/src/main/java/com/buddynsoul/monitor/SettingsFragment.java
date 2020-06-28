@@ -37,7 +37,6 @@ public class SettingsFragment extends Fragment {
     private Boolean boolTemp;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
-    private String fromFragment;
 
     private int old_from_hour, old_from_min, old_to_hour, old_to_min;
 
@@ -207,14 +206,14 @@ public class SettingsFragment extends Fragment {
         //Init Loading Dialog
         LoadingDialog loadingDialog = new LoadingDialog(getActivity());
 
-        ImageButton backup = (ImageButton)v.findViewById(R.id.backUpDataBtn_ID);
-        backup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingDialog.startLoadingDialog();
-                backupData(loadingDialog);
-            }
-        });
+//        ImageButton backup = (ImageButton)v.findViewById(R.id.backUpDataBtn_ID);
+//        backup.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                loadingDialog.startLoadingDialog();
+//                backupData(loadingDialog);
+//            }
+//        });
 
         return v;
     }

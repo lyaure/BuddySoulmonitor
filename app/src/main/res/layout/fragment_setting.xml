@@ -20,187 +20,156 @@
         android:textSize="36sp" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:layout_marginTop="30dp"
         android:orientation="vertical">
+        android:layout_marginBottom="25dp">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/textView5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="10dp"
+            android:text="Change temperature unit"
+            android:textColor="@color/colorBlue"
+            android:textColorLink="@color/colorOrange"
+            android:textSize="24sp" />
 
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="Change your step goal"
-                android:textColor="@color/colorBlue"
-                android:textSize="24sp" />
-
-            <EditText
-                android:id="@+id/goalTxtv_ID"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:ems="10"
-                android:hint="Enter your goal here"
-                android:inputType="numberSigned"
-                android:textColorLink="@color/colorGreen" />
-        </LinearLayout>
-
-        <LinearLayout
+        <RadioGroup
+            android:id="@+id/radioGroupTemp_ID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:orientation="vertical">
-            android:layout_marginBottom="25dp">
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="Change temperature unit"
-                android:textColor="@color/colorBlue"
-                android:textColorLink="@color/colorOrange"
-                android:textSize="24sp" />
-
-            <RadioGroup
-                android:id="@+id/radioGroupTemp_ID"
-                android:layout_width="match_parent"
+            <RadioButton
+                android:id="@+id/radioButtonF_ID"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:shadowColor="@color/colorGreen"
+                android:text="°F" />
 
-                <RadioButton
-                    android:id="@+id/radioButtonF_ID"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:shadowColor="@color/colorGreen"
-                    android:text="°F" />
-
-                <RadioButton
-                    android:id="@+id/radioButtonC_ID"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="°C" />
-
-            </RadioGroup>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Set approximative sleeping time"
-                android:textColor="@color/colorBlue"
-                android:textSize="24sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal">
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="From:" />
-
-                <TextView
-                    android:id="@+id/fromTime_ID"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="TextView"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textView11"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="To:" />
-
-                <TextView
-                    android:id="@+id/toTime_ID"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="TextView"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="50dp"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/applyBtn_ID"
+            <RadioButton
+                android:id="@+id/radioButtonC_ID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@drawable/rounded_button"
-                android:text="apply" />
+                android:layout_weight="1"
+                android:text="°C" />
 
-            <Button
-                android:id="@+id/resetBtn_ID"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@drawable/rounded_button"
-                android:text="reset" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Back up your data from the server"
-                android:textColor="@color/colorBlue"
-                android:layout_marginBottom="25dp"
-                android:textSize="22sp" />
-
-            <ImageButton
-                android:id="@+id/backUpDataBtn_ID"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="#00FFFFFF"
-                android:scaleType="fitEnd"
-                android:src="@drawable/ic_backup_orange_24dp" />
-
-        </LinearLayout>
+        </RadioGroup>
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Change your step goal"
+            android:textColor="@color/colorBlue"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/goalTxtv_ID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:hint="Enter your goal here"
+            android:inputType="numberSigned"
+            android:textColorLink="@color/colorGreen" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Set approximative sleeping time"
+            android:textColor="@color/colorBlue"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="From:" />
+
+            <TextView
+                android:id="@+id/fromTime_ID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="TextView"
+                android:textColor="@color/colorBlack"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="To:" />
+
+            <TextView
+                android:id="@+id/toTime_ID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="TextView"
+                android:textColor="@color/colorBlack"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/applyBtn_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_button"
+            android:text="apply" />
+
+        <Button
+            android:id="@+id/resetBtn_ID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_button"
+            android:text="reset" />
+
+
+    </LinearLayout>
 
 
 </LinearLayout>

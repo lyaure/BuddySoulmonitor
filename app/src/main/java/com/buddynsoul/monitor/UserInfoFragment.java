@@ -45,6 +45,8 @@ import static android.content.Context.MODE_PRIVATE;
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
+            AdminActivity activity = (AdminActivity)getActivity();
+            activity.setFragmentID(R.layout.fragment_user_info);
             // Inflate the layout for this fragment
             View v = inflater.inflate(R.layout.fragment_user_info, container, false);
 
