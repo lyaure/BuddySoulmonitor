@@ -120,6 +120,26 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/profile_restore_layout_ID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/restore_black"
+            android:drawablePadding="10dp"
+            android:text="Restore data"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/profile_logout_layout_ID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

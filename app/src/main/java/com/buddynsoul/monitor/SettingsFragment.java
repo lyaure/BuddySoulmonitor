@@ -202,70 +202,7 @@ public class SettingsFragment extends Fragment {
                 Toast.makeText(getContext(), "Settings have been successfully reset", Toast.LENGTH_SHORT).show();
             }
         });
-
-        //Init Loading Dialog
-        LoadingDialog loadingDialog = new LoadingDialog(getActivity());
-
-//        ImageButton backup = (ImageButton)v.findViewById(R.id.backUpDataBtn_ID);
-//        backup.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                loadingDialog.startLoadingDialog();
-//                backupData(loadingDialog);
-//            }
-//        });
-
         return v;
     }
-
-    private void backupData(LoadingDialog loadingDialog) {
-
-        SharedPreferences sp = getContext().getSharedPreferences("user", MODE_PRIVATE);
-        String refreshToken = sp.getString("refreshToken", "");
-
-        IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
-
-        Call<JsonElement> todoCall = iMyService.backupuserdata(refreshToken);
-        todoCall.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                loadingDialog.dismissDialog();
-                if (response.code() == 200) {
-                    String res = response.body().toString();
-                    res = res.substring(1, res.length() - 1);
-
-                    if (res.equals("Still no data")) {
-                        Toast.makeText(getContext(), "No data to backup", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        JsonArray statsArray = response.body().getAsJsonArray();
-
-                        for (int i = 0; i < statsArray.size(); i++) {
-                            JsonObject jsonObject = statsArray.get(i).getAsJsonObject();
-                            long date = jsonObject.get("timestamps").getAsLong();
-                            int steps = jsonObject.get("steps").getAsInt();
-                            String morning_location = jsonObject.get("morning_location").getAsString();
-                            String night_location = jsonObject.get("night_location").getAsString();
-                            int asleepTime = jsonObject.get("asleep_time").getAsInt();
-                            int wokeUpTime = jsonObject.get("woke_up_time").getAsInt();
-                            int sleepDuration = wokeUpTime - asleepTime;
-                            int deepSleep = jsonObject.get("deep_sleep").getAsInt();
-                            int lightSleep = sleepDuration - deepSleep;
-
-                            Database db = Database.getInstance(getContext());
-                            db.insertBackupDay(date, steps, morning_location, night_location,
-                                    sleepDuration, asleepTime, wokeUpTime, deepSleep, lightSleep);
-                        }
-                        Toast.makeText(getContext(), "Data has been backed up", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                loadingDialog.dismissDialog();
-                Toast.makeText(getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+    
 }
