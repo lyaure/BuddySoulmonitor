@@ -118,14 +118,13 @@ public class StepCounterListener extends Service implements SensorEventListener 
                 boolean inDarkRoom = sp.getBoolean("inDarkRoom", false);
 //                if (luxVal == 0 && !inDarkRoom) { // dark room - light off
                 if (luxVal <= 10 && !inDarkRoom) { // dark room - light off
+                    if(last[1] != 0)
+                        lightInterval.add(new long[]{System.currentTimeMillis(), 0});
                     //Toast.makeText(this, "Dark room", Toast.LENGTH_SHORT).show();
 
                     SharedPreferences.Editor editor = sp.edit();
                     long tmpLight = System.currentTimeMillis();
                     editor.putLong("tmpLight", tmpLight);
-
-                    if(last[1] != 0)
-                        lightInterval.add(new long[]{System.currentTimeMillis(), 0});
 
                     editor.putBoolean("inDarkRoom", true);
                     editor.apply();
@@ -171,11 +170,12 @@ public class StepCounterListener extends Service implements SensorEventListener 
             float tempZ = oldAzimuth - event.values[2];
 
             if (tempX > Math.abs(1) || tempY > Math.abs(1) || tempZ > Math.abs(1)) {
+                long currTime = System.currentTimeMillis();
                 long[] last = stationaryInterval.get(stationaryInterval.size() -1);
 
                 // get the last time when the phone was stationary
 //                long tmpStationary = sp.getLong("tmpStationary", System.currentTimeMillis());
-
+//
                 ///////////////////// lyaure's changes ///////////////////
                 long tmpStationary = last[0];
 
@@ -185,7 +185,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
                     Log.d("DebugStepCounter", "tmp stationary: " + tmpStationary);
 
                 // get the stationary duration time
-                long stationaryDuration = System.currentTimeMillis() - tmpStationary;
+                long stationaryDuration = currTime - last[0];
 
                 // if more than one second
                 if (stationaryDuration >= 1000) {
@@ -198,7 +198,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 //                    long[] interval = {tmpStationary, endCounterStationary};
 //                    stationaryInterval.add(interval);
 
-                    last[1] = last[0] + stationaryDuration * 1000;
+                    last[1] = currTime;
 
                     // add the current stationary duration our stationary variable
                     stationaryDuration += sp.getLong("stationary", 0);
@@ -1028,18 +1028,19 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         for(long[] inter : data){
             diff += inter[1] - inter[0];
-            if(diff < FIVE_MIN_TO_MILLISEC) {
+            if(diff < FIVE_MIN_TO_MILLISEC)
                 data.remove(inter);
+            else
                 break;
-            }
         }
 
         for(int i=data.size()-1; i>=0; i--){
             diff = data.get(i)[1] - data.get(i)[0];
-            if(diff < FIVE_MIN_TO_MILLISEC) {
+            if(diff < FIVE_MIN_TO_MILLISEC)
                 data.remove(i);
+            else
                 break;
-            }
+
         }
     }
 
