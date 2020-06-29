@@ -210,7 +210,10 @@ public class GraphChartView extends View {
     }
 
     public long getDatePosition(){
+        if(!objects.isEmpty())
         return objects.get(position).getDateInMillis();
+        else
+            return 0;
     }
 
     public void changeGraph(){
