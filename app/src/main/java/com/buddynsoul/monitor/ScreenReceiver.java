@@ -28,6 +28,7 @@ public class ScreenReceiver extends BroadcastReceiver {
         SharedPreferences sp = context.getSharedPreferences("tempData", MODE_PRIVATE);
 
         if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
+            long currTime = System.currentTimeMillis();
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter","Screen Off");
 
             long tmpScreenOff = sp.getLong("tmpScreenOff", System.currentTimeMillis());
@@ -55,7 +56,7 @@ public class ScreenReceiver extends BroadcastReceiver {
 
             if (BuildConfig.DEBUG) Log.d("DebugStepCounter", str);
 
-            last[1] = last[0] + durationScreenOff;
+            last[1] = currTime;
 
             addToSharedPreference(sp, screenInterval);
         }
