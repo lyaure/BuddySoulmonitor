@@ -174,9 +174,9 @@ public class ProfileFragment extends Fragment {
                             int steps = jsonObject.get("steps").getAsInt();
                             String morning_location = jsonObject.get("morning_location").getAsString();
                             String night_location = jsonObject.get("night_location").getAsString();
-                            int asleepTime = jsonObject.get("asleep_time").getAsInt();
-                            int wokeUpTime = jsonObject.get("woke_up_time").getAsInt();
-                            int sleepDuration = wokeUpTime - asleepTime;
+                            long asleepTime = jsonObject.get("asleep_time").getAsLong();
+                            long wokeUpTime = jsonObject.get("woke_up_time").getAsLong();
+                            int sleepDuration = (int)(wokeUpTime - asleepTime);
                             int deepSleep = jsonObject.get("deep_sleep").getAsInt();
                             int lightSleep = sleepDuration - deepSleep;
 

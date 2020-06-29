@@ -77,7 +77,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void insertBackupDay(long date, int steps, String morningLocation, String nightLocation,
-                                int sleepDuration, int asleep, int wokeUp,
+                                int sleepDuration, long asleep, long wokeUp,
                                 int deepSleep, int lightSleep){
 
         SQLiteDatabase db = getWritableDatabase();
