@@ -3,10 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".StatisticsFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,5 +16,23 @@
         android:text="Statistics"
         android:textColor="@color/colorPrimary"
         android:textSize="36sp" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pedometer_viewpager_ID"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.95" />
+
+    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+        android:id="@+id/dots_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_weight="0.05"
+        app:dotsColor="#CCC"
+        app:dotsSize="7dp"
+        app:dotsWidthFactor="3"
+        app:selectedDotColor="@color/colorPrimary" />
 
 </LinearLayout>
