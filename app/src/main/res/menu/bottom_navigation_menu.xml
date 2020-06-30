@@ -13,6 +13,10 @@
         android:icon="@drawable/weather_black"
         android:title="Weather" />
     <item
+        android:id="@+id/navigation_todayGoals"
+        android:icon="@drawable/today_goals"
+        android:title="Today's goals" />
+    <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/profile_black"
         android:title="Profile" />

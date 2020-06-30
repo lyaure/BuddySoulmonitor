@@ -20,10 +20,11 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME + "(date INTEGER, steps INTEGER, " +
+        String query = "CREATE TABLE IF NOT EXISTS " + DB_NAME +
+                "(date INTEGER, steps INTEGER, " + "stepGoal INTEGER, " +
                 "morning_location STRING, night_location STRING, " +
                 "sleepDuration INTEGER, asleep INTEGER, wokeUp INTEGER, " +
-                "deepSleep INTEGER, lightSleep INTEGER)";
+                "deepSleep INTEGER, lightSleep INTEGER, sleepGoal INTEGER)";
         db.execSQL(query);
     }
 
@@ -57,6 +58,7 @@ public class Database extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put("date", date);
             cv.put("steps", -steps);
+            cv.put("stepGoal", -1);
             cv.put("morning_location", "");
             cv.put("night_location", "");
             cv.put("sleepDuration", -1);
@@ -64,6 +66,7 @@ public class Database extends SQLiteOpenHelper {
             cv.put("wokeUp", -1);
             cv.put("deepSleep", -1);
             cv.put("lightSleep", -1);
+            cv.put("sleepGoal", -1);
 
 
             db.insert(DB_NAME, null, cv);
@@ -190,6 +193,35 @@ public class Database extends SQLiteOpenHelper {
 
         if(cursor.moveToFirst())
             res = cursor.getInt(cursor.getColumnIndex("steps"));
+
+        cursor.close();
+        return res;
+    }
+
+    public void insertStepGoal(int goal) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " ORDER BY date DESC", null);
+
+        if (cursor.moveToFirst()) {
+            ContentValues cv = new ContentValues();
+            cv.put("stepGoal", goal);
+
+            long date = cursor.getLong(cursor.getColumnIndex("date"));
+
+            db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
+
+            cursor.close();
+        }
+    }
+
+    public int getStepGoal(final long date){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        int res = -1;
+
+        if(cursor.moveToFirst())
+            res = cursor.getInt(cursor.getColumnIndex("stepsGoal"));
 
         cursor.close();
         return res;

@@ -3,9 +3,15 @@ package com.buddynsoul.monitor;
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,7 +21,8 @@ import androidx.fragment.app.Fragment;
 
 public class PedometerRecentFragment extends Fragment {
     final double stepToKilometre = 0.000762;
-
+    View v;
+    TextView today;
 
     public PedometerRecentFragment(){
 
@@ -23,7 +30,9 @@ public class PedometerRecentFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_pedometer_recent, container, false);
+        v = inflater.inflate(R.layout.fragment_pedometer_recent, container, false);
+
+//        LinearLayout mainLayout = (LinearLayout)v.findViewById(R.id.pedometer_mainLayout_ID);
 
         TextView stepsAverage_txtv = (TextView)v.findViewById(R.id.stepsAverage_ID);
         TextView distanceAverage_txtv = (TextView)v.findViewById(R.id.distanceAverage_ID);
@@ -34,6 +43,9 @@ public class PedometerRecentFragment extends Fragment {
         TextView distanceMaxSteps_txtv = (TextView)v.findViewById(R.id.distanceMaxSteps_ID);
         ProgressBar maxSteps_bar = (ProgressBar)v.findViewById(R.id.maxSteps_progressBar_ID);
         ProgressBar distanceMaxSteps_bar = (ProgressBar)v.findViewById(R.id.distanceMaxSteps_progressBar_ID);
+
+        TextView yesterday = (TextView)v.findViewById(R.id.yesterday_steps_ID);
+        today = (TextView)v.findViewById(R.id.today_goal_ID);
 
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
         int  goal = sp.getInt("goal", 10000);
@@ -79,6 +91,28 @@ public class PedometerRecentFragment extends Fragment {
         ObjectAnimator.ofInt(distanceAverage_bar, "progress", (int) (distanceAverage))
                 .setDuration(3000)
                 .start();
+
+        int yesterdaySteps = db.getSteps(Util.getYesterday());
+        if(yesterdaySteps != Integer.MIN_VALUE) {
+            yesterday.setText("Yesterday I walked " + yesterdaySteps + " steps");
+            today.setText(String.valueOf(yesterdaySteps + 100));
+        }
+        else {
+            yesterday.setText("No data for yesterday's steps");
+            today.setText(String.valueOf(goal));
+        }
+
+
+        today.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NumberPickerDialog dialogFragment = new NumberPickerDialog();
+//                Bundle bundle = new Bundle();
+//                bundle.putString("from", "toTime");
+//                dialogFragment.setArguments(bundle);
+                dialogFragment.show(getActivity().getSupportFragmentManager(), "steps");
+            }
+        });
 
         return v;
     }
