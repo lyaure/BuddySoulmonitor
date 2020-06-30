@@ -54,7 +54,7 @@ public class GraphChartView extends View {
 
     @Override
     protected void onDraw(Canvas canvas){
-        canvas.drawColor(Color.parseColor("#9ed4d5"));
+        canvas.drawColor(context.getResources().getColor(R.color.colorLightBlue));
         pWhite.setTextAlign(Paint.Align.CENTER);
 //        int x = screenWidth/2, y = canvasHeight / 2;
 
