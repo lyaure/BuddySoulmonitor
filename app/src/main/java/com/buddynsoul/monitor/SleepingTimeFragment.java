@@ -53,6 +53,7 @@ public class SleepingTimeFragment extends Fragment {
 
 
         date = (TextView)v.findViewById(R.id.date_txtv_ID);
+        date.setVisibility(View.INVISIBLE);
         asleep = (TextView)v.findViewById(R.id.asleep_txtv_ID);
         wokeUp = (TextView)v.findViewById(R.id.wokeUpe_txtv_ID);
         deepSleep = (TextView)v.findViewById(R.id.deepSleep_txtv_ID);
@@ -132,20 +133,22 @@ public class SleepingTimeFragment extends Fragment {
     }
 
     private void update(){
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(graph.getDatePosition());
-
-        String d = c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", "
-                + c.get(Calendar.DAY_OF_MONTH) + " "
-                + c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " "
-                + c.get(Calendar.YEAR);
-
-        date.setText(d);
-
         long time;
         int count = db.getSleepingTimeDatesCount() >= 7 ? 7 : db.getSleepingTimeDatesCount();
 
         if(count > 0){
+            date.setVisibility(View.VISIBLE);
+
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(graph.getDatePosition());
+
+            String d = c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", "
+                    + c.get(Calendar.DAY_OF_MONTH) + " "
+                    + c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " "
+                    + c.get(Calendar.YEAR);
+
+            date.setText(d);
+
             time = db.getWokeUp(graph.getDatePosition());
             if(time >= 0)
                 wokeUp.setText(getTime(time));
