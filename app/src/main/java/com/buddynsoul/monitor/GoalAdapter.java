@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -58,6 +59,15 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
         TextView text = (TextView)listItem.findViewById(R.id.goal_text_ID);
         text.setText(goal.getText());
 
+        Button remove = (Button)listItem.findViewById(R.id.goal_remove_btn_ID);
+        remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goals.remove(goal);
+                notifyDataSetChanged();
+                deleteFromDB(goal);
+            }
+        });
 
         return listItem;
     }
@@ -71,5 +81,10 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
         cv.put("checked", bool);
 
         db.update("MyGoals", cv, "id = ?", new String[]{String.valueOf(goal.getId())});
+    }
+
+    private void deleteFromDB(Goal goal){
+        SQLiteDatabase db = context.openOrCreateDatabase("MyGoals", context.MODE_PRIVATE, null);
+        db.delete("MyGoals", "id = ?", new String[]{String.valueOf(goal.getId())});
     }
 }
