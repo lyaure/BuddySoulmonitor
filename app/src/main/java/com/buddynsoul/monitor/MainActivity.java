@@ -49,12 +49,16 @@ public class MainActivity extends FragmentActivity {
                             fragment = new PedometerFragment();
                             loadFragment(fragment);
                             return true;
+                        case R.id.navigation_sleep:
+                            fragment = new SleepingTimeFragment();
+                            loadFragment(fragment);
+                            return true;
                         case R.id.navigation_weather:
                             fragment = new WeatherFragment();
                             loadFragment(fragment);
                             return true;
-                        case R.id.navigation_sleep:
-                            fragment = new SleepingTimeFragment();
+                        case R.id.navigation_todayGoals:
+                            fragment = new TodayGoalsFragment();
                             loadFragment(fragment);
                             return true;
                         case R.id.navigation_profile:

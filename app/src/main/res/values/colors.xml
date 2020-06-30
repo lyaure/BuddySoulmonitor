@@ -9,6 +9,7 @@
     <color name="colorGreen">#5BB446</color>
 
     <color name="colorBlack">#111111</color>
-    <color name="colorGray">#E1E1E1</color>
+    <color name="colorLightGray">#e1e1e1</color>
+    <color name="colorGray">#bfbfbf</color>
     <color name="colorWhite">#FFFFFF</color>
 </resources>
