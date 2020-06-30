@@ -221,7 +221,7 @@ public class Database extends SQLiteOpenHelper {
         int res = -1;
 
         if(cursor.moveToFirst())
-            res = cursor.getInt(cursor.getColumnIndex("stepsGoal"));
+            res = cursor.getInt(cursor.getColumnIndex("stepGoal"));
 
         cursor.close();
         return res;

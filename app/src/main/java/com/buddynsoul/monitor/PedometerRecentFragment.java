@@ -1,6 +1,8 @@
 package com.buddynsoul.monitor;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -93,14 +95,17 @@ public class PedometerRecentFragment extends Fragment {
                 .start();
 
         int yesterdaySteps = db.getSteps(Util.getYesterday());
-        if(yesterdaySteps != Integer.MIN_VALUE) {
+        if(yesterdaySteps != Integer.MIN_VALUE)
             yesterday.setText("Yesterday I walked " + yesterdaySteps + " steps");
-            today.setText(String.valueOf(yesterdaySteps + 100));
-        }
-        else {
+
+        else
             yesterday.setText("No data for yesterday's steps");
+
+        int todayGoal = db.getStepGoal(Util.getToday());
+        if(todayGoal == -1)
             today.setText(String.valueOf(goal));
-        }
+        else
+            today.setText(String.valueOf(todayGoal));
 
 
         today.setOnClickListener(new View.OnClickListener() {

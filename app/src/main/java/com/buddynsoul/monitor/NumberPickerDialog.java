@@ -24,21 +24,21 @@ public class NumberPickerDialog extends DialogFragment {
 
         int  goal = sp.getInt("goal", 10000);
 
-//        db = Database.getInstance(getActivity());
-//        int yesterdayGoal = db.getStepGoal(Util.getYesterday());
+        db = Database.getInstance(getActivity());
+        int todayGoal = db.getStepGoal(Util.getToday());
 
         numberPicker.setMinValue(0);
         numberPicker.setMaxValue(goal);
-//        if(yesterdayGoal != -1)
-//            numberPicker.setValue(yesterdayGoal);
-//        else
-//            numberPicker.setValue(goal);
+        if(todayGoal != -1)
+            numberPicker.setValue(todayGoal);
+        else
+            numberPicker.setValue(goal);
 
         numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 value = newVal;
-                db.insertStepGoal(newVal);
+//                db.insertStepGoal(newVal);
             }
         });
 
@@ -50,8 +50,7 @@ public class NumberPickerDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 TextView steps = (TextView)getActivity().findViewById(R.id.today_goal_ID);
                 steps.setText(String.valueOf(value));
-
-
+                db.insertStepGoal(value);
             }
         });
 

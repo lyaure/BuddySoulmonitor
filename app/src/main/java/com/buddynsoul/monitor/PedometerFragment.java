@@ -1,5 +1,8 @@
 package com.buddynsoul.monitor;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.buddynsoul.monitor.Utils.Util;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
 public class PedometerFragment extends Fragment {
@@ -40,6 +44,28 @@ public class PedometerFragment extends Fragment {
         adapter.notifyDataSetChanged();
 
 //        viewPager.setCurrentItem(1);
+
+        Database db = Database.getInstance(getActivity());
+
+        SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
+        if(!sp.contains("showGoalAchieved")
+                || (sp.getLong("showGoalAchieved", Util.getToday()) != Util.getToday()
+                && db.getSteps(Util.getYesterday()) >= db.getStepGoal(Util.getYesterday()))){
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("GOOD JOB!!")
+                    .setMessage("Congratulation, you achieved you daily goal yesterday!\nKepp going!")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(R.drawable.icon)
+                    .show();
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putLong("showGoalAchieved", Util.getToday());
+            editor.commit();
+        }
 
         return v;
     }
