@@ -56,40 +56,30 @@ public class AdminActivity extends FragmentActivity {
                 }
             };
 
-    public void setFragmentID(int id){
-        this.fragmentID = id;
-    }
-
     @Override
     public void onBackPressed(){
-        if(fragmentID == R.layout.fragment_user_info){
-            fragment = new UsersFragment();
-            loadFragment(fragment);
-        }
-        else{
-            new AlertDialog.Builder(this)
-                    .setTitle("Exit")
-                    .setMessage("Are you sure want to exit?")
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(Intent.ACTION_MAIN);
-                            intent.addCategory(Intent.CATEGORY_HOME);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("Go to my monitor", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(AdminActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    })
-                    .show();
-        }
+        new AlertDialog.Builder(this)
+                .setTitle("Exit")
+                .setMessage("Are you sure want to exit?")
+                .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setNegativeButton("Go to my monitor", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .show();
     }
 
 }
