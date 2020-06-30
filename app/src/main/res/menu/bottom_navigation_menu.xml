@@ -5,13 +5,13 @@
         android:icon="@drawable/pedometer_black"
         android:title="Pedometer" />
     <item
-        android:id="@+id/navigation_weather"
-        android:icon="@drawable/weather_black"
-        android:title="Weather" />
-    <item
         android:id="@+id/navigation_sleep"
         android:icon="@drawable/sleep_black"
         android:title="Sleep" />
+    <item
+        android:id="@+id/navigation_weather"
+        android:icon="@drawable/weather_black"
+        android:title="Weather" />
     <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/profile_black"

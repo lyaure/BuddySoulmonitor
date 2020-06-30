@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="Users"
-        android:textColor="@color/colorBlue"
+        android:textColor="@color/colorPrimary"
         android:textSize="36sp"
         android:textStyle="normal" />
 

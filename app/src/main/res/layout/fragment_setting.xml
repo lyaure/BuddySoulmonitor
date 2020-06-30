@@ -16,7 +16,7 @@
         android:layout_marginBottom="20dp"
         android:text="Settings"
         android:textAlignment="center"
-        android:textColor="@color/colorBlue"
+        android:textColor="@color/colorPrimary"
         android:textSize="36sp" />
 
     <LinearLayout
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:text="Change temperature unit"
-            android:textColor="@color/colorBlue"
+            android:textColor="@color/colorPrimary"
             android:textColorLink="@color/colorOrange"
             android:textSize="24sp" />
 
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:text="Change your step goal"
-            android:textColor="@color/colorBlue"
+            android:textColor="@color/colorPrimary"
             android:textSize="24sp" />
 
         <EditText
@@ -100,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Set approximative sleeping time"
-            android:textColor="@color/colorBlue"
+            android:textColor="@color/colorPrimary"
             android:textSize="24sp" />
 
         <LinearLayout

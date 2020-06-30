@@ -25,7 +25,7 @@
             android:layout_marginStart="10dp"
             android:text="Last week"
             android:textAlignment="center"
-            android:textColor="@color/colorBlue" />
+            android:textColor="@color/colorPrimary" />
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
             android:layout_marginStart="10dp"
             android:text="Best scores"
             android:textAlignment="center"
-            android:textColor="@color/colorBlue" />
+            android:textColor="@color/colorPrimary" />
 
         <FrameLayout
             android:layout_width="wrap_content"
