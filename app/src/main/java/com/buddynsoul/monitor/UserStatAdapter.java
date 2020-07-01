@@ -50,6 +50,12 @@ public class UserStatAdapter extends ArrayAdapter<UserStat> {
         TextView userStatNightLocation = (TextView)listItem.findViewById(R.id.userStatNightLocation_ID);
         userStatNightLocation.setText(String.format("%s%s", "Night location: ", String.valueOf(userStat.getNight_location())));
 
+        TextView userStatStepGoal = (TextView)listItem.findViewById(R.id.userStatStepGoal_ID);
+        userStatStepGoal.setText(String.format("%s%s", "Step goal: ", String.valueOf(userStat.getStepGoal())));
+
+        TextView userStatSleepGoal = (TextView)listItem.findViewById(R.id.userStatSleepGoal_ID);
+        userStatSleepGoal.setText(String.format("%s%s", "Sleep goal: ", String.valueOf(userStat.getSleepGoal())));
+
         return listItem;
     }
 }

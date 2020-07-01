@@ -176,8 +176,11 @@ public class UsersSearchFragment extends Fragment {
                                 int deepSleep = jsonObject.get("deep_sleep").getAsInt();
                                 String morning_location = jsonObject.get("morning_location").getAsString();
                                 String night_location = jsonObject.get("night_location").getAsString();
-                                UserStat stat = new UserStat(dateStr, steps, asleepTime, wokeUpTime,
-                                        deepSleep, morning_location, night_location);
+                                int stepGoal = jsonObject.get("step_goal").getAsInt();
+                                int sleepGoal = jsonObject.get("sleep_goal").getAsInt();
+
+                                UserStat stat = new UserStat(dateStr, steps, stepGoal, asleepTime, wokeUpTime,
+                                        deepSleep, sleepGoal, morning_location, night_location);
 
                                 userStatList.add(stat);
                             }

@@ -12,7 +12,6 @@ import com.buddynsoul.monitor.Utils.Util;
 import java.util.Calendar;
 
 public class Database extends SQLiteOpenHelper {
-//    private SQLiteDatabase db;
     private static final String DB_NAME = "monitor";
     private static final int DB_VERSION = 1;
     public static Database instance;
@@ -79,9 +78,9 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void insertBackupDay(long date, int steps, String morningLocation, String nightLocation,
+    public void insertBackupDay(long date, int steps, int stepGoal, String morningLocation, String nightLocation,
                                 int sleepDuration, long asleep, long wokeUp,
-                                int deepSleep, int lightSleep){
+                                int deepSleep, int lightSleep, int sleepGoal){
 
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null );
@@ -91,6 +90,7 @@ public class Database extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put("date", date);
             cv.put("steps", steps);
+            cv.put("stepGoal", stepGoal);
             cv.put("morning_location", morningLocation);
             cv.put("night_location", nightLocation);
             cv.put("sleepDuration", sleepDuration);
@@ -98,6 +98,7 @@ public class Database extends SQLiteOpenHelper {
             cv.put("wokeUp", wokeUp);
             cv.put("deepSleep", deepSleep);
             cv.put("lightSleep", lightSleep);
+            cv.put("sleepGoal", sleepGoal);
 
             db.insert(DB_NAME, null, cv);
 
@@ -222,6 +223,19 @@ public class Database extends SQLiteOpenHelper {
 
         if(cursor.moveToFirst())
             res = cursor.getInt(cursor.getColumnIndex("stepGoal"));
+
+        cursor.close();
+        return res;
+    }
+
+    public int getSleepGoal(final long date) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
+
+        int res = -1;
+
+        if(cursor.moveToFirst())
+            res = cursor.getInt(cursor.getColumnIndex("sleepGoal"));
 
         cursor.close();
         return res;

@@ -179,10 +179,12 @@ public class ProfileFragment extends Fragment {
                             int sleepDuration = (int)(wokeUpTime - asleepTime);
                             int deepSleep = jsonObject.get("deep_sleep").getAsInt();
                             int lightSleep = sleepDuration - deepSleep;
+                            int stepGoal = jsonObject.get("step_goal").getAsInt();
+                            int sleepGoal = jsonObject.get("sleep_goal").getAsInt();
 
                             Database db = Database.getInstance(getContext());
-                            db.insertBackupDay(date, steps, morning_location, night_location,
-                                    sleepDuration, asleepTime, wokeUpTime, deepSleep, lightSleep);
+                            db.insertBackupDay(date, steps, stepGoal, morning_location, night_location,
+                                    sleepDuration, asleepTime, wokeUpTime, deepSleep, lightSleep, sleepGoal);
                         }
                         Toast.makeText(getContext(), "Data has been backed up", Toast.LENGTH_SHORT).show();
                     }
