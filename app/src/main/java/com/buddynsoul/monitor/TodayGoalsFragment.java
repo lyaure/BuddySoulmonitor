@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.buddynsoul.monitor.Utils.Util;
 
@@ -52,10 +53,16 @@ public class TodayGoalsFragment extends Fragment {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Goal goal = new Goal(newGoal.getText().toString(), false);
-                goals.add(goal);
-                adapter.notifyDataSetChanged();
-                addNewGoalToDB(goal);
+                String newGoalStr = newGoal.getText().toString();
+                if(newGoalStr.trim().length() == 0) {
+                    Toast.makeText(getContext(), "Goal can't be empty!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Goal goal = new Goal(newGoal.getText().toString(), false);
+                    goals.add(goal);
+                    adapter.notifyDataSetChanged();
+                    addNewGoalToDB(goal);
+                }
             }
         });
 
