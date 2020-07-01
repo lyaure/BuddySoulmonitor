@@ -16,7 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
@@ -54,11 +58,29 @@ public class UsersListFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_users_list, container, false);
 
+        final RadioGroup userStatus = v.findViewById(R.id.userStatusRadioGroup_ID);
+        RadioButton confirmedUser = (RadioButton)v.findViewById(R.id.confirmedUserBtn_ID);
+        RadioButton notConfirmedUser = (RadioButton) v.findViewById(R.id.notConfirmedUserBtn_ID);
+
+        confirmedUser.setChecked(true);
+
         ListView userListView = (ListView) v.findViewById(R.id.userList_ID);
         adapter = new UserAdapter(getContext(), userList);
         userListView.setAdapter(adapter);
-        userList.clear();
-        getUserList(getActivity());
+        getUserList(getActivity(), true);
+
+
+        userStatus.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.confirmedUserBtn_ID) {
+                    getUserList(getActivity(), true);
+                }
+                else {
+                    getUserList(getActivity(), false);
+                }
+            }
+        });
 
         userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -84,14 +106,18 @@ public class UsersListFragment extends Fragment {
         return v;
     }
 
-    private void getUserList(Activity activity) {
+    private void getUserList(Activity activity, boolean status) {
+
+        if(userList != null) {
+            userList.clear();
+        }
 
         SharedPreferences sp = activity.getSharedPreferences("user", MODE_PRIVATE);
         String refreshToken = sp.getString("refreshToken", "");
 
         IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
 
-        Call<JsonElement> todoCall = iMyService.listusers(refreshToken);
+        Call<JsonElement> todoCall = iMyService.listusers(refreshToken, status);
         todoCall.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -101,26 +127,40 @@ public class UsersListFragment extends Fragment {
 
                     JsonArray usersArray = response.body().getAsJsonArray();
 
-                    for (int i = 0; i < usersArray.size(); i++) {
-                        String name = usersArray.get(i).getAsJsonObject().get("name").getAsString();
-                        String email = usersArray.get(i).getAsJsonObject().get("email").getAsString();
-                        long registrationDate = usersArray.get(i).getAsJsonObject().get("registration_date").getAsLong();
-                        String registrationStr = Util.convertTimeInMillisToDate(registrationDate);
-                        boolean admin = usersArray.get(i).getAsJsonObject().get("admin").getAsBoolean();
-                        User user = new User(name, email, registrationStr, admin);
-
-                        emailList.add(email);
-                        userList.add(user);
+                    if(usersArray.size() == 0) {
+                        adapter.notifyDataSetChanged();
+                        Toast.makeText(getContext(), "List of not confirmed users is empty", Toast.LENGTH_SHORT).show();
                     }
-                    adapter.notifyDataSetChanged();
+                    else {
+                        for (int i = 0; i < usersArray.size(); i++) {
+                            String name = usersArray.get(i).getAsJsonObject().get("name").getAsString();
+                            String email = usersArray.get(i).getAsJsonObject().get("email").getAsString();
+                            long registrationDate = usersArray.get(i).getAsJsonObject().get("registration_date").getAsLong();
 
-                    Gson gson = new Gson();
-                    String emailList_str = gson.toJson(emailList);
+                            String registrationStr;
+                            if(status) {
+                                registrationStr = Util.convertTimeInMillisToDate(registrationDate);
+                            }
+                            else {
+                                registrationStr = String.valueOf(new Date(registrationDate));
+                            }
 
-                    SharedPreferences sp = getContext().getSharedPreferences("admin", MainActivity.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("emailList", emailList_str);
-                    editor.apply();
+                            boolean admin = usersArray.get(i).getAsJsonObject().get("admin").getAsBoolean();
+                            User user = new User(name, email, registrationStr, admin);
+
+                            emailList.add(email);
+                            userList.add(user);
+                        }
+                        adapter.notifyDataSetChanged();
+
+                        Gson gson = new Gson();
+                        String emailList_str = gson.toJson(emailList);
+
+                        SharedPreferences sp = getContext().getSharedPreferences("admin", MainActivity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString("emailList", emailList_str);
+                        editor.apply();
+                    }
                 }
             }
 

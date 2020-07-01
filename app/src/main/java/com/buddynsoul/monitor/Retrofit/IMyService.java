@@ -73,8 +73,10 @@ public interface IMyService {
     Call<String> contactUs(@Path("refreshToken") String refreshToken,
                           @Field("message") String message);
 
-    @GET("listusers/{refreshToken}")
-    Call<JsonElement> listusers(@Path("refreshToken") String refreshToken);
+    @POST("listusers/{refreshToken}")
+    @FormUrlEncoded
+    Call<JsonElement> listusers(@Path("refreshToken") String refreshToken,
+                                @Field("status") boolean status);
 
     @POST("databetweentwodates/{refreshToken}")
     @FormUrlEncoded
