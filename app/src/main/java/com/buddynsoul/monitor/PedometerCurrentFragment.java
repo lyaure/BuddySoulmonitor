@@ -388,7 +388,7 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         appPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
         appPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         //TODO just for testing
-        appPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//        appPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         // Check which permissions are granted
         List<String> listPermissionsNeeded = new ArrayList<>();

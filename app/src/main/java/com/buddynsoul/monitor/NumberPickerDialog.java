@@ -52,7 +52,7 @@ public class NumberPickerDialog extends DialogFragment {
         }
         else {
             textView = (TextView)getActivity().findViewById(R.id.sleep_min_goal_ID);
-            message = "Choose youre tonight's duration sleep goal";
+            message = "Choose your tonight's duration sleep goal";
             numberPicker.setMaxValue(60);
         }
 
