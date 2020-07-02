@@ -38,7 +38,7 @@ public class NumberPickerDialog extends DialogFragment {
 
         if(from.equals("pedometer")){
             textView = (TextView)getActivity().findViewById(R.id.today_goal_ID);
-            message = "Choose youre today's step goal";
+            message = "Choose your today's step goal";
             numberPicker.setMaxValue(goal);
             if(todayGoal != -1)
                 numberPicker.setValue(todayGoal);
@@ -47,7 +47,7 @@ public class NumberPickerDialog extends DialogFragment {
         }
         else if(from.equals("sleepHours")) {
             textView = (TextView)getActivity().findViewById(R.id.sleep_hours_goal_ID);
-            message = "Choose youre tonight's duration sleep goal";
+            message = "Choose your tonight's duration sleep goal";
             numberPicker.setMaxValue(12);
         }
         else {
@@ -56,13 +56,12 @@ public class NumberPickerDialog extends DialogFragment {
             numberPicker.setMaxValue(60);
         }
 
-
-        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                value = newVal;
-            }
-        });
+//        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+//            @Override
+//            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+//                value = newVal;
+//            }
+//        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(message);
@@ -70,6 +69,8 @@ public class NumberPickerDialog extends DialogFragment {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                numberPicker.clearFocus();
+                value = numberPicker.getValue();
                 textView.setText(String.valueOf(value));
 
                 if(from.equals("pedometer"))
