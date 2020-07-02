@@ -47,17 +47,19 @@ public class PedometerFragment extends Fragment {
 
         Database db = Database.getInstance(getActivity());
 
-        SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
+        SharedPreferences sp = getActivity().getSharedPreferences("goalAchieved", getActivity().MODE_PRIVATE);
 
-        if(!sp.contains("showGoalAchieved")){
+        if(!sp.contains("showStepGoalAchieved")){
             SharedPreferences.Editor editor = sp.edit();
-            editor.putLong("showGoalAchieved", Util.getToday());
+            editor.putLong("showStepGoalAchieved", Util.getToday());
             editor.commit();
         }
 
-        if((sp.getLong("showGoalAchieved", Util.getToday()) != Util.getToday()
-                && db.getSteps(Util.getYesterday()) >= db.getStepGoal(Util.getYesterday())
-                && db.getStepGoal(Util.getYesterday()) != Integer.MIN_VALUE)){
+        int yesterday = db.getStepGoal(Util.getYesterday());
+
+        if((sp.getLong("showStepGoalAchieved", Util.getToday()) != Util.getToday()
+                && db.getSteps(Util.getYesterday()) >= yesterday
+                && yesterday != Integer.MIN_VALUE && yesterday != -1)){
             new AlertDialog.Builder(getActivity())
                     .setTitle("GOOD JOB!!")
                     .setMessage("Congratulation, you achieved your daily goal yesterday!\nKepp going!")
@@ -70,7 +72,7 @@ public class PedometerFragment extends Fragment {
                     .setIcon(R.drawable.icon)
                     .show();
             SharedPreferences.Editor editor = sp.edit();
-            editor.putLong("showGoalAchieved", Util.getToday());
+            editor.putLong("showStepGoalAchieved", Util.getToday());
             editor.commit();
         }
 

@@ -1,5 +1,8 @@
 package com.buddynsoul.monitor;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -93,6 +96,36 @@ public class SleepingTimeFragment extends Fragment {
                 hs.fullScroll(View.FOCUS_LEFT);
             }
         });
+
+
+        SharedPreferences sp = getActivity().getSharedPreferences("goalAchieved", getActivity().MODE_PRIVATE);
+
+        if(!sp.contains("showSleepGoalAchieved")){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putLong("showSleepGoalAchieved", Util.getToday());
+            editor.commit();
+        }
+
+        int yesterday = db.getSleepGoal(Util.getYesterday());
+
+        if(sp.getLong("showSleepGoalAchieved", Util.getToday()) != Util.getToday()
+                && db.getSleepDuration(Util.getYesterday()) >= yesterday
+                && yesterday != Integer.MIN_VALUE && yesterday != -1){
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("GOOD JOB!!")
+                    .setMessage("Congratulation, you achieved your goal this night!\nKepp going!")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(R.drawable.icon)
+                    .show();
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putLong("showSleepGoalAchieved", Util.getToday());
+            editor.commit();
+        }
 
         return v;
     }
