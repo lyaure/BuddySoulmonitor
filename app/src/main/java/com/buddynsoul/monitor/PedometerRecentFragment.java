@@ -102,7 +102,7 @@ public class PedometerRecentFragment extends Fragment {
             yesterday.setText("No data for yesterday's steps");
 
         int todayGoal = db.getStepGoal(Util.getToday());
-        if(todayGoal == -1)
+        if(todayGoal == Integer.MIN_VALUE)
             today.setText(String.valueOf(goal));
         else
             today.setText(String.valueOf(todayGoal));

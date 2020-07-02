@@ -219,7 +219,7 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        int res = -1;
+        int res = Integer.MIN_VALUE;
 
         if(cursor.moveToFirst())
             res = cursor.getInt(cursor.getColumnIndex("stepGoal"));
@@ -232,7 +232,7 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);
 
-        int res = -1;
+        int res = Integer.MIN_VALUE;
 
         if(cursor.moveToFirst())
             res = cursor.getInt(cursor.getColumnIndex("sleepGoal"));

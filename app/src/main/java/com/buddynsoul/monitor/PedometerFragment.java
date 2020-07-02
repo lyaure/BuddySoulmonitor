@@ -48,12 +48,19 @@ public class PedometerFragment extends Fragment {
         Database db = Database.getInstance(getActivity());
 
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
-        if(!sp.contains("showGoalAchieved")
-                || (sp.getLong("showGoalAchieved", Util.getToday()) != Util.getToday()
-                && db.getSteps(Util.getYesterday()) >= db.getStepGoal(Util.getYesterday()))){
+
+        if(!sp.contains("showGoalAchieved")){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putLong("showGoalAchieved", Util.getToday());
+            editor.commit();
+        }
+
+        if((sp.getLong("showGoalAchieved", Util.getToday()) != Util.getToday()
+                && db.getSteps(Util.getYesterday()) >= db.getStepGoal(Util.getYesterday())
+                && db.getStepGoal(Util.getYesterday()) != Integer.MIN_VALUE)){
             new AlertDialog.Builder(getActivity())
                     .setTitle("GOOD JOB!!")
-                    .setMessage("Congratulation, you achieved you daily goal yesterday!\nKepp going!")
+                    .setMessage("Congratulation, you achieved your daily goal yesterday!\nKepp going!")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
