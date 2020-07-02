@@ -15,9 +15,16 @@ public class NumberPickerDialog extends DialogFragment {
     private NumberPicker.OnValueChangeListener valueChangeListener;
     private int value = 0;
     private Database db;
+    private String from;
+    private TextView textView;
+    private String message;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstance){
+        Bundle bundle = this.getArguments();
+        if(bundle != null)
+            from = bundle.getString("from", "null");
+
         final NumberPicker numberPicker = new NumberPicker(getActivity());
 
         SharedPreferences sp = getActivity().getSharedPreferences("pedometer", getActivity().MODE_PRIVATE);
@@ -28,29 +35,53 @@ public class NumberPickerDialog extends DialogFragment {
         int todayGoal = db.getStepGoal(Util.getToday());
 
         numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(goal);
-        if(todayGoal != -1)
-            numberPicker.setValue(todayGoal);
-        else
-            numberPicker.setValue(goal);
+
+        if(from.equals("pedometer")){
+            textView = (TextView)getActivity().findViewById(R.id.today_goal_ID);
+            message = "Choose youre today's step goal";
+            numberPicker.setMaxValue(goal);
+            if(todayGoal != -1)
+                numberPicker.setValue(todayGoal);
+            else
+                numberPicker.setValue(goal);
+        }
+        else if(from.equals("sleepHours")) {
+            textView = (TextView)getActivity().findViewById(R.id.sleep_hours_goal_ID);
+            message = "Choose youre tonight's duration sleep goal";
+            numberPicker.setMaxValue(12);
+        }
+        else {
+            textView = (TextView)getActivity().findViewById(R.id.sleep_min_goal_ID);
+            message = "Choose youre tonight's duration sleep goal";
+            numberPicker.setMaxValue(60);
+        }
+
 
         numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 value = newVal;
-//                db.insertStepGoal(newVal);
             }
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Choose youre today's step goal");
+        builder.setTitle(message);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TextView steps = (TextView)getActivity().findViewById(R.id.today_goal_ID);
-                steps.setText(String.valueOf(value));
-                db.insertStepGoal(value);
+                textView.setText(String.valueOf(value));
+
+                if(from.equals("pedometer"))
+                   db.insertStepGoal(value);
+                else if(from.equals("sleepHours")) {
+                    TextView txtv = (TextView)getActivity().findViewById(R.id.sleep_min_goal_ID);
+                    db.insertSleepGoal(value * 3600 + Integer.parseInt(txtv.getText().toString()) * 60);
+                }
+                else {
+                    TextView txtv = (TextView)getActivity().findViewById(R.id.sleep_hours_goal_ID);
+                    db.insertSleepGoal(Integer.parseInt(txtv.getText().toString()) * 3600 + value * 60);
+                }
             }
         });
 

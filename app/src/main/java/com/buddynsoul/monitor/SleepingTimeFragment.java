@@ -3,6 +3,7 @@ package com.buddynsoul.monitor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import com.buddynsoul.monitor.Utils.Util;
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
 import java.time.DayOfWeek;
 import java.util.Calendar;
@@ -22,11 +24,12 @@ import java.util.Locale;
 
 public class SleepingTimeFragment extends Fragment {
     private final int SLEEP = 1;
-    View v;
+    private View v;
     private GraphChartView graph;
     private HorizontalScrollView hs;
-    private TextView date, asleep, wokeUp, deepSleep, lightSleep, duration, average;
     private Database db;
+    private ViewPager viewPager;
+    private ViewPagerAdapter adapter;
 
     public SleepingTimeFragment() {
         // Required empty public constructor
@@ -40,6 +43,22 @@ public class SleepingTimeFragment extends Fragment {
 
         db = Database.getInstance(getContext());
 
+
+        viewPager = (ViewPager) v.findViewById(R.id.sleep_viewpager_ID);
+        adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
+        viewPager.setAdapter(adapter);
+
+        DotsIndicator dotsIndicator = (DotsIndicator)v.findViewById(R.id.sleep_dots_indicator);
+        dotsIndicator.setViewPager(viewPager);
+
+        SleepSummaryFragment summary = new SleepSummaryFragment();
+        SleepGoalFragment goals = new SleepGoalFragment();
+
+        adapter.addFrag(summary, "current");
+        adapter.addFrag(goals, "recent");
+        adapter.notifyDataSetChanged();
+
+
         hs = (HorizontalScrollView) v.findViewById(R.id.sleepingTime_horizontal_scrollview_ID);
         hs.setHorizontalScrollBarEnabled(false);
 
@@ -52,17 +71,6 @@ public class SleepingTimeFragment extends Fragment {
         graph.setScreenDimensions(width, height);
 
 
-        date = (TextView)v.findViewById(R.id.date_txtv_ID);
-        date.setVisibility(View.INVISIBLE);
-        asleep = (TextView)v.findViewById(R.id.asleep_txtv_ID);
-        wokeUp = (TextView)v.findViewById(R.id.wokeUpe_txtv_ID);
-        deepSleep = (TextView)v.findViewById(R.id.deepSleep_txtv_ID);
-        lightSleep = (TextView)v.findViewById(R.id.lightSleep_txtv_ID);
-        duration = (TextView)v.findViewById(R.id.duration_txtv_ID);
-        average = (TextView)v.findViewById(R.id.average_txtv_ID);
-
-        update();
-
         hs.post(new Runnable() {
             @Override
             public void run() {
@@ -71,11 +79,7 @@ public class SleepingTimeFragment extends Fragment {
                     @Override
                     public void onScrollChanged() {
                         graph.setScrollPosition(hs.getScrollX());
-//                        tmp = hs.getScrollX();
-//                        asleep.setText(getTime(db.getAsleep(graph.getDatePosition())));
-//                        wokeUp.setText(getTime(db.getWokeUp(graph.getDatePosition())));
-//                        duration.setText(getSleepingTime(db.getSleepingTime(graph.getDatePosition())));
-                        update();
+                        summary.update(graph);
                     }
                 });
             }
@@ -90,93 +94,6 @@ public class SleepingTimeFragment extends Fragment {
             }
         });
 
-
-//        TextView data = (TextView)v.findViewById(R.id.stat_data_ID);
-//
-//        SharedPreferences sp = getActivity().getSharedPreferences("tempData", getActivity().MODE_PRIVATE);
-//        long statData = sp.getLong("stat", -1);
-//        if(statData != -1)
-//            data.setText(String.valueOf(statData));
-//
-//        TextView sleeping_time_txtv = (TextView)v.findViewById(R.id.sleeping_time_ID);
-//
-//        int hour = 0, min = 0, sec = 0;
-//
-//        int sleepingTime = sp.getInt("sleepingTime", -1);
-//        if (sleepingTime != -1)
-//            hour = sleepingTime / 3600;
-//            min = (sleepingTime  % 3600 ) / 60;
-//            sec = ((sleepingTime % 86400 ) % 3600 ) % 60;
-//        sleeping_time_txtv.setText(String.format("%s\n\n%d hour %d min %d sec", String.valueOf(sleepingTime), hour, min, sec));
-
         return v;
-    }
-
-    private String getTime(long date){
-        if(date == 0)
-            return "No data for this day";
-
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(date);
-
-        String time = String.format("%02d", c.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", c.get(Calendar.MINUTE));
-        time += c.get(Calendar.AM_PM) == Calendar.AM ? " am" : " pm";
-
-        return time;
-    }
-
-    private String getSleepingTime(int time){
-        int hours = (int)time / 3600;
-        int minutes = ((int)time % 3600) / 60;
-
-        return hours + "h" + String.format("%02d", minutes);
-    }
-
-    private void update(){
-        long time;
-        int count = db.getSleepingTimeDatesCount() >= 7 ? 7 : db.getSleepingTimeDatesCount();
-
-        if(count > 0){
-            date.setVisibility(View.VISIBLE);
-
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(graph.getDatePosition());
-
-            String d = c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", "
-                    + c.get(Calendar.DAY_OF_MONTH) + " "
-                    + c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + " "
-                    + c.get(Calendar.YEAR);
-
-            date.setText(d);
-
-            time = db.getWokeUp(graph.getDatePosition());
-            if(time >= 0)
-                wokeUp.setText(getTime(time));
-
-
-            time = db.getAsleep(graph.getDatePosition());
-            if(time >= 0)
-                asleep.setText(getTime(time));
-
-            int dur = db.getSleepDuration(graph.getDatePosition());
-//            dur /= 1000; // millisec to sec
-
-            if(dur >= 0)
-                duration.setText(getSleepingTime((int)dur));
-
-            int deep = db.getDeepSleep(graph.getDatePosition());
-            if(deep >= 0)
-                deepSleep.setText(getSleepingTime(deep));
-
-            int light = db.getLightSleep(graph.getDatePosition());
-//            light /= 1000;
-            if(light >= 0)
-                lightSleep.setText(getSleepingTime(light));
-
-            int avrg = db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday()) / count;
-//            avrg /= 1000;
-            average.setText(getSleepingTime(avrg));
-        }
-
     }
 }

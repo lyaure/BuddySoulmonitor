@@ -228,6 +228,22 @@ public class Database extends SQLiteOpenHelper {
         return res;
     }
 
+    public void insertSleepGoal(int goal) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " ORDER BY date DESC", null);
+
+        if (cursor.moveToFirst()) {
+            ContentValues cv = new ContentValues();
+            cv.put("sleepGoal", goal);
+
+            long date = cursor.getLong(cursor.getColumnIndex("date"));
+
+            db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
+
+            cursor.close();
+        }
+    }
+
     public int getSleepGoal(final long date) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " WHERE date = " + date, null);

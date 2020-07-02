@@ -102,7 +102,7 @@ public class PedometerRecentFragment extends Fragment {
             yesterday.setText("No data for yesterday's steps");
 
         int todayGoal = db.getStepGoal(Util.getToday());
-        if(todayGoal == Integer.MIN_VALUE)
+        if(todayGoal == Integer.MIN_VALUE || todayGoal == -1)
             today.setText(String.valueOf(goal));
         else
             today.setText(String.valueOf(todayGoal));
@@ -112,10 +112,12 @@ public class PedometerRecentFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NumberPickerDialog dialogFragment = new NumberPickerDialog();
-//                Bundle bundle = new Bundle();
-//                bundle.putString("from", "toTime");
-//                dialogFragment.setArguments(bundle);
+                Bundle bundle = new Bundle();
+                bundle.putString("from", "pedometer");
+                dialogFragment.setArguments(bundle);
                 dialogFragment.show(getActivity().getSupportFragmentManager(), "steps");
+
+                db.insertStepGoal(Integer.valueOf(today.getText().toString()));
             }
         });
 
