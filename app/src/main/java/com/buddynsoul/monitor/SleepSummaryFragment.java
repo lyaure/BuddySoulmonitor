@@ -17,6 +17,7 @@ import java.util.Locale;
 public class SleepSummaryFragment extends Fragment {
     private View v;
     private TextView date, asleep, wokeUp, deepSleep, lightSleep, duration, average;
+    private static GraphChartView graph;
 
     public SleepSummaryFragment() {
         // Required empty public constructor
@@ -37,7 +38,7 @@ public class SleepSummaryFragment extends Fragment {
         duration = (TextView)v.findViewById(R.id.duration_txtv_ID);
         average = (TextView)v.findViewById(R.id.average_txtv_ID);
 
-//        update();
+        update(graph);
 
         return v;
     }
@@ -109,5 +110,9 @@ public class SleepSummaryFragment extends Fragment {
             average.setText(getSleepingTime(avrg));
         }
 
+    }
+
+    public void setGraph(GraphChartView g){
+        this.graph = g;
     }
 }

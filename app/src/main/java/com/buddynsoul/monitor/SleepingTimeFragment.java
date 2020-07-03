@@ -33,6 +33,7 @@ public class SleepingTimeFragment extends Fragment {
     private Database db;
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
+    private SleepSummaryFragment summary;
 
     public SleepingTimeFragment() {
         // Required empty public constructor
@@ -42,7 +43,7 @@ public class SleepingTimeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        v =  inflater.inflate(R.layout.fragment_sleeping_time, container, false);
+        v = inflater.inflate(R.layout.fragment_sleeping_time, container, false);
 
         db = Database.getInstance(getContext());
 
@@ -51,14 +52,14 @@ public class SleepingTimeFragment extends Fragment {
         adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
         viewPager.setAdapter(adapter);
 
-        DotsIndicator dotsIndicator = (DotsIndicator)v.findViewById(R.id.sleep_dots_indicator);
+        DotsIndicator dotsIndicator = (DotsIndicator) v.findViewById(R.id.sleep_dots_indicator);
         dotsIndicator.setViewPager(viewPager);
 
-        SleepSummaryFragment summary = new SleepSummaryFragment();
+        summary = new SleepSummaryFragment();
         SleepGoalFragment goals = new SleepGoalFragment();
 
-        adapter.addFrag(summary, "current");
-        adapter.addFrag(goals, "recent");
+        adapter.addFrag(summary, "summary");
+        adapter.addFrag(goals, "goal");
         adapter.notifyDataSetChanged();
 
 
@@ -69,10 +70,9 @@ public class SleepingTimeFragment extends Fragment {
 
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels, height = dm.heightPixels;
-        graph = (GraphChartView)v.findViewById(R.id.sleepingTime_graph_ID);
+        graph = (GraphChartView) v.findViewById(R.id.sleepingTime_graph_ID);
         graph.setType(SLEEP);
         graph.setScreenDimensions(width, height);
-
 
         hs.post(new Runnable() {
             @Override
@@ -88,7 +88,7 @@ public class SleepingTimeFragment extends Fragment {
             }
         });
 
-        Button changeGraph = (Button)v.findViewById(R.id.sleepingTime_change_graph_btn_ID);
+        Button changeGraph = (Button) v.findViewById(R.id.sleepingTime_change_graph_btn_ID);
         changeGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,10 +97,9 @@ public class SleepingTimeFragment extends Fragment {
             }
         });
 
-
         SharedPreferences sp = getActivity().getSharedPreferences("goalAchieved", getActivity().MODE_PRIVATE);
 
-        if(!sp.contains("showSleepGoalAchieved")){
+        if (!sp.contains("showSleepGoalAchieved")) {
             SharedPreferences.Editor editor = sp.edit();
             editor.putLong("showSleepGoalAchieved", Util.getToday());
             editor.commit();
@@ -108,9 +107,9 @@ public class SleepingTimeFragment extends Fragment {
 
         int yesterday = db.getSleepGoal(Util.getYesterday());
 
-        if(sp.getLong("showSleepGoalAchieved", Util.getToday()) != Util.getToday()
+        if (sp.getLong("showSleepGoalAchieved", Util.getToday()) != Util.getToday()
                 && db.getSleepDuration(Util.getYesterday()) >= yesterday
-                && yesterday != Integer.MIN_VALUE && yesterday != -1){
+                && yesterday != Integer.MIN_VALUE && yesterday != -1) {
             new AlertDialog.Builder(getActivity())
                     .setTitle("GOOD JOB!!")
                     .setMessage("Congratulation, you achieved your goal this night!\nKepp going!")
@@ -129,4 +128,11 @@ public class SleepingTimeFragment extends Fragment {
 
         return v;
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        summary.setGraph(graph);
+    }
+
 }
