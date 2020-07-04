@@ -10,12 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.buddynsoul.monitor.Database;
-import com.buddynsoul.monitor.LoadingDialog;
-import com.buddynsoul.monitor.LoginActivity;
-import com.buddynsoul.monitor.MainActivity;
-import com.buddynsoul.monitor.ProfileFragment;
-import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.google.android.material.textfield.TextInputEditText;

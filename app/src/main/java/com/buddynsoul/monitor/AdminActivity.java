@@ -74,7 +74,7 @@ public class AdminActivity extends FragmentActivity {
                 .setNegativeButton("Go to my monitor", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+                        Intent intent = new Intent(AdminActivity.this, MonitorActivity.class);
                         startActivity(intent);
                         finish();
                     }

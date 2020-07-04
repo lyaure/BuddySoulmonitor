@@ -60,8 +60,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Fragment fragment = new SettingsFragment();
-                MainActivity m = (MainActivity)getActivity();
-                m.setFragmentID(R.layout.fragment_setting);
+                MonitorActivity activity = (MonitorActivity)getActivity();
+                activity.setFragmentID(R.layout.fragment_setting);
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container_ID, fragment, "tag")
                         .addToBackStack(null)
@@ -73,6 +73,8 @@ public class ProfileFragment extends Fragment {
         admin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MonitorActivity activity = (MonitorActivity)getActivity();
+                activity.setAdminButtonPressed();
                 Intent i = new Intent(getActivity(), AdminActivity.class);
                 startActivity(i);
                 getActivity().finish();
@@ -87,7 +89,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Fragment fragment = new ContactUsFragment();
-                MainActivity m = (MainActivity)getActivity();
+                MonitorActivity m = (MonitorActivity)getActivity();
                 m.setFragmentID(R.layout.fragment_contact_us);
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container_ID, fragment, "tag")

@@ -98,7 +98,7 @@ public class CitySearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //String[] values = {cities.get(position).getCityName() ,cities.get(position).getKeyValue()};
 
-                SharedPreferences sp = getContext().getSharedPreferences("Weather_autocomplete", MainActivity.MODE_PRIVATE);
+                SharedPreferences sp = getContext().getSharedPreferences("Weather_autocomplete", MonitorActivity.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putString("keyValue", cities.get(position).getKeyValue());
                 editor.putString("cityName", cities.get(position).getCityName());

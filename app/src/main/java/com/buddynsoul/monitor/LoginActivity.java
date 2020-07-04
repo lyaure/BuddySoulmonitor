@@ -161,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(final String email, String password, LoadingDialog loadingDialog) {
-        final Intent i = new Intent(LoginActivity.this, MainActivity.class);
+        final Intent i = new Intent(LoginActivity.this, MonitorActivity.class);
 
         Call<JsonElement> todoCall = iMyService.loginUser(email, password);
         todoCall.enqueue(new Callback<JsonElement>() {

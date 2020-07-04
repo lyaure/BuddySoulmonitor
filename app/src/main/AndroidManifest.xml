@@ -27,7 +27,7 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".AdminActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".MainActivity"
+        <activity android:name=".MonitorActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".ResetPasswordActivity"
             android:screenOrientation="portrait"/>

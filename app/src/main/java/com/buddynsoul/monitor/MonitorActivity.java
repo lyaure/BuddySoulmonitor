@@ -18,15 +18,19 @@ import androidx.fragment.app.FragmentTransaction;
 import com.buddynsoul.monitor.Utils.WeatherUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends FragmentActivity {
+public class MonitorActivity extends FragmentActivity {
     private BottomNavigationView bottomNavigation;
     private Fragment fragment;
     private int fragmentID;
+    private boolean adminButtonPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        adminButtonPressed = false;
+
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         fragment = new PedometerFragment();
@@ -74,6 +78,10 @@ public class MainActivity extends FragmentActivity {
         this.fragmentID = id;
     }
 
+    public void setAdminButtonPressed(){
+        this.adminButtonPressed = true;
+    }
+
     @Override
     public void onBackPressed(){
         if(fragmentID == R.layout.fragment_setting || fragmentID == R.layout.fragment_contact_us){
@@ -81,6 +89,19 @@ public class MainActivity extends FragmentActivity {
             loadFragment(fragment);
         }
         else {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        if(fragmentID != R.layout.fragment_profile && this.adminButtonPressed == false){
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -29,7 +28,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -156,7 +154,7 @@ public class UsersListFragment extends Fragment {
                         Gson gson = new Gson();
                         String emailList_str = gson.toJson(emailList);
 
-                        SharedPreferences sp = getContext().getSharedPreferences("admin", MainActivity.MODE_PRIVATE);
+                        SharedPreferences sp = getContext().getSharedPreferences("admin", MonitorActivity.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
                         editor.putString("emailList", emailList_str);
                         editor.apply();

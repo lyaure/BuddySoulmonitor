@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.buddynsoul.monitor.MainActivity;
+import com.buddynsoul.monitor.MonitorActivity;
 import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
@@ -38,7 +38,7 @@ public abstract class WeatherUtils {
 
         API_KEY = context.getResources().getString(R.string.accuweather_api_key);
 
-        SharedPreferences sp = context.getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+        SharedPreferences sp = context.getSharedPreferences("Weather", MonitorActivity.MODE_PRIVATE);
         long last_update = sp.getLong("last_update", 0);
 
         // if last update is more than one hour then do new weather update
@@ -95,7 +95,7 @@ public abstract class WeatherUtils {
 
         API_KEY = context.getResources().getString(R.string.accuweather_api_key);
 
-        SharedPreferences prefs = context.getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences("Settings", MonitorActivity.MODE_PRIVATE);
         boolean metricValue = prefs.getBoolean("metricValue", true);
 
         chooseSpFile(context, autocomplete);
@@ -181,7 +181,7 @@ public abstract class WeatherUtils {
 
         API_KEY = context.getResources().getString(R.string.accuweather_api_key);
 
-        SharedPreferences prefs = context.getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences("Settings", MonitorActivity.MODE_PRIVATE);
         boolean metricValue = prefs.getBoolean("metricValue", true);
 
         chooseSpFile(context, autocomplete);
@@ -205,7 +205,7 @@ public abstract class WeatherUtils {
                     String day = currentConditionsJsonArray.get(0).getAsJsonObject().get("IsDayTime").toString();
                     boolean isDayTime = day.equals("true")? true : false;
 
-                    SharedPreferences sp = context.getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+                    SharedPreferences sp = context.getSharedPreferences("Weather", MonitorActivity.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
                     editor.putBoolean("IsDayTime", isDayTime);
                     editor.commit();
@@ -311,10 +311,10 @@ public abstract class WeatherUtils {
 
     private static void chooseSpFile(Context context, boolean autocomplete) {
         if(autocomplete) {
-            sp = context.getSharedPreferences("Weather_autocomplete", MainActivity.MODE_PRIVATE);
+            sp = context.getSharedPreferences("Weather_autocomplete", MonitorActivity.MODE_PRIVATE);
         }
         else {
-            sp = context.getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+            sp = context.getSharedPreferences("Weather", MonitorActivity.MODE_PRIVATE);
         }
     }
 

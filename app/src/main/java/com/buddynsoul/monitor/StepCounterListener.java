@@ -22,13 +22,11 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
@@ -40,7 +38,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -644,7 +641,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
         }
         notificationBuilder.setPriority(Notification.PRIORITY_MIN).setShowWhen(false)
                 .setContentIntent(PendingIntent
-                        .getActivity(context, 0, new Intent(context, MainActivity.class),
+                        .getActivity(context, 0, new Intent(context, MonitorActivity.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT))
                 .setSmallIcon(R.drawable.icon)
                 .setOngoing(true);

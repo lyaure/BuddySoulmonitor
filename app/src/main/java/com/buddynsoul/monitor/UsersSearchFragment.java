@@ -60,7 +60,7 @@ public class UsersSearchFragment extends Fragment {
         ListView userListView = (ListView) v.findViewById(R.id.userStatList_ID);
         autoCompleteTextView = (AutoCompleteTextView)v.findViewById(R.id.autoCompleteEmail_ID);
 
-        SharedPreferences sp = getContext().getSharedPreferences("admin", MainActivity.MODE_PRIVATE);
+        SharedPreferences sp = getContext().getSharedPreferences("admin", MonitorActivity.MODE_PRIVATE);
         Gson gson = new Gson();
         String json_data = sp.getString("emailList", "");
 

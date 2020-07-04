@@ -61,7 +61,7 @@ public class WeatherFragment extends Fragment {
             return v;
         }
 
-        SharedPreferences prefs = getActivity().getSharedPreferences("Settings", MainActivity.MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences("Settings", MonitorActivity.MODE_PRIVATE);
         metricValue = prefs.getBoolean("metricValue", true);
 
         // choose the right sp file and update last update text field
@@ -69,12 +69,12 @@ public class WeatherFragment extends Fragment {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             if (bundle.getBoolean("autocomplete", true)) {
-                sp = getActivity().getSharedPreferences("Weather_autocomplete", MainActivity.MODE_PRIVATE);
+                sp = getActivity().getSharedPreferences("Weather_autocomplete", MonitorActivity.MODE_PRIVATE);
                 last_update_txtv.setText("");
             }
         }
         else {
-            sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+            sp = getActivity().getSharedPreferences("Weather", MonitorActivity.MODE_PRIVATE);
 
             String last_update_txt = lastUpdate(sp);
             last_update_txtv.setText(last_update_txt);
@@ -138,7 +138,7 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //cityNameAndKeyFromLocation();
-                sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+                sp = getActivity().getSharedPreferences("Weather", MonitorActivity.MODE_PRIVATE);
 
                 if (initialize_arrayList(sp)) {
                     cityNameAndKeyFromLocation();
@@ -215,7 +215,7 @@ public class WeatherFragment extends Fragment {
             return;
         }
 //         add background according to time in day
-        sp = getActivity().getSharedPreferences("Weather", MainActivity.MODE_PRIVATE);
+        sp = getActivity().getSharedPreferences("Weather", MonitorActivity.MODE_PRIVATE);
         boolean bool = sp.getBoolean("IsDayTime", true);
         if(bool)
             layout.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.day_gradiant_background));
