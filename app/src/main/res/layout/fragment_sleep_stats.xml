@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:text="Woke up time" />
+                android:text="Sleep Duration" />
 
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/duration_barchart_ID"
