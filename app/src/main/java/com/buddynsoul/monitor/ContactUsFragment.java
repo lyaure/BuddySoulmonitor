@@ -68,6 +68,13 @@ public class ContactUsFragment extends Fragment {
 
                 loadingDialog.startLoadingDialog();
                 sendData(loadingDialog, subject.getText().toString(), message.getText().toString());
+
+                Fragment fragment = new ProfileFragment();
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container_ID, fragment, "tag")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

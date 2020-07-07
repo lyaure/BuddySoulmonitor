@@ -168,7 +168,7 @@ public class SettingsFragment extends Fragment {
                     getActivity().startService(myService);
                 }
 
-                Fragment fragment = new PedometerFragment();
+                Fragment fragment = new ProfileFragment();
 
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.container_ID, fragment, "tag")
