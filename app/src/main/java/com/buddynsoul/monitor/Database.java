@@ -385,7 +385,7 @@ public class Database extends SQLiteOpenHelper {
 
         int t = cursor.getInt(0);
 
-        cursor = db.rawQuery("SELECT * FROM " + DB_NAME, null);
+        cursor = db.rawQuery("SELECT * FROM " + DB_NAME + " ORDER BY date ASC", null);
         long[] dates = new long[t];
         int index = 0;
 
@@ -413,7 +413,7 @@ public class Database extends SQLiteOpenHelper {
 
         int t = cursor.getInt(0);
 
-        cursor = db.rawQuery("SELECT * FROM " + DB_NAME, null);
+        cursor = db.rawQuery("SELECT * FROM " + DB_NAME+ " ORDER BY date ASC", null);
         long[] dates = new long[t];
         int index = 0;
 
