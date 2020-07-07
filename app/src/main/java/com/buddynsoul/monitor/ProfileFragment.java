@@ -129,6 +129,9 @@ public class ProfileFragment extends Fragment {
 
                                 getActivity().stopService(myService);
 
+                                MonitorActivity activity = (MonitorActivity)getActivity();
+                                activity.setLogoutButtonPressed();
+
                                 Intent i = new Intent(getActivity(), LoginActivity.class);
                                 startActivity(i);
                                 getActivity().finish();

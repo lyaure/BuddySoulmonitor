@@ -22,7 +22,7 @@ public class MonitorActivity extends FragmentActivity {
     private BottomNavigationView bottomNavigation;
     private Fragment fragment;
     private int fragmentID;
-    private boolean adminButtonPressed;
+    private boolean adminButtonPressed, logoutButtonPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +30,7 @@ public class MonitorActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         adminButtonPressed = false;
+        logoutButtonPressed = false;
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
@@ -82,6 +83,10 @@ public class MonitorActivity extends FragmentActivity {
         this.adminButtonPressed = true;
     }
 
+    public void setLogoutButtonPressed() {
+        this.logoutButtonPressed = true;
+    }
+
     @Override
     public void onBackPressed(){
         if(fragmentID == R.layout.fragment_setting || fragmentID == R.layout.fragment_contact_us){
@@ -101,7 +106,7 @@ public class MonitorActivity extends FragmentActivity {
     protected void onStop(){
         super.onStop();
 
-        if(fragmentID != R.layout.fragment_profile && this.adminButtonPressed == false){
+        if(fragmentID != R.layout.fragment_profile && this.adminButtonPressed == false && this.logoutButtonPressed == false){
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
