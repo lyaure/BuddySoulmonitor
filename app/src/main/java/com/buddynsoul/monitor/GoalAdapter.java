@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Paint;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -25,8 +26,7 @@ import java.util.ArrayList;
 public class GoalAdapter extends ArrayAdapter<Goal> {
     private Context context;
     private ArrayList<Goal> goals;
-    public TextView lastEdit;
-    private int lastPos = -1;
+    public TextView text;
 
     public GoalAdapter(Context context, ArrayList<Goal> list) {
         super(context, 0, list);
@@ -43,11 +43,14 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
 
         Goal goal = goals.get(position);
 
+        text = (TextView)listItem.findViewById(R.id.goal_text_ID);
+
         CheckBox checked = (CheckBox)listItem.findViewById(R.id.checkBox_goal_ID);
         checked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 goal.setChecked(isChecked);
+                scratchText(isChecked);
                 goals.set(position, goal);
                 notifyDataSetChanged();
                 updateDB(goal);
@@ -56,8 +59,8 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
 
         checked.setChecked(goal.isChecked());
 
-        TextView text = (TextView)listItem.findViewById(R.id.goal_text_ID);
         text.setText(goal.getText());
+        scratchText(goal.isChecked());
 
         Button remove = (Button)listItem.findViewById(R.id.goal_remove_btn_ID);
         remove.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +73,13 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
         });
 
         return listItem;
+    }
+
+    private void scratchText(boolean isChecked){
+        if(isChecked)
+            text.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+        else
+            text.setPaintFlags(text.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
     private void updateDB(Goal goal) {
