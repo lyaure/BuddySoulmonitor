@@ -65,7 +65,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
     private final static long SAVE_OFFSET_TIME = AlarmManager.INTERVAL_HOUR;
     private final static int SAVE_OFFSET_STEPS = 500;
 
-    private final static int FIVE_MIN_TO_MILLISEC = 300000;
+    private final static int THIRTY_MIN_TO_MILLISEC = 1800000;
 
     private static int steps;
     private static int lastSaveSteps;
@@ -1028,7 +1028,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         for(long[] inter : data){
             diff += inter[1] - inter[0];
-            if(diff < FIVE_MIN_TO_MILLISEC)
+            if(diff < THIRTY_MIN_TO_MILLISEC)
                 data.remove(inter);
             else
                 break;
@@ -1036,7 +1036,7 @@ public class StepCounterListener extends Service implements SensorEventListener 
 
         for(int i=data.size()-1; i>=0; i--){
             diff = data.get(i)[1] - data.get(i)[0];
-            if(diff < FIVE_MIN_TO_MILLISEC)
+            if(diff < THIRTY_MIN_TO_MILLISEC)
                 data.remove(i);
             else
                 break;

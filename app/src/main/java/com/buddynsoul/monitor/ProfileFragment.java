@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +30,8 @@ import retrofit2.Response;
 import static android.content.Context.MODE_PRIVATE;
 
 public class ProfileFragment extends Fragment {
-    TextView name, email, registration;
+    private TextView name, email, registration;
+    private SharedPreferences sp;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -41,13 +43,46 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_profile, container, false);
 
-        SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
+        sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
 
         name = (TextView)v.findViewById(R.id.profile_name_ID);
         name.setText(sp.getString("name", ""));
 
         email = (TextView)v.findViewById(R.id.profile_email_ID);
         email.setText(sp.getString("email", ""));
+        email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText input = new EditText(getActivity());
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                input.setHint("Enter new mail");
+
+                new AlertDialog.Builder(getActivity())
+                                .setTitle("Edit email")
+                                .setView(input)
+                                .setPositiveButton("SEND", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(!input.getText().toString().equals("")){
+                                            SharedPreferences.Editor editor = sp.edit();
+                                            editor.putString("email", input.getText().toString());
+                                            editor.commit();
+                                            email.setText(input.getText().toString());
+
+                                            // TODO ---- change in DB + check new email
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .show();
+            }
+        });
 
         registration = (TextView)v.findViewById(R.id.profile_registrationDate_ID);
         String registrationStr = Util.convertTimeInMillisToDate(sp.getLong("registrationDate", 0));
