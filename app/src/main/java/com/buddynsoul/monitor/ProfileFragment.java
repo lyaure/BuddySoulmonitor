@@ -133,6 +133,33 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        LinearLayout delete = (LinearLayout) v.findViewById(R.id.profile_deleteAccount_layout_ID);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Delete Account")
+                        .setMessage("Are you sure you want to delete your account? " +
+                                "\nAll your data will be loss, this will immediately log you out and" +
+                                " you will not be able to log in again.")
+                        .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO ---- delete account from DB
+                                logout();
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
+
+            }
+        });
+
         //Init Loading Dialog
         LoadingDialog loadingDialog = new LoadingDialog(getActivity());
 
@@ -155,21 +182,7 @@ public class ProfileFragment extends Fragment {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                final Intent myService = new Intent(getActivity(), StepCounterListener.class);
-
-                                SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sp.edit();
-                                editor.putBoolean("logged", false);
-                                editor.apply();
-
-                                getActivity().stopService(myService);
-
-                                MonitorActivity activity = (MonitorActivity)getActivity();
-                                activity.setLogoutButtonPressed();
-
-                                Intent i = new Intent(getActivity(), LoginActivity.class);
-                                startActivity(i);
-                                getActivity().finish();
+                                logout();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -184,6 +197,24 @@ public class ProfileFragment extends Fragment {
 
 
         return v;
+    }
+
+    private void logout(){
+        final Intent myService = new Intent(getActivity(), StepCounterListener.class);
+
+        SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean("logged", false);
+        editor.apply();
+
+        getActivity().stopService(myService);
+
+        MonitorActivity activity = (MonitorActivity)getActivity();
+        activity.setLogoutButtonPressed();
+
+        Intent i = new Intent(getActivity(), LoginActivity.class);
+        startActivity(i);
+        getActivity().finish();
     }
 
     private void backupData(LoadingDialog loadingDialog) {
