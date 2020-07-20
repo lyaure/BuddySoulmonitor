@@ -99,6 +99,9 @@ public interface IMyService {
     Call<String> deleteUser(@Path("refreshToken") String refreshToken,
                                   @Field("email") String email);
 
+    @GET("deleteaccount/{refreshToken}")
+    Call<String> deleteaccount(@Path("refreshToken") String refreshToken);
+
     // AccuWeather Request
 
     @GET("locations/v1/cities/geoposition/search")

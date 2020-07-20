@@ -1,5 +1,6 @@
 package com.buddynsoul.monitor;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -146,7 +147,7 @@ public class ProfileFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // TODO ---- delete account from DB
-                                logout();
+                                deleteAccount(getActivity());
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -266,6 +267,28 @@ public class ProfileFragment extends Fragment {
             public void onFailure(Call<JsonElement> call, Throwable t) {
                 loadingDialog.dismissDialog();
                 Toast.makeText(getContext(), "An error occurred", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void deleteAccount(Activity activity) {
+        SharedPreferences sp = activity.getSharedPreferences("user", MODE_PRIVATE);
+        String refreshToken = sp.getString("refreshToken", "");
+
+        IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
+
+        Call<String> todoCall = iMyService.deleteaccount(refreshToken);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.code() == 200) {
+                    logout();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getContext(), "Failed to delete your account", Toast.LENGTH_SHORT).show();
             }
         });
     }
