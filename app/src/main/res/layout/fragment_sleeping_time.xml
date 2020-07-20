@@ -8,7 +8,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="5dp"
-    tools:context=".SleepingTimeFragment">
+    tools:context=".Fragments.Monitor.SleepingTimeFragment">
 
     <TextView
         android:id="@+id/textView16"

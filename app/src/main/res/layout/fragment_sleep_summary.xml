@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SleepSummaryFragment">
+    tools:context=".Fragments.Admins.SleepSummaryFragment">
 
     <TextView
         android:id="@+id/date_txtv_ID"

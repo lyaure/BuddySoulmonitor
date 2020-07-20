@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 
+import com.buddynsoul.monitor.Objects.Database;
 import com.buddynsoul.monitor.Utils.Util;
 
 public class ShutdownReceiver extends BroadcastReceiver {

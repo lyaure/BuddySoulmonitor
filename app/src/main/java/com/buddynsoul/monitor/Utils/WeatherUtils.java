@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.buddynsoul.monitor.MonitorActivity;
+import com.buddynsoul.monitor.Activities.MonitorActivity;
 import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Retrofit.IMyService;
 import com.buddynsoul.monitor.Retrofit.RetrofitClient;

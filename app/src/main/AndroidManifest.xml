@@ -25,24 +25,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".AdminActivity"
+        <activity android:name=".Activities.AdminActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".MonitorActivity"
+        <activity android:name=".Activities.MonitorActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".ResetPasswordActivity"
+        <activity android:name=".Activities.ResetPasswordActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".SettingsFragment" />
-        <activity android:name=".PedometerCurrentFragment" />
-        <activity android:name=".WeatherFragment" />
-        <activity android:name=".LoginActivity"
+        <activity android:name=".Fragments.Monitor.SettingsFragment" />
+        <activity android:name=".Fragments.Monitor.PedometerCurrentFragment" />
+        <activity android:name=".Fragments.Monitor.WeatherFragment" />
+        <activity android:name=".Activities.LoginActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".CitySearchFragment" />
+        <activity android:name=".Fragments.Monitor.CitySearchFragment" />
         <activity
-            android:name=".SignupActivity"
+            android:name=".Activities.SignupActivity"
             android:windowSoftInputMode="stateVisible|adjustResize"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".SplashActivity"
+            android:name=".Activities.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SplashScreen">
             <intent-filter>
@@ -58,7 +58,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".StepCounterListener" />
+        <service android:name=".MonitorService" />
     </application>
 
 </manifest>

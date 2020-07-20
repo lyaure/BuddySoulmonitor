@@ -8,6 +8,9 @@ import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.buddynsoul.monitor.Objects.Database;
+import com.buddynsoul.monitor.Objects.MyObject;
+
 import java.util.ArrayList;
 
 

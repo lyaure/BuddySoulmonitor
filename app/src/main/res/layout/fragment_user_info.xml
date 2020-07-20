@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="5dp"
-    tools:context=".UsersListFragment">
+    tools:context=".Fragments.Admins.UsersListFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView

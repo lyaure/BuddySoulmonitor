@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
+import com.buddynsoul.monitor.Objects.Database;
+
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
@@ -34,9 +36,9 @@ public class BootReceiver extends BroadcastReceiver {
 
             if (Build.VERSION.SDK_INT >= 26) {
                 //API26Wrapper.startForegroundService(context, new Intent(context, SensorEventListener.class));
-                context.startForegroundService(new Intent(context, StepCounterListener.class));
+                context.startForegroundService(new Intent(context, MonitorService.class));
             } else {
-                context.startService(new Intent(context, StepCounterListener.class));
+                context.startService(new Intent(context, MonitorService.class));
             }
         }
 

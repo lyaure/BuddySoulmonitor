@@ -7,7 +7,7 @@
     android:layout_weight="1"
     android:clipToPadding="false"
     android:orientation="vertical"
-    tools:context=".PedometerCurrentFragment">
+    tools:context=".Fragments.Monitor.PedometerCurrentFragment">
 
     <FrameLayout
         android:layout_width="match_parent"

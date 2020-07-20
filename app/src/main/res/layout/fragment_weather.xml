@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorLightGray"
     android:orientation="vertical"
-    tools:context=".WeatherFragment">
+    tools:context=".Fragments.Monitor.WeatherFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
