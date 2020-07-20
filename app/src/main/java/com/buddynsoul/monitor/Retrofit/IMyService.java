@@ -78,6 +78,9 @@ public interface IMyService {
     Call<JsonElement> listusers(@Path("refreshToken") String refreshToken,
                                 @Field("status") boolean status);
 
+    @GET("dataallusers/{refreshToken}")
+    Call<JsonElement> getAllUserData(@Path("refreshToken") String refreshToken);
+
     @POST("databetweentwodates/{refreshToken}")
     @FormUrlEncoded
     Call<JsonElement> databetweentwodates(@Path("refreshToken") String refreshToken,
