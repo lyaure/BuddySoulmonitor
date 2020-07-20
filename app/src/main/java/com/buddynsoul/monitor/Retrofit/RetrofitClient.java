@@ -32,6 +32,7 @@ public class RetrofitClient {
     private static Retrofit retrofit = null;
     private static Retrofit retrofit_accuwather = null;
     private static final String BASE_URL = "http://3.12.111.177/";
+
     private static final String BASE_URL_ACCUWEATHER = "http://dataservice.accuweather.com/";
 
     public static Retrofit getClient() {

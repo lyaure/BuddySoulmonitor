@@ -100,7 +100,18 @@ public interface IMyService {
                                   @Field("email") String email);
 
     @GET("deleteaccount/{refreshToken}")
-    Call<String> deleteaccount(@Path("refreshToken") String refreshToken);
+    Call<String> deleteAccount(@Path("refreshToken") String refreshToken);
+
+
+    @POST("sendverificationcode/{refreshToken}")
+    @FormUrlEncoded
+    Call<String> sendVerificationCode(@Path("refreshToken") String refreshToken,
+                                      @Field("newEmail") String newEmail);
+
+    @POST("updateemail/{refreshToken}")
+    @FormUrlEncoded
+    Call<JsonElement> updateEmail(@Path("refreshToken") String refreshToken,
+                                @Field("verificationCode") String verificationCode);
 
     // AccuWeather Request
 

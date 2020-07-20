@@ -34,6 +34,10 @@ public class ProfileFragment extends Fragment {
     private TextView name, email, registration;
     private SharedPreferences sp;
 
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -65,14 +69,17 @@ public class ProfileFragment extends Fragment {
                                 .setPositiveButton("SEND", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if(!input.getText().toString().equals("")){
-                                            SharedPreferences.Editor editor = sp.edit();
-                                            editor.putString("email", input.getText().toString());
-                                            editor.commit();
-                                            email.setText(input.getText().toString());
-
-                                            // TODO ---- change in DB + check new email
+                                        String newEmail = input.getText().toString().trim();
+                                        if (!newEmail.matches(EMAIL_PATTERN)) {
+                                            Toast.makeText(getContext(), "Email is not valid", Toast.LENGTH_SHORT).show();
+                                            return;
                                         }
+
+                                        if (newEmail.equals("")) {
+                                            Toast.makeText(getContext(), "Email can not be empty", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                        updateEmail(getActivity(), newEmail);
                                     }
                                 })
                                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -277,7 +284,7 @@ public class ProfileFragment extends Fragment {
 
         IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
 
-        Call<String> todoCall = iMyService.deleteaccount(refreshToken);
+        Call<String> todoCall = iMyService.deleteAccount(refreshToken);
         todoCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -291,5 +298,99 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "Failed to delete your account", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateEmail(Activity activity, String newEmail) {
+        //Init Loading Dialog
+        LoadingDialog loadingDialog = new LoadingDialog(getActivity());
+        loadingDialog.startLoadingDialog();
+
+        SharedPreferences sp = activity.getSharedPreferences("user", MODE_PRIVATE);
+        String refreshToken = sp.getString("refreshToken", "");
+
+        IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
+
+        Call<String> todoCall = iMyService.sendVerificationCode(refreshToken, newEmail);
+        todoCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.code() == 200) {
+                    loadingDialog.dismissDialog();
+
+                    final EditText input = new EditText(getActivity());
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                    input.setLayoutParams(lp);
+
+                    input.setHint("Enter verification code");
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Email confirmation")
+                            .setView(input)
+                            .setPositiveButton("CONFIRM", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    String verificationCode = input.getText().toString().trim();
+                                    if (verificationCode.equals("")) {
+                                        Toast.makeText(getContext(), "Verification code can not be empty!", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        loadingDialog.startLoadingDialog();
+
+                                        Call<JsonElement> todoCall = iMyService.updateEmail(refreshToken, verificationCode);
+                                        todoCall.enqueue(new Callback<JsonElement>() {
+                                            @Override
+                                            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                                                if (response.code() == 200) {
+                                                    loadingDialog.dismissDialog();
+
+                                                    // update refresh token
+                                                    String refreshToken = response.body().getAsJsonObject().get("refreshToken").getAsString();
+                                                    SharedPreferences sp = getActivity().getSharedPreferences("user", MODE_PRIVATE);
+                                                    SharedPreferences.Editor editor = sp.edit();
+                                                    editor.putString("refreshToken", refreshToken);
+                                                    editor.putString("email", newEmail);
+                                                    editor.apply();
+
+                                                    // update email textView
+                                                    email.setText(newEmail);
+                                                }
+                                                else {
+                                                    loadingDialog.dismissDialog();
+                                                    Toast.makeText(getContext(), "Verification code is not correct", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<JsonElement> call, Throwable t) {
+                                                loadingDialog.dismissDialog();
+                                                Toast.makeText(getContext(), "Failed to update the email", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }
+                            })
+                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })
+                            .show();
+                }
+                else if (response.code() == 409) {
+                    loadingDialog.dismissDialog();
+                    Toast.makeText(getContext(), "Please choose an other new email", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                loadingDialog.dismissDialog();
+                Toast.makeText(getContext(), "Failed to send verification code", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
     }
 }
