@@ -81,11 +81,9 @@ public class getLocation extends AppCompatActivity {
 
                     }
                 };
-                // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_FOR_UPDATE, MIN_DIS_FOR_UPFATE, locationListener);
 
                 Criteria criteria = new Criteria();
                 criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-                //criteria.setAltitudeRequired(true);
                 criteria.setPowerRequirement(Criteria.POWER_LOW);
                 criteria.setCostAllowed(true);
 
@@ -117,7 +115,8 @@ public class getLocation extends AppCompatActivity {
                 }
                 return "";
             }
-        } else {
+        }
+        else {
             if (activity != null)
                 requestPermissions(activity);
             return "";

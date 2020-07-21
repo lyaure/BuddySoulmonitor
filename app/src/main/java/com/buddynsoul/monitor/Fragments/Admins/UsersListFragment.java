@@ -155,6 +155,7 @@ public class UsersListFragment extends Fragment {
                         }
                         adapter.notifyDataSetChanged();
 
+                        // save users email to the shared preferences
                         Gson gson = new Gson();
                         String emailList_str = gson.toJson(emailList);
 
@@ -171,6 +172,5 @@ public class UsersListFragment extends Fragment {
                 Log.d("Response", "onFailure: " + t.getLocalizedMessage());
             }
         });
-        //return userList;
     }
 }

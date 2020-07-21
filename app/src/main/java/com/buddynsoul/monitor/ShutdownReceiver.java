@@ -25,16 +25,15 @@ public class ShutdownReceiver extends BroadcastReceiver {
                 .putBoolean("correctShutdown", true).commit();
 
         Database db = Database.getInstance(context);
-//        Database db = new Database(context);
+
         // if it's already a new day, add the temp. steps to the last one
         if (db.getSteps(Util.getToday()) == Integer.MIN_VALUE) {
             int steps = db.getCurrentSteps();
             db.insertNewDay(Util.getToday(), steps);
-        } else {
+        }
+        else {
             db.addToLastEntry(db.getCurrentSteps());
         }
-        // current steps will be reset on boot @see BootReceiver
-        //db.close();
     }
 
 

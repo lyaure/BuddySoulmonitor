@@ -49,14 +49,11 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
     private int todayOffset, total_start, goal, since_boot, total_days;
     private TextView steps;
     private TextView distance_txtv;
-    final int MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION = 42;
     private ProgressBar progSteps;
     private GraphChartView graph;
     private HorizontalScrollView hs;
-    double tmp;
     final double stepToKilometre = 0.000762;
 
-    //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
     public PedometerCurrentFragment(){
@@ -81,7 +78,6 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
             getActivity().startService(new Intent(getActivity(), MonitorService.class));
         }
 
-//        detector = new GestureDetectorCompat(this, this);
         steps = v.findViewById(R.id.stepTxtv_ID);
         distance_txtv = v.findViewById(R.id.distanceTxtv_ID);
         progSteps = v.findViewById(R.id.stepProgress_ID);
@@ -98,37 +94,6 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         int  goal = sp.getInt("goal", 10000);
 
         progSteps.setMax(goal);
-
-//        Database db = new Database(getActivity());
-        Database db = Database.getInstance(getActivity());
-
-//        final int sleepingTimeDb = (int)db.getSleepingTime(Util.getToday());
-//
-//        Button sleepingTimeBtn = findViewById(R.id.sleepingTimeBtn_ID);
-//        sleepingTimeBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                TextView sleepingTimeTxtv = findViewById(R.id.sleepingTimeTxtv_ID);
-//                final int sleepingTime = (int)StepCounterListener.calculateSleepingTime();
-//                Log.d("DebugStepCounter", "SleepingTime2: " + sleepingTime);
-//                int sleepingHours = sleepingTime / 3600;
-//                int sleepingMinutes = (sleepingTime % 3600) / 60;
-//                int sleepingSeconds = sleepingTime % 60;
-//
-//                String sleepingTimeStr = sleepingHours + " Hour(s) " + sleepingMinutes + " Minute(s) " + sleepingSeconds + " Second(s)";
-//                sleepingTimeTxtv.setText(sleepingTimeStr);
-//
-//
-//                int sleepingDbHours = sleepingTimeDb / 3600;
-//                int sleepingDbMinutes = (sleepingTimeDb % 3600) / 60;
-//                int sleepingDbSeconds = sleepingTimeDb % 60;
-//
-//                TextView sleepingTimeDb = findViewById(R.id.sleepingTimeDbTxtv_ID);
-//                String sleepingTimeDbStr = sleepingDbHours + " Hour(s) " + sleepingDbMinutes + " Minute(s) " + sleepingDbSeconds + " Second(s)";
-//                sleepingTimeDb.setText(sleepingTimeDbStr);
-//            }
-//        });
-
 
         hs = (HorizontalScrollView) v.findViewById(R.id.pedometer_horizontal_scrollview_ID);
         hs.setHorizontalScrollBarEnabled(false);
@@ -150,7 +115,6 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
                     @Override
                     public void onScrollChanged() {
                         graph.setScrollPosition(hs.getScrollX());
-//                        tmp = hs.getScrollX();
                     }
                 });
             }
@@ -164,49 +128,6 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
                 hs.fullScroll(View.FOCUS_LEFT);
             }
         });
-//
-
-
-        // Button sendDataBtn = findViewById(R.id.sendDataBtn_ID);
-        // sendDataBtn.setOnClickListener(new View.OnClickListener() {
-        //        @Override
-        //        public void onClick(View v) {
-        //            try {
-        //                sendData();
-        //            } catch (JSONException e) {
-        //                e.printStackTrace();
-        //            }
-        //        }
-        //     }
-        // );
-
-
-//        ImageButton weather_btn = (ImageButton)v.findViewById(R.id.weather_btn_ID);
-//        weather_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(PedometerActivity.this, WeatherActivity.class);
-//                startActivity(i);
-//            }
-//        });
-//
-//        ImageButton sleep_btn = (ImageButton)findViewById(R.id.sleep_btn_ID);
-//        sleep_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        ImageButton settings_btn = (ImageButton)findViewById(R.id.settings_btn_ID);
-//        settings_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(PedometerActivity.this, SettingsActivity.class);
-//                i.putExtra("from", "pedometer");
-//                startActivity(i);
-//            }
-//        });
 
         if (!Util.isNetworkAvailable(getActivity())) {
             Toast.makeText(getActivity(), "Please check your internet connection", Toast.LENGTH_LONG).show();
@@ -224,27 +145,6 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        Log.d("DebugOnSensor", "change");
-//        if (sensorEvent.values[0] > Integer.MAX_VALUE || sensorEvent.values[0] == 0) {
-//            return;
-//        }
-//        Database db = Database.getInstance(this);
-//
-//        if (todayOffset == Integer.MIN_VALUE) {
-//            // no values for today
-//            // we dont know when the reboot was, so set todays steps to 0 by
-//            // initializing them with -STEPS_SINCE_BOOT
-//            todayOffset = -(int) sensorEvent.values[0];
-//            //db.insertNewDay(Util.getToday(), (int) sensorEvent.values[0]);
-//            db.insertNewDay(Util.getToday(), todayOffset);
-//
-//
-//        }
-//        since_boot = (int) sensorEvent.values[0];
-//        int a = todayOffset + (int)sensorEvent.values[0];
-//        steps.setText("" + a);
-//
-//        db.close();
 
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
@@ -252,20 +152,15 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
             }
             if (todayOffset == Integer.MIN_VALUE) {
                 // no values for today
-                // we dont know when the reboot was, so set todays steps to 0 by
+                // we don't know when the reboot was, so set todays steps to 0 by
                 // initializing them with -STEPS_SINCE_BOOT
                 todayOffset = -(int) event.values[0];
-//                todayOffset = (int) event.values[0];
                 Database db = Database.getInstance(getActivity());
-//                Database db = new Database(getActivity());
                 db.insertNewDay(Util.getToday(), (int) event.values[0]);
-                //db.close();
             }
             since_boot = (int) event.values[0];
-            //updatePie();
             int steps_today = Math.max(todayOffset + since_boot, 0);
             if(Build.VERSION.SDK_INT >= 24) {
-                //progSteps.setProgress(steps_today, true);
                 ObjectAnimator.ofInt(progSteps, "progress", steps_today)
                         .setDuration(3000)
                         .start();
@@ -290,21 +185,12 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
     public void onResume() {
         super.onResume();
 
-
-
-       // this.getActionBar().setDisplayHomeAsUpEnabled(false);
-
         Database db = Database.getInstance(getActivity());
-//        Database db = new Database(getActivity());
-
-        //if (BuildConfig.DEBUG) db.logState();
-        // read todays offset
         todayOffset = db.getSteps(Util.getToday());
 
         SharedPreferences prefs =
                 getActivity().getSharedPreferences("pedometer", MODE_PRIVATE);
 
-//        goal = prefs.getInt("goal", Fragment_Settings.DEFAULT_GOAL);
         since_boot = db.getCurrentSteps();
 
         int pauseDifference = since_boot - prefs.getInt("pauseCount", since_boot);
@@ -330,33 +216,10 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
             sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
         }
 
-//        sensor = sm.getDefaultSensor(Sensor.TYPE_LIGHT);
-//        if (sensor == null) {
-//            new AlertDialog.Builder(this).setTitle(R.string.no_sensor)
-//                    .setMessage(R.string.no_light_sensor_explain)
-//                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                        @Override
-//                        public void onDismiss(final DialogInterface dialogInterface) {
-//                            finish();
-//                        }
-//                    }).setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(final DialogInterface dialogInterface, int i) {
-//                    dialogInterface.dismiss();
-//                }
-//            }).create().show();
-//        } else {
-//            sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
-//        }
-
         since_boot -= pauseDifference;
 
         total_start = db.getTotalWithoutToday();
         total_days = db.getDays();
-
-        //db.close();
-
-        //stepsDistanceChanged();
     }
 
     @Override
@@ -370,9 +233,7 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
             //if (BuildConfig.DEBUG) Logger.log(e);
         }
         Database db = Database.getInstance(getActivity());
-//        Database db = new Database(getActivity());
         db.saveCurrentSteps(since_boot);
-        //db.close();
     }
 
     private void requestPermissions() {
@@ -384,8 +245,6 @@ public class PedometerCurrentFragment extends Fragment implements SensorEventLis
         }
         appPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
         appPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        //TODO just for testing
-//        appPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         // Check which permissions are granted
         List<String> listPermissionsNeeded = new ArrayList<>();

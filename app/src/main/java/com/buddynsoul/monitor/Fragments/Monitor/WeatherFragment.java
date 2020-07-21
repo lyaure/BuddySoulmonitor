@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.buddynsoul.monitor.Activities.MonitorActivity;
-import com.buddynsoul.monitor.Fragments.Monitor.CitySearchFragment;
 import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Utils.Util;
 import com.google.gson.Gson;
@@ -203,7 +202,6 @@ public class WeatherFragment extends Fragment {
             int maxTemp = checkUnitTemperature(metricValue, Integer.parseInt(forecast_data.get(j+2)));
             String tmpTemp = minTemp + "°\n" + maxTemp + "°";
             dForecast.get(i).setText(tmpTemp);
-            //dForecast.get(i).setText(forecast_data.get(j+1));
 
             if (i != 0) {
                 daysTextView.get(i-1).setText(forecast_data.get(j+3));

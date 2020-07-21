@@ -1,10 +1,6 @@
 package com.buddynsoul.monitor.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-//import io.reactivex.android.schedulers.AndroidSchedulers;
-//import io.reactivex.disposables.CompositeDisposable;
-//import io.reactivex.functions.Consumer;
-//import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,7 +24,6 @@ import com.google.android.material.textfield.TextInputLayout;
 public class ResetPasswordActivity extends AppCompatActivity {
     private TextView email;
 
-    //    CompositeDisposable compositeDisposable = new CompositeDisposable();
     IMyService iMyService;
 
     @Override
@@ -67,35 +62,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
                 loadingDialog.startLoadingDialog();
                 resetUserPassword(email.getText().toString().trim(), loadingDialog);
-//                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
-//                startActivity(i);
             }
         });
     }
 
     private void resetUserPassword(final String email, LoadingDialog loadingDialog) {
         final Intent i = new Intent(ResetPasswordActivity.this, LoginActivity.class);
-
-//        compositeDisposable.add(iMyService.resetUserPassword(email)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<String>() {
-//                    @Override
-//                    public void accept(String response) throws Exception {
-//                        String msg = "If a matching account was found an email was sent to "
-//                                + email + " to allow you to reset your password.";
-//                        Toast.makeText(ResetPasswordActivity.this, msg, Toast.LENGTH_LONG).show();
-//                        startActivity(i);
-////                        if (response.equals("\"Login success\"")) {
-////                            SharedPreferences sp = getSharedPreferences("Settings", MODE_PRIVATE);
-////                            SharedPreferences.Editor editor = sp.edit();
-////                            editor.putBoolean("logged", true);
-////                            editor.commit();
-////
-////                            startActivity(i);
-////                        }
-//                    }
-//                }));
 
         Call<String> todoCall = iMyService.resetUserPassword(email);
         todoCall.enqueue(new Callback<String>() {

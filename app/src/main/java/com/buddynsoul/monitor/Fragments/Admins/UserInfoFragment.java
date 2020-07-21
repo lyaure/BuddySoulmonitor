@@ -76,7 +76,7 @@ import static android.content.Context.MODE_PRIVATE;
                     }
 
                     new AlertDialog.Builder(getContext())
-                            .setTitle("com/buddynsoul/monitor/Fragments/Admins")
+                            .setTitle("Permission")
                             .setMessage(msg)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
@@ -145,7 +145,7 @@ import static android.content.Context.MODE_PRIVATE;
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-
+                    Toast.makeText(getContext(), "An error occurred when updating permission", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -174,7 +174,7 @@ import static android.content.Context.MODE_PRIVATE;
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
-
+                    Toast.makeText(getContext(), "An error occurred when deleting user", Toast.LENGTH_SHORT).show();
                 }
             });
         }

@@ -19,7 +19,6 @@ public class BootReceiver extends BroadcastReceiver {
             SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
 
             Database db = Database.getInstance(context);
-//            Database db = new Database(context);
             if (!prefs.getBoolean("correctShutdown", false)) {
                 if (BuildConfig.DEBUG) Log.d("debug","Incorrect shutdown");
                 // can we at least recover some steps?
@@ -31,11 +30,9 @@ public class BootReceiver extends BroadcastReceiver {
             // row if that's the case
             db.removeNegativeEntries();
             db.saveCurrentSteps(0);
-           // db.close();
             prefs.edit().remove("correctShutdown").apply();
 
             if (Build.VERSION.SDK_INT >= 26) {
-                //API26Wrapper.startForegroundService(context, new Intent(context, SensorEventListener.class));
                 context.startForegroundService(new Intent(context, MonitorService.class));
             } else {
                 context.startService(new Intent(context, MonitorService.class));

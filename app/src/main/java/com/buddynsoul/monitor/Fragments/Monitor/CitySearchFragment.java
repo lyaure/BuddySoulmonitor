@@ -94,7 +94,7 @@ public class CitySearchFragment extends Fragment {
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putString("keyValue", cities.get(position).getKeyValue());
                 editor.putString("cityName", cities.get(position).getCityName());
-                editor.commit();
+                editor.apply();
 
                 WeatherUtils.forecast(getContext(), true);
                 WeatherUtils.currentConditions(getContext(), true);
@@ -162,7 +162,7 @@ public class CitySearchFragment extends Fragment {
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-
+                Toast.makeText(getActivity(), "An error occurred", Toast.LENGTH_LONG).show();
             }
         });
     }

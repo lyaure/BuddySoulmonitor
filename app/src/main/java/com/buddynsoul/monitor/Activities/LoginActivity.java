@@ -39,12 +39,6 @@ public class LoginActivity extends AppCompatActivity {
 
     IMyService iMyService;
 
-//    @Override
-//    protected void onStop() {
-//        compositeDisposable.clear();
-//        super.onStop();
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +92,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 loadingDialog.startLoadingDialog();
                 loginUser(email.getText().toString().trim(), password.getText().toString().trim(), loadingDialog);
-//                Intent i = new Intent(LoginActivity.this, PedometerActivity.class);
-//                startActivity(i);
             }
         });
 
@@ -124,37 +116,10 @@ public class LoginActivity extends AppCompatActivity {
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setHighlightColor(Color.TRANSPARENT);
 
-//        hide = true;
-//        password.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                final int DRAWABLE_LEFT = 0;
-//                final int DRAWABLE_TOP = 1;
-//                final int DRAWABLE_RIGHT = 2;
-//                final int DRAWABLE_BOTTOM = 3;
-//
-//                if(event.getAction() == MotionEvent.ACTION_UP) {
-//                    if(event.getX() >= (password.getRight() - password.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-//                        hide = !hide;
-//                        if(hide)
-//                            password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                        else
-//                            password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-//
-//                    }
-//                }
-//                return false;
-//            }
-//        });
-
         TextView forgot = (TextView)findViewById(R.id.forgotLink_ID);
         forgot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Uri uriUrl = Uri.parse("https://www.buddynsoul.com/Account/ForgotPassword");
-//                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
-//                startActivity(launchBrowser);
-
                 Intent i = new Intent(LoginActivity.this, ResetPasswordActivity.class);
                 startActivity(i);
             }

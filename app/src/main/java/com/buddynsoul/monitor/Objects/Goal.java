@@ -1,8 +1,5 @@
 package com.buddynsoul.monitor.Objects;
 
-import android.text.TextWatcher;
-import android.widget.TextView;
-
 public class Goal {
     private String text;
     private boolean checked;

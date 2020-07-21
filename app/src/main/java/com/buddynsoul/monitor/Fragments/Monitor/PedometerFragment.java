@@ -58,7 +58,7 @@ public class PedometerFragment extends Fragment {
         if(!sp.contains("showStepGoalAchieved")){
             SharedPreferences.Editor editor = sp.edit();
             editor.putLong("showStepGoalAchieved", Util.getToday());
-            editor.commit();
+            editor.apply();
         }
 
         int yesterday = db.getStepGoal(Util.getYesterday());
@@ -82,7 +82,7 @@ public class PedometerFragment extends Fragment {
             // save that we already show the message
             SharedPreferences.Editor editor = sp.edit();
             editor.putLong("showStepGoalAchieved", Util.getToday());
-            editor.commit();
+            editor.apply();
         }
 
         return v;

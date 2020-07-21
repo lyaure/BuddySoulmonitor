@@ -117,16 +117,13 @@ public class Database extends SQLiteOpenHelper {
 
         if(cursor.moveToFirst()){
             int duration = (int)(wokeUp - asleep)/1000;
-            int tmpSleep = cursor.getInt(cursor.getColumnIndex("deepSleep"));
-//            if(deepSleep > tmpSleep){
-                ContentValues cv = new ContentValues();
-                cv.put("sleepDuration", duration);
-                cv.put("asleep", asleep);
-                cv.put("wokeUp", wokeUp);
-                cv.put("deepSleep", deepSleep);
-                cv.put("lightSleep", duration - deepSleep);
-                db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
-//            }
+            ContentValues cv = new ContentValues();
+            cv.put("sleepDuration", duration);
+            cv.put("asleep", asleep);
+            cv.put("wokeUp", wokeUp);
+            cv.put("deepSleep", deepSleep);
+            cv.put("lightSleep", duration - deepSleep);
+            db.update(DB_NAME, cv, "date = ?", new String[]{String.valueOf(date)});
         }
 
         cursor.close();

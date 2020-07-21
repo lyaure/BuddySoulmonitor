@@ -158,9 +158,10 @@ public class UsersSearchFragment extends Fragment {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.code() == 200) {
-                    // todo check if response.body() == "User's email doesn't exist"
+
                     String checkResponse = response.body().toString();
                     checkResponse = checkResponse.substring(1, checkResponse.length()-1);
+
                     if(checkResponse.equals("User's email doesn't exist")) {
                         Toast.makeText(getActivity(), "User's email doesn't exist", Toast.LENGTH_LONG).show();
                     }
