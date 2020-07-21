@@ -39,6 +39,7 @@ public class StepsStatsFragment extends Fragment {
         return v;
     }
 
+    // draw step graph
     private void drawAsleepChart(){
         AdminActivity activity = (AdminActivity)getActivity();
         ArrayList<UserStat> users = activity.getFinalStats();
@@ -60,6 +61,7 @@ public class StepsStatsFragment extends Fragment {
 
         float[] results = new float[steps.size()];
 
+        // fill the graph
         for(int i=0; i<users.size(); i++){
             if(users.get(i).getSteps() / 1000 >= 10)
                 results[11]++;
@@ -71,19 +73,6 @@ public class StepsStatsFragment extends Fragment {
 
         for(int i=0; i<results.length; i++)
             stats.add(new BarEntry(results[i], i));
-
-
-//        stats.add(new BarEntry(30f, 0));
-//        stats.add(new BarEntry(60f, 1));
-//        stats.add(new BarEntry(110f, 2));
-//        stats.add(new BarEntry(90f, 3));
-//        stats.add(new BarEntry(75f, 4));
-//        stats.add(new BarEntry(185f, 5));
-//        stats.add(new BarEntry(100f, 6));
-//        stats.add(new BarEntry(90f, 7));
-//        stats.add(new BarEntry(130f, 8));
-//        stats.add(new BarEntry(35f, 9));
-//        stats.add(new BarEntry(25f, 10));
 
 
         ArrayList colors = new ArrayList();

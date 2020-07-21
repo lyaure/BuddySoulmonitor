@@ -13,6 +13,7 @@ import com.buddynsoul.monitor.Adapters.ViewPagerAdapter;
 import com.buddynsoul.monitor.R;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
+
 public class UsersFragment extends Fragment {
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
@@ -28,18 +29,22 @@ public class UsersFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_users, container, false);
 
+        // multiple fragments in the same fragments
         viewPager = (ViewPager) v.findViewById(R.id.users_viewpager_ID);
         adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
         viewPager.setAdapter(adapter);
 
+        // indicates number of fragments
         DotsIndicator dotsIndicator = (DotsIndicator)v.findViewById(R.id.dots_indicator);
         dotsIndicator.setViewPager(viewPager);
 
         UsersListFragment list = new UsersListFragment();
         UsersSearchFragment search = new UsersSearchFragment();
 
+        // add fragments
         adapter.addFrag(list, "list");
         adapter.addFrag(search, "search");
+
         adapter.notifyDataSetChanged();
 
 

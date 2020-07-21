@@ -173,7 +173,6 @@ public class ProfileFragment extends Fragment {
                         .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // TODO ---- delete account from DB
                                 deleteAccount(getActivity());
                             }
                         })

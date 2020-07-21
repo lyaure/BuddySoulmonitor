@@ -24,10 +24,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
-import java.util.ArrayList;
-
-import static android.content.Context.MODE_PRIVATE;
-
 
 public class StatisticsFragment extends Fragment {
     private View v;

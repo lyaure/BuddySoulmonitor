@@ -21,6 +21,7 @@ import com.buddynsoul.monitor.R;
 
 import java.util.Calendar;
 
+// dialog to pick time
 public class TimePickerFragment extends DialogFragment {
     String from;
 
@@ -36,6 +37,7 @@ public class TimePickerFragment extends DialogFragment {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
+        // recover from where we came
         Bundle bundle = this.getArguments();
         if(bundle != null)
             from = bundle.getString("from", "null");
@@ -61,21 +63,20 @@ public class TimePickerFragment extends DialogFragment {
                     TextView time;
                     SharedPreferences sp = getActivity().getSharedPreferences("prefTime", getActivity().MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
+
+                    // update textview and shared preferences
                     if(from.equals("fromTime")) {
                         time = (TextView)getActivity().findViewById(R.id.fromTime_ID);
-//                        time.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute) + " " + am_pm);
                         editor.putInt("fromHour", hourOfDay);
                         editor.putInt("fromMinute", minute);
                         editor.putString("am_pm_from", am_pm);
                     }
                     else {
                         time = (TextView)getActivity().findViewById(R.id.toTime_ID);
-//                        time.setText(hourOfDay + ":" + minute + " " + am_pm);
                         editor.putInt("toHour", hourOfDay);
                         editor.putInt("toMinute", minute);
                         editor.putString("am_pm_to", am_pm);
                     }
-
                     time.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute) + " " + am_pm);
 
                     editor.commit();

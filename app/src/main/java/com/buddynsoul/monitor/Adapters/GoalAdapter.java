@@ -18,6 +18,7 @@ import com.buddynsoul.monitor.R;
 
 import java.util.ArrayList;
 
+// adapter for daily goals list with custom list item
 public class GoalAdapter extends ArrayAdapter<Goal> {
     private Context context;
     private ArrayList<Goal> goals;
@@ -44,10 +45,13 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
         checked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // user check the checkbox
                 goal.setChecked(isChecked);
                 scratchText(isChecked);
                 goals.set(position, goal);
                 notifyDataSetChanged();
+
+                // update db that goal is scratched
                 updateDB(goal);
             }
         });

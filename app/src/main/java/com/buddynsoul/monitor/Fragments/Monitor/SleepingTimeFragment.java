@@ -45,19 +45,22 @@ public class SleepingTimeFragment extends Fragment {
 
         db = Database.getInstance(getContext());
 
-
+        // multiple fragments in this fragment
         viewPager = (ViewPager) v.findViewById(R.id.sleep_viewpager_ID);
         adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
         viewPager.setAdapter(adapter);
 
+        // indicates number  of fragments
         DotsIndicator dotsIndicator = (DotsIndicator) v.findViewById(R.id.sleep_dots_indicator);
         dotsIndicator.setViewPager(viewPager);
 
         summary = new SleepSummaryFragment();
         SleepGoalFragment goals = new SleepGoalFragment();
 
+        // add fragments
         adapter.addFrag(summary, "summary");
         adapter.addFrag(goals, "goal");
+
         adapter.notifyDataSetChanged();
 
 
@@ -66,12 +69,14 @@ public class SleepingTimeFragment extends Fragment {
 
         DisplayMetrics dm = new DisplayMetrics();
 
+        // indicates to the graph the scree size
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels, height = dm.heightPixels;
         graph = (GraphChartView) v.findViewById(R.id.sleepingTime_graph_ID);
         graph.setType(SLEEP);
         graph.setScreenDimensions(width, height);
 
+        // the scroll position indicates where we are in the graph (it's in red)
         hs.post(new Runnable() {
             @Override
             public void run() {
@@ -105,6 +110,7 @@ public class SleepingTimeFragment extends Fragment {
 
         int yesterday = db.getSleepGoal(Util.getYesterday());
 
+        // congrats message for yesterday achieved goal
         if (sp.getLong("showSleepGoalAchieved", Util.getToday()) != Util.getToday()
                 && db.getSleepDuration(Util.getYesterday()) >= yesterday
                 && yesterday != Integer.MIN_VALUE && yesterday != -1) {

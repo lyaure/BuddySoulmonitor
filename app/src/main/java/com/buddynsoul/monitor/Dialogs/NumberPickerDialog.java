@@ -13,6 +13,7 @@ import com.buddynsoul.monitor.Objects.Database;
 import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Utils.Util;
 
+// dialog to pick number
 public class NumberPickerDialog extends DialogFragment {
     private NumberPicker.OnValueChangeListener valueChangeListener;
     private int value = 0;
@@ -23,6 +24,8 @@ public class NumberPickerDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstance){
+
+        // recover from where we came
         Bundle bundle = this.getArguments();
         if(bundle != null)
             from = bundle.getString("from", "null");
@@ -38,6 +41,9 @@ public class NumberPickerDialog extends DialogFragment {
 
         numberPicker.setMinValue(0);
 
+        // we use this dialog in two different places
+        // initialize numberPicker initial value (from where to start)
+        // set maximum to picker
         if(from.equals("pedometer")){
             textView = (TextView)getActivity().findViewById(R.id.today_goal_ID);
             message = "Choose your today's step goal";
@@ -58,13 +64,6 @@ public class NumberPickerDialog extends DialogFragment {
             numberPicker.setMaxValue(60);
         }
 
-//        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-//            @Override
-//            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-//                value = newVal;
-//            }
-//        });
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(message);
 
@@ -73,6 +72,8 @@ public class NumberPickerDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 numberPicker.clearFocus();
                 value = numberPicker.getValue();
+
+                // update textview and database
                 textView.setText(String.valueOf(value));
 
                 if(from.equals("pedometer"))

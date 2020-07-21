@@ -35,9 +35,6 @@ public class UserStat {
 
         this.date = null;
         this.stepGoal = 0;
-        this.asleepTime = asleepTime;
-        this.wokeUpTime = wokeUpTime;
-        this.deepSleep = 0;
         this.sleepGoal = 0;
         this.morning_location = null;
         this.night_location = null;
@@ -63,56 +60,28 @@ public class UserStat {
         return stepGoal;
     }
 
-    public void setStepGoal(int stepGoal) {
-        this.stepGoal = stepGoal;
-    }
-
     public long getAsleepTime() {
         return asleepTime;
-    }
-
-    public void setAsleepTime(long asleepTime) {
-        this.asleepTime = asleepTime;
     }
 
     public long getWokeUpTime() {
         return wokeUpTime;
     }
 
-    public void setWokeUpTime(long wokeUpTime) {
-        this.wokeUpTime = wokeUpTime;
-    }
-
     public int getDeepSleep() {
         return deepSleep;
-    }
-
-    public void setDeepSleep(int deepSleep) {
-        this.deepSleep = deepSleep;
     }
 
     public int getSleepGoal() {
         return sleepGoal;
     }
 
-    public void setSleepGoal(int sleepGoal) {
-        this.sleepGoal = sleepGoal;
-    }
-
     public String getMorning_location() {
         return morning_location;
     }
 
-    public void setMorning_location(String morning_location) {
-        this.morning_location = morning_location;
-    }
-
     public String getNight_location() {
         return night_location;
-    }
-
-    public void setNight_location(String night_location) {
-        this.night_location = night_location;
     }
 
     public long getDuration() {

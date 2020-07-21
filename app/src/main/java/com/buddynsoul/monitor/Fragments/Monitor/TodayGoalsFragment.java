@@ -42,6 +42,7 @@ public class TodayGoalsFragment extends Fragment {
         // Inflate the layout for this fragment
         v =  inflater.inflate(R.layout.fragment_today_goals, container, false);
 
+        // init viewa
         goalsList = (ListView)v.findViewById(R.id.goalsList_ID);
         add = (TextView) v.findViewById(R.id.add_txtv_ID);
         newGoal = (EditText)v.findViewById(R.id.new_goal_ID);
@@ -50,6 +51,8 @@ public class TodayGoalsFragment extends Fragment {
 
         adapter = new GoalAdapter(getContext(), goals);
         goalsList.setAdapter(adapter);
+
+        // fill and notify
         fillList();
         adapter.notifyDataSetChanged();
 
@@ -61,10 +64,17 @@ public class TodayGoalsFragment extends Fragment {
                     Toast.makeText(getContext(), "Goal can't be empty!", Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    // add and update list
                     Goal goal = new Goal(newGoal.getText().toString(), false);
                     goals.add(goal);
                     adapter.notifyDataSetChanged();
+
+                    // update db
                     addNewGoalToDB(goal);
+
+                    // clear textview
+                    newGoal.setText("");
+                    newGoal.clearFocus();
                 }
             }
         });
@@ -72,6 +82,7 @@ public class TodayGoalsFragment extends Fragment {
         return v;
     }
 
+    // insert new goal to SQLite db
     private void addNewGoalToDB(Goal goal) {
         db = getActivity().openOrCreateDatabase("MyGoals", getActivity().MODE_PRIVATE, null);
 
@@ -86,6 +97,7 @@ public class TodayGoalsFragment extends Fragment {
         db.insert("MyGoals", null, cv);
     }
 
+    // fill list after reopening app from db's data
     private void fillList(){
         db = getActivity().openOrCreateDatabase("MyGoals", getActivity().MODE_PRIVATE, null);
         String query = "CREATE TABLE IF NOT EXISTS MyGoals (id INTEGER, date INTEGER, goal TEXT, checked TEXT)";

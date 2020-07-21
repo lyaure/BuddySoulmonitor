@@ -32,6 +32,7 @@ public class SleepSummaryFragment extends Fragment {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_sleep_summary, container, false);
 
+        // init views
         date = (TextView)v.findViewById(R.id.date_txtv_ID);
         date.setVisibility(View.INVISIBLE);
         asleep = (TextView)v.findViewById(R.id.asleep_txtv_ID);
@@ -41,11 +42,13 @@ public class SleepSummaryFragment extends Fragment {
         duration = (TextView)v.findViewById(R.id.duration_txtv_ID);
         average = (TextView)v.findViewById(R.id.average_txtv_ID);
 
+        // update the graph
         update(graph);
 
         return v;
     }
 
+    // convert date to String
     private String getTime(long date){
         if(date == 0)
             return "No data for this day";
@@ -59,6 +62,8 @@ public class SleepSummaryFragment extends Fragment {
         return time;
     }
 
+    // convert time to String
+    // time in millisec
     private String getSleepingTime(int time){
         int hours = (int)time / 3600;
         int minutes = ((int)time % 3600) / 60;
@@ -66,6 +71,7 @@ public class SleepSummaryFragment extends Fragment {
         return hours + "h" + String.format("%02d", minutes);
     }
 
+    // updates views in onCreate and after scroll position changed
     public void update(GraphChartView graph){
         Database db  = Database.getInstance(getActivity());
         long time;
@@ -84,6 +90,8 @@ public class SleepSummaryFragment extends Fragment {
 
             date.setText(d);
 
+            // recover data from SQLite local database
+
             time = db.getWokeUp(graph.getDatePosition());
             if(time >= 0)
                 wokeUp.setText(getTime(time));
@@ -94,7 +102,6 @@ public class SleepSummaryFragment extends Fragment {
                 asleep.setText(getTime(time));
 
             int dur = db.getSleepDuration(graph.getDatePosition());
-//            dur /= 1000; // millisec to sec
 
             if(dur >= 0)
                 duration.setText(getSleepingTime((int)dur));
@@ -104,12 +111,10 @@ public class SleepSummaryFragment extends Fragment {
                 deepSleep.setText(getSleepingTime(deep));
 
             int light = db.getLightSleep(graph.getDatePosition());
-//            light /= 1000;
             if(light >= 0)
                 lightSleep.setText(getSleepingTime(light));
 
             int avrg = db.getSleepingTimes(Util.getSpecificDate(7), Util.getYesterday()) / count;
-//            avrg /= 1000;
             average.setText(getSleepingTime(avrg));
         }
 

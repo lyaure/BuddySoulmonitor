@@ -13,6 +13,7 @@ import com.buddynsoul.monitor.Objects.User;
 
 import java.util.ArrayList;
 
+// adapter for users list in admin activity with custom list item
 public class UserAdapter extends ArrayAdapter<User> {
     private Context context;
     private ArrayList<User> users;
@@ -37,12 +38,6 @@ public class UserAdapter extends ArrayAdapter<User> {
 
         ImageView icon = (ImageView)listItem.findViewById(R.id.user_list_icon_ID);
         icon.setImageResource(R.drawable.users_list_icon);
-
-//        TextView userEmail = (TextView)listItem.findViewById(R.id.userEmail_ID);
-//        userEmail.setText(String.valueOf(user.getEmail()));
-//
-//        TextView userRegistration = (TextView)listItem.findViewById(R.id.userRegistration_ID);
-//        userRegistration.setText(user.getRegistrationDate());
 
         return listItem;
     }

@@ -4,6 +4,7 @@ import android.graphics.Point;
 
 import java.util.Calendar;
 
+// object to draw the bars and points
 public class GraphObject {
     private long date;
     private int data;

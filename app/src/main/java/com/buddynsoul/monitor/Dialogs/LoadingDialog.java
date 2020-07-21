@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 
 import com.buddynsoul.monitor.R;
 
+// loading dialog
 public class LoadingDialog {
 
     private Activity activity;

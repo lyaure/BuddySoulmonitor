@@ -32,21 +32,24 @@ public class PedometerFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_pedometer, container, false);
 
+        // multiple fragments in this fragment
         viewPager = (ViewPager) v.findViewById(R.id.pedometer_viewpager_ID);
         adapter = new ViewPagerAdapter(getFragmentManager(), getActivity(), viewPager);
         viewPager.setAdapter(adapter);
 
+        // indicates number of fragments
         DotsIndicator dotsIndicator = (DotsIndicator)v.findViewById(R.id.dots_indicator);
         dotsIndicator.setViewPager(viewPager);
 
         PedometerCurrentFragment current = new PedometerCurrentFragment();
         PedometerRecentFragment recent = new PedometerRecentFragment();
 
+        // add fragments
         adapter.addFrag(current, "current");
         adapter.addFrag(recent, "recent");
+
         adapter.notifyDataSetChanged();
 
-//        viewPager.setCurrentItem(1);
 
         Database db = Database.getInstance(getActivity());
 
@@ -60,6 +63,7 @@ public class PedometerFragment extends Fragment {
 
         int yesterday = db.getStepGoal(Util.getYesterday());
 
+        // congrats message for yesterday goal achieved
         if((sp.getLong("showStepGoalAchieved", Util.getToday()) != Util.getToday()
                 && db.getSteps(Util.getYesterday()) >= yesterday
                 && yesterday != Integer.MIN_VALUE && yesterday != -1)){
@@ -74,6 +78,8 @@ public class PedometerFragment extends Fragment {
                     })
                     .setIcon(R.drawable.icon)
                     .show();
+
+            // save that we already show the message
             SharedPreferences.Editor editor = sp.edit();
             editor.putLong("showStepGoalAchieved", Util.getToday());
             editor.commit();

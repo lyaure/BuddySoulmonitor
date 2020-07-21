@@ -29,6 +29,7 @@ public class SleepGoalFragment extends Fragment {
 
         Database db = Database.getInstance(getActivity());
 
+        // init views
         TextView yesterday = (TextView)v.findViewById(R.id.sleep_yesterday_ID);
         TextView hours = (TextView)v.findViewById(R.id.sleep_hours_goal_ID);
         TextView minutes = (TextView)v.findViewById(R.id.sleep_min_goal_ID);
@@ -54,9 +55,12 @@ public class SleepGoalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NumberPickerDialog dialogFragment = new NumberPickerDialog();
+
+                // to recover from where we cam
                 Bundle bundle = new Bundle();
                 bundle.putString("from", "sleepHours");
                 dialogFragment.setArguments(bundle);
+
                 dialogFragment.show(getActivity().getSupportFragmentManager(), "sleep");
             }
         });
@@ -65,9 +69,12 @@ public class SleepGoalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NumberPickerDialog dialogFragment = new NumberPickerDialog();
+
+                // to recover from where we came
                 Bundle bundle = new Bundle();
                 bundle.putString("from", "sleepMinutes");
                 dialogFragment.setArguments(bundle);
+
                 dialogFragment.show(getActivity().getSupportFragmentManager(), "sleep");
             }
         });
@@ -76,15 +83,15 @@ public class SleepGoalFragment extends Fragment {
         return v;
     }
 
+    // get hours from millisec
     private int getHours(int time){
         return (int)time / 3600;
     }
 
+    // get minutes from millisec
     private int getMinutes(int time){
         return ((int)time % 3600) / 60;
     }
 
-    private int getDuration(String hours, String minutes){
-        return Integer.parseInt(hours) * 3600 + Integer.parseInt(minutes) * 60;
-    }
+
 }

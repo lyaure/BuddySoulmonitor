@@ -214,14 +214,6 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("Response", "onFailure: "+t.getLocalizedMessage());
             }
         });
-
-
-
     }
-//
-//    @Override
-//    protected void onStop(){
-//        super.onStop();
-//        finish();
-//    }
+
 }

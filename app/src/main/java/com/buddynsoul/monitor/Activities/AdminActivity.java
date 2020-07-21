@@ -42,17 +42,19 @@ public class AdminActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        // bottom nav
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+
         fragment = new UsersFragment();
         loadFragment(fragment);
 
+        // recover all user's data for the graphs
         getAllUserData();
-
     }
 
+    // load fragment
     private void loadFragment(Fragment fragment) {
-        // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.admin_container_ID, fragment);
         transaction.addToBackStack(null);
@@ -85,6 +87,7 @@ public class AdminActivity extends FragmentActivity {
                 .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // return to home
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_HOME);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -95,6 +98,7 @@ public class AdminActivity extends FragmentActivity {
                 .setNegativeButton("Go to my monitor", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // go to monitor
                         Intent intent = new Intent(AdminActivity.this, MonitorActivity.class);
                         startActivity(intent);
                         finish();
@@ -102,12 +106,6 @@ public class AdminActivity extends FragmentActivity {
                 })
                 .show();
     }
-
-//    public ArrayList<UserStat> getFinalStats(){
-//        getAllUserData();
-//        calculateStats();
-//        return this.finalStats;
-//    }
 
     public ArrayList<UserStat> getFinalStats() {
         return finalStats;
@@ -153,6 +151,7 @@ public class AdminActivity extends FragmentActivity {
         });
     }
 
+    // add averages of each user for the graphs
     private void calculateStats(){
         for(UserStat[] stats : data){
             int steps = 0, stepsCount = 0, sleepCount = 0;
@@ -189,6 +188,7 @@ public class AdminActivity extends FragmentActivity {
                 tmpAsleep = asleep/sleepCount;
                 tmpWokeUp = wokeUp/sleepCount;
             }
+            // finalStats contain for each user a UserStat object of the user averages
             finalStats.add(new UserStat((tmpSteps), (tmpAsleep), (tmpWokeUp)));
         }
     }

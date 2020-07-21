@@ -12,6 +12,7 @@ import com.buddynsoul.monitor.R;
 
 import java.util.ArrayList;
 
+// adapter for search city list with custom list item
 public class CityAdapter extends ArrayAdapter<City> {
     private Context context;
     private ArrayList<City> users;

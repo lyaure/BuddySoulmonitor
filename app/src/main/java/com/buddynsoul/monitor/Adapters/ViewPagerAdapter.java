@@ -9,6 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 
+// adapter for multiple fragments in the same activity or fragment
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private final ArrayList<Fragment> mFragmentList = new ArrayList<>();
     private final ArrayList<String> mFragmentTitleList = new ArrayList<>();
@@ -31,68 +32,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         return mFragmentList.size();
     }
 
+    // add fragment to "list" of fragments
     public void addFrag(Fragment fragment, String title) {
         mFragmentList.add(fragment);
         mFragmentTitleList.add(title);
     }
-
-
-//    public View getTabView(final int position) {
-//        View view = LayoutInflater.from(context).inflate(R.layout.custom_tab_item, null);
-//        TextView tabItemName = (TextView) view.findViewById(R.id.textViewTabItemName);
-//        CircleImageView tabItemAvatar =
-//                (CircleImageView) view.findViewById(R.id.imageViewTabItemAvatar);
-//        ImageButton remove = (ImageButton) view.findViewById(R.id.imageButtonRemove);
-//        remove.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d("Remove", "Remove");
-//                removeFrag(position);
-//            }
-//        });
-//
-//        tabItemName.setText(mFragmentTitleList.get(position));
-//        tabItemName.setTextColor(context.getResources().getColor(android.R.color.background_light));
-//
-//        switch (mFragmentTitleList.get(position)) {
-//            case "Gaiduk":
-//                tabItemAvatar.setImageResource(R.drawable.gaiduk);
-//                break;
-//            case "Nguyen":
-//                tabItemAvatar.setImageResource(R.drawable.avatar);
-//                break;
-//            case "Balakin":
-//                tabItemAvatar.setImageResource(R.drawable.balakin);
-//                break;
-//            case "Golovin":
-//                tabItemAvatar.setImageResource(R.drawable.golovin);
-//                break;
-//            case "Ovcharov":
-//                tabItemAvatar.setImageResource(R.drawable.ovcharov);
-//                break;
-//            case "Solovienko":
-//                tabItemAvatar.setImageResource(R.drawable.solovei);
-//                break;
-//            default:
-//                tabItemAvatar.setImageResource(R.drawable.boy);
-//                break;
-//        }
-//
-//        return view;
-//    }
-
-//    public void destroyFragmentView(ViewGroup container, int position, Object object) {
-//        FragmentManager manager = ((Fragment) object).getFragmentManager();
-//        FragmentTransaction trans = manager.beginTransaction();
-//        trans.remove((Fragment) object);
-//        trans.commit();
-//    }
-//
-//    public void removeTab(int position) {
-//        if (tabLayout.getChildCount() > 0) {
-//            tabLayout.removeTabAt(position);
-//        }
-//    }
 
     @Override
     public int getItemPosition(Object object) {

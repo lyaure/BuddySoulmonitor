@@ -61,6 +61,7 @@ public class SleepStatsFragment extends Fragment {
 
         float[] results = new float[hours.size()];
 
+        // fill the grph
         for(int i=0; i<users.size(); i++){
             if(users.get(i).getAsleepTime() > 0){
                 int hour = getHour(users.get(i).getAsleepTime());
@@ -72,30 +73,12 @@ public class SleepStatsFragment extends Fragment {
                 else
                     results[index]++;
             }
-//            if(hour <= 2)
-//                results[hour + 12 - 20]++;
-//            else{
-//
-//                results[hour] ++;
-//            }
         }
 
         ArrayList stats = new ArrayList();
 
         for(int i=0; i<results.length; i++)
             stats.add(new BarEntry(results[i], i));
-        /*
-        ArrayList users = new ArrayList();
-
-        users.add(new BarEntry(50f, 0));
-        users.add(new BarEntry(60f, 1));
-        users.add(new BarEntry(110f, 2));
-        users.add(new BarEntry(90f, 3));
-        users.add(new BarEntry(75f, 4));
-        users.add(new BarEntry(35f, 5));
-        users.add(new BarEntry(25f, 6));
-*/
-
 
         ArrayList colors = new ArrayList();
         colors.add(getActivity().getResources().getColor(R.color.colorOrange));
@@ -133,6 +116,7 @@ public class SleepStatsFragment extends Fragment {
 
         float[] results = new float[hours.size()];
 
+        // fill the graph
         for(int i=0; i<users.size(); i++){
             int hour = getHour(users.get(i).getWokeUpTime());
             if(hour > 10)
@@ -145,18 +129,6 @@ public class SleepStatsFragment extends Fragment {
 
         for(int i=0; i<results.length; i++)
             stats.add(new BarEntry(results[i], i));
-
-        /*
-        ArrayList users = new ArrayList();
-
-        users.add(new BarEntry(50f, 0));
-        users.add(new BarEntry(60f, 1));
-        users.add(new BarEntry(110f, 2));
-        users.add(new BarEntry(90f, 3));
-        users.add(new BarEntry(75f, 4));
-        users.add(new BarEntry(35f, 5));
-        users.add(new BarEntry(25f, 6));
-        */
 
 
         ArrayList colors = new ArrayList();
@@ -208,17 +180,6 @@ public class SleepStatsFragment extends Fragment {
 //        for(int i=0; i<results.length; i++)
 //            stats.add(new BarEntry(results[i], i));
 //
-///*
-//        ArrayList users = new ArrayList();
-//
-//        users.add(new BarEntry(25f, 0));
-//        users.add(new BarEntry(145f, 1));
-//        users.add(new BarEntry(90f, 2));
-//        users.add(new BarEntry(145f, 3));
-//        users.add(new BarEntry(50f, 4));
-//        users.add(new BarEntry(30f, 5));
-//
-//*/
 //
 //        ArrayList colors = new ArrayList();
 //        colors.add(getActivity().getResources().getColor(R.color.colorOrange));
@@ -239,6 +200,7 @@ public class SleepStatsFragment extends Fragment {
 //
 //    }
 
+    // get the hour of the date (date is in millisec)
     private int getHour(long date){
         if(date == 0)
             return 0;
@@ -255,6 +217,7 @@ public class SleepStatsFragment extends Fragment {
         return hour;
     }
 
+    // get the hour duration (time is in millisec)
     private int getDuration(long time){
         int hours = (int)time / 3600;
 

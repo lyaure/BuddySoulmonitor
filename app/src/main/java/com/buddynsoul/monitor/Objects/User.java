@@ -33,10 +33,6 @@ public class User {
         return registrationDate;
     }
 
-    public void setRegistrationDate(String registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
     public boolean isAdmin() {
         return admin;
     }

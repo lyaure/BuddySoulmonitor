@@ -28,18 +28,22 @@ public class MonitorActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // booleans to know if close the app after onStop
         adminButtonPressed = false;
         logoutButtonPressed = false;
         resetPressed = false;
 
+        // bottom nav
         bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         fragment = new PedometerFragment();
         loadFragment(fragment);
 
     }
+
+
+    // load fragment
     private void loadFragment(Fragment fragment) {
-        // load fragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container_ID, fragment);
         transaction.addToBackStack(null);
@@ -93,11 +97,12 @@ public class MonitorActivity extends FragmentActivity {
 
     @Override
     public void onBackPressed(){
+        // doesn't close the app
         if(fragmentID == R.layout.fragment_setting || fragmentID == R.layout.fragment_contact_us){
             fragment = new ProfileFragment();
             loadFragment(fragment);
         }
-        else {
+        else { // close the app and go home
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -109,7 +114,7 @@ public class MonitorActivity extends FragmentActivity {
     @Override
     protected void onStop(){
         super.onStop();
-
+        // if buttons not pressed, close the app and go home
         if(fragmentID != R.layout.fragment_profile && this.adminButtonPressed == false && this.logoutButtonPressed == false && this.resetPressed == false){
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);

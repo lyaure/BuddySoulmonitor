@@ -21,24 +21,12 @@ public class City {
         return cityName;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
-    }
-
     public String getCountryName() {
         return countryName;
     }
 
-    public void setCountryName(String countryName) {
-        this.countryName = countryName;
-    }
-
     public String getKeyValue() {
         return keyValue;
-    }
-
-    public void setKeyValue(String keyValue) {
-        this.keyValue = keyValue;
     }
 }
 

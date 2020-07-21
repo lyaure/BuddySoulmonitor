@@ -84,18 +84,6 @@ public class CitySearchFragment extends Fragment {
         adapter = new CityAdapter(getContext(), cities);
         citiesList.setAdapter(adapter);
 
-//        search = (TextView)v.findViewById(R.id.searchCity_ID);
-//
-//        search.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d("DebugTextViewCity", "clicked");
-//                cities.clear();
-//                autoCompleteListSearch();
-//                Fragment fragment = new PedometerFragment();
-//                loadFragment(fragment);
-//            }
-//        });
 
         citiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -124,18 +112,10 @@ public class CitySearchFragment extends Fragment {
             }
         });
 
-
-//        if (android.os.Build.VERSION.SDK_INT > 9) {
-//            StrictMode.ThreadPolicy policy = new
-//                    StrictMode.ThreadPolicy.Builder().permitAll().build();
-//            StrictMode.setThreadPolicy(policy);
-//        }
-
         return v;
     }
-
+    // load fragment
     private void loadFragment(Fragment fragment) {
-        // load fragment
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container_ID, fragment);
         transaction.addToBackStack(null);
@@ -180,13 +160,10 @@ public class CitySearchFragment extends Fragment {
                 }
             }
 
-
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
 
             }
         });
-
-
     }
 }

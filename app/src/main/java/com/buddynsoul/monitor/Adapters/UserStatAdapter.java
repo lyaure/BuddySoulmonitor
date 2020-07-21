@@ -12,6 +12,7 @@ import com.buddynsoul.monitor.Objects.UserStat;
 
 import java.util.ArrayList;
 
+// adapter for user's stats in admin activity search
 public class UserStatAdapter extends ArrayAdapter<UserStat> {
     private Context context;
     private ArrayList<UserStat> userStatList;
@@ -33,7 +34,6 @@ public class UserStatAdapter extends ArrayAdapter<UserStat> {
 
         TextView userStatDate = (TextView)listItem.findViewById(R.id.userStatDate_ID);
         userStatDate.setText(String.format("%s%s", "Date: ", String.valueOf(userStat.getDate())));
-
 
         TextView userStatSteps = (TextView)listItem.findViewById(R.id.userStatSteps_ID);
         userStatSteps.setText(String.format("%s%s", "Steps: ", String.valueOf(userStat.getSteps())));

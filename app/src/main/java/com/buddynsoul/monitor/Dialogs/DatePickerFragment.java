@@ -15,7 +15,7 @@ import com.buddynsoul.monitor.R;
 
 import java.util.Calendar;
 
-
+// dialog to pick a date
 public class DatePickerFragment extends DialogFragment {
     private String from;
 
@@ -27,10 +27,13 @@ public class DatePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         final Calendar calendar = Calendar.getInstance();
+
+        // today's date
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+        // recover from where we came
         Bundle bundle = this.getArguments();
         if(bundle != null)
             from = bundle.getString("from", "null");
@@ -38,6 +41,7 @@ public class DatePickerFragment extends DialogFragment {
         return new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                // update textview
                 if(from.equals("fromDate")){
                     TextView fromDate = (TextView)getActivity().findViewById(R.id.fromDate_txtv_ID);
                     fromDate.setText(dayOfMonth + "/" + (month+1) + "/" + year);
@@ -46,7 +50,6 @@ public class DatePickerFragment extends DialogFragment {
                     TextView toDate = (TextView)getActivity().findViewById(R.id.toDate_txtv_ID);
                     toDate.setText(dayOfMonth + "/" + (month+1) + "/" + year);
                 }
-
             }
         }, year, month, day);
     }

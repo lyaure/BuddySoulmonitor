@@ -13,7 +13,7 @@ import com.buddynsoul.monitor.Objects.GraphObject;
 
 import java.util.ArrayList;
 
-
+// custom view for steps and sleep graph
 public class GraphChartView extends View {
     private final int PEDOMETER = 0, SLEEP = 1, TWELVE_IN_SEC = 43200;
     private final Paint pWhite, pRED, pPrimary, pBlack;
@@ -59,12 +59,12 @@ public class GraphChartView extends View {
     protected void onDraw(Canvas canvas){
         canvas.drawColor(context.getResources().getColor(R.color.colorLightBlue));
         pWhite.setTextAlign(Paint.Align.CENTER);
-//        int x = screenWidth/2, y = canvasHeight / 2;
 
         graphHeight = canvasHeight - (canvasHeight/10) * 3;
 
         int index = 0;
 
+        // calculates the coordinates of the object to draw according to data
         for(GraphObject o : objects){
             int tmp = Math.round((((float)o.getData()/goal)*graphHeight));
             if(tmp > graphHeight)
@@ -74,8 +74,10 @@ public class GraphChartView extends View {
             index ++;
         }
 
+        // for bottom dates
         canvas.drawRect(0, canvasHeight - (canvasHeight/10), canvasWidth, canvasHeight, pPrimary);
 
+        // draw bars or points according to boolean bars
         if(!objects.isEmpty()){
            if(bars)
                drawBars(canvas);
@@ -85,11 +87,11 @@ public class GraphChartView extends View {
         else
             canvas.drawText("No data yet", canvasWidth/2, canvasHeight/2, pBlack);
 
+        // draws top goal/limit points
         for(int i=0; i<width; i++){
             if(i%20 == 0)
                 canvas.drawCircle(i, canvasHeight/10, 4, pWhite);
         }
-
 
         pWhite.setTextAlign(Paint.Align.RIGHT);
         if(this.type == PEDOMETER)
@@ -105,31 +107,34 @@ public class GraphChartView extends View {
         this.type = type;
         loadData();
 
+        // change goal if it's sleeping graph
         if(type == SLEEP)
             this.goal = TWELVE_IN_SEC;
     }
 
+    // load data from SQLite db
     private void loadData(){
-//        Database db = new Database(context);
         Database db = Database.getInstance(context);
         long[] dates;
 
+        // pedometer graph
         if(this.type == PEDOMETER){
             dates = db.getStepsDates();
             for(int i=0; i<dates.length; i++)
                 objects.add(new GraphObject(dates[i], (db.getSteps(dates[i]))));
         }
-        else{
+        else{ // sleep graph
             dates = db.getSleepingTimeDates();
             for(int i=0; i<dates.length; i++)
                 objects.add(new GraphObject(dates[i], (db.getSleepDuration(dates[i]))));
         }
     }
 
-
+    // draws bars
     private void drawBars(Canvas canvas){
         for(GraphObject o: objects) {
 
+            // according to scrollview position - draws in red
             if (position == objects.indexOf(o)) {
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) + (graphHeight - o.getPoint().y),
                         o.getPoint().x + barWidth, canvasHeight - (canvasHeight / 10) * 2, pRED);
@@ -137,7 +142,7 @@ public class GraphChartView extends View {
                 if(type == PEDOMETER)
                     canvas.drawText(Integer.toString((int)o.getData()), o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y) - 5, pBlack);
             }
-            else {
+            else { // draws in white
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) +(graphHeight - o.getPoint().y),
                         o.getPoint().x + barWidth, canvasHeight - (canvasHeight / 10) * 2, pWhite);
                 canvas.drawText(o.getDate(), o.getPoint().x, canvasHeight - (canvasHeight / 30), pWhite);
@@ -145,27 +150,32 @@ public class GraphChartView extends View {
         }
     }
 
+    // draws points and lines
     private void drawPoints(Canvas canvas){
         Point[] points = new Point[objects.size()];
 
+        //to recover last points and draw line between two points
         for(GraphObject o : objects){
             points[objects.indexOf(o)] = new Point(o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y));
         }
 
+        // draws line
         for(int i=0; i<points.length; i++){
             if(i != 0)
                 canvas.drawLine(points[i-1].x, points[i-1].y, points[i].x, points[i].y, pWhite);
         }
 
+        // draws points
         for(int i=0; i<points.length; i++){
 
+            // according to scrollview position - draws in red
             if (position == i) {
                 canvas.drawCircle(points[i].x, points[i].y, radius, pRED);
                 canvas.drawText(objects.get(i).getDate(), points[i].x, canvasHeight - (canvasHeight / 30), pRED);
                 if(type == PEDOMETER)
                     canvas.drawText(Integer.toString((int)objects.get(i).getData()), points[i].x, points[i].y + canvasHeight/10, pBlack);
             }
-            else {
+            else {// draws in white
                 canvas.drawCircle(points[i].x, points[i].y, radius, pWhite);
                 canvas.drawText(objects.get(i).getDate(), points[i].x, canvasHeight - (canvasHeight / 30), pWhite);
             }

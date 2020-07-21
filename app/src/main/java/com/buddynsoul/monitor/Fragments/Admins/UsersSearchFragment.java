@@ -117,9 +117,12 @@ public class UsersSearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 DatePickerFragment dialogFragment = new DatePickerFragment();
+
+                // to recover from where we came
                 Bundle bundle = new Bundle();
                 bundle.putString("from", "fromDate");
                 dialogFragment.setArguments(bundle);
+
                 dialogFragment.show(getActivity().getSupportFragmentManager(), "date");
             }
         });
@@ -129,9 +132,12 @@ public class UsersSearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 DatePickerFragment dialogFragment = new DatePickerFragment();
+
+                // to recover from where we came
                 Bundle bundle = new Bundle();
                 bundle.putString("from", "toDate");
                 dialogFragment.setArguments(bundle);
+
                 dialogFragment.show(getActivity().getSupportFragmentManager(), "date");
             }
         });
