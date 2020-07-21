@@ -36,11 +36,11 @@ public class SleepStatsFragment extends Fragment {
 
         asleepChart = (BarChart)v.findViewById(R.id.asleep_barchart_ID);
         wokeUpChart = (BarChart)v.findViewById(R.id.wokeup_barchart_ID);
-        duration = (BarChart)v.findViewById(R.id.duration_barchart_ID);
+//        duration = (BarChart)v.findViewById(R.id.duration_barchart_ID);
 
         drawAsleepChart();
         drawWokeupChart();
-        drawDurationChart();
+//        drawDurationChart();
 
         return v;
     }
@@ -62,15 +62,22 @@ public class SleepStatsFragment extends Fragment {
         float[] results = new float[hours.size()];
 
         for(int i=0; i<users.size(); i++){
-            int hour = getHour(users.get(i).getAsleepTime());
-            if(hour <= 2)
-                results[hour + 12 - 20]++;
-            else{
-                if(hour > 2 && hour < 20)
-                    results[results.length-1] ++;
+            if(users.get(i).getAsleepTime() > 0){
+                int hour = getHour(users.get(i).getAsleepTime());
+                int index = hour - 20;
+                if(index > 6)
+                    results[results.length-1]++;
+                else if(index < 20)
+                    results[0] ++;
                 else
-                    results[hour] ++;
+                    results[index]++;
             }
+//            if(hour <= 2)
+//                results[hour + 12 - 20]++;
+//            else{
+//
+//                results[hour] ++;
+//            }
         }
 
         ArrayList stats = new ArrayList();
@@ -127,7 +134,7 @@ public class SleepStatsFragment extends Fragment {
         float[] results = new float[hours.size()];
 
         for(int i=0; i<users.size(); i++){
-            int hour = getHour(users.get(i).getAsleepTime());
+            int hour = getHour(users.get(i).getWokeUpTime());
             if(hour > 10)
                 results[results.length-1]++;
             else
@@ -171,64 +178,66 @@ public class SleepStatsFragment extends Fragment {
 
     }
 
-    private void drawDurationChart(){
-        AdminActivity activity = (AdminActivity)getActivity();
-        ArrayList<UserStat> users = activity.getFinalStats();
-
-        ArrayList hours = new ArrayList();
-
-        hours.add("05:00");
-        hours.add("06:00");
-        hours.add("07:00");
-        hours.add("08:00");
-        hours.add("09:00");
-        hours.add("10:00");
-
-        float[] results = new float[hours.size()];
-
-        for(int i=0; i<users.size(); i++){
-            int hour = getHour(users.get(i).getAsleepTime());
-            if(hour > 10)
-                results[results.length-1]++;
-            else
-                results[hour] ++;
-        }
-
-        ArrayList stats = new ArrayList();
-
-        for(int i=0; i<results.length; i++)
-            stats.add(new BarEntry(results[i], i));
-
-/*
-        ArrayList users = new ArrayList();
-
-        users.add(new BarEntry(25f, 0));
-        users.add(new BarEntry(145f, 1));
-        users.add(new BarEntry(90f, 2));
-        users.add(new BarEntry(145f, 3));
-        users.add(new BarEntry(50f, 4));
-        users.add(new BarEntry(30f, 5));
-
-*/
-
-        ArrayList colors = new ArrayList();
-        colors.add(getActivity().getResources().getColor(R.color.colorOrange));
-        colors.add(getActivity().getResources().getColor(R.color.colorGreen));
-        colors.add(getActivity().getResources().getColor(R.color.colorPrimary));
-        colors.add(getActivity().getResources().getColor(R.color.colorPrimaryDark));
-        colors.add(getActivity().getResources().getColor(R.color.colorPrimary));
-        colors.add(getActivity().getResources().getColor(R.color.colorGreen));
-        colors.add(getActivity().getResources().getColor(R.color.colorOrange));
-
-
-        BarDataSet bardataset = new BarDataSet(stats, "Users");
-        duration.animateY(5000);
-        BarData data = new BarData(hours, bardataset);
-
-        bardataset.setColors(colors);
-        duration.setData(data);
-
-    }
+//    private void drawDurationChart(){
+//        AdminActivity activity = (AdminActivity)getActivity();
+//        ArrayList<UserStat> users = activity.getFinalStats();
+//
+//        ArrayList hours = new ArrayList();
+//
+//        hours.add("05:00");
+//        hours.add("06:00");
+//        hours.add("07:00");
+//        hours.add("08:00");
+//        hours.add("09:00");
+//        hours.add("10:00");
+//
+//        float[] results = new float[hours.size()];
+//
+//        for(int i=0; i<users.size(); i++){
+//            if(users.get(i).getDuration() > 0){
+//                int hour = getDuration(users.get(i).getDuration());
+//                if(hour > 10)
+//                    results[results.length-1]++;
+//                else
+//                    results[hour] ++;
+//            }
+//        }
+//
+//        ArrayList stats = new ArrayList();
+//
+//        for(int i=0; i<results.length; i++)
+//            stats.add(new BarEntry(results[i], i));
+//
+///*
+//        ArrayList users = new ArrayList();
+//
+//        users.add(new BarEntry(25f, 0));
+//        users.add(new BarEntry(145f, 1));
+//        users.add(new BarEntry(90f, 2));
+//        users.add(new BarEntry(145f, 3));
+//        users.add(new BarEntry(50f, 4));
+//        users.add(new BarEntry(30f, 5));
+//
+//*/
+//
+//        ArrayList colors = new ArrayList();
+//        colors.add(getActivity().getResources().getColor(R.color.colorOrange));
+//        colors.add(getActivity().getResources().getColor(R.color.colorGreen));
+//        colors.add(getActivity().getResources().getColor(R.color.colorPrimary));
+//        colors.add(getActivity().getResources().getColor(R.color.colorPrimaryDark));
+//        colors.add(getActivity().getResources().getColor(R.color.colorPrimary));
+//        colors.add(getActivity().getResources().getColor(R.color.colorGreen));
+//        colors.add(getActivity().getResources().getColor(R.color.colorOrange));
+//
+//
+//        BarDataSet bardataset = new BarDataSet(stats, "Users");
+//        duration.animateY(5000);
+//        BarData data = new BarData(hours, bardataset);
+//
+//        bardataset.setColors(colors);
+//        duration.setData(data);
+//
+//    }
 
     private int getHour(long date){
         if(date == 0)
@@ -240,11 +249,13 @@ public class SleepStatsFragment extends Fragment {
         int hour = c.get(Calendar.HOUR_OF_DAY);
         if(c.get(Calendar.AM_PM) == Calendar.PM)
             hour += 12;
+        if(c.get(Calendar.AM_PM) == Calendar.AM && hour < 12)
+            hour += 24;
 
         return hour;
     }
 
-    private int dur(int time){
+    private int getDuration(long time){
         int hours = (int)time / 3600;
 
         return hours;

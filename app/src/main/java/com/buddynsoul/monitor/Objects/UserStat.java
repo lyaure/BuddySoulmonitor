@@ -114,4 +114,8 @@ public class UserStat {
     public void setNight_location(String night_location) {
         this.night_location = night_location;
     }
+
+    public long getDuration() {
+        return this.duration;
+    }
 }
