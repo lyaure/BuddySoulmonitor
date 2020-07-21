@@ -47,6 +47,8 @@ public class AdminActivity extends FragmentActivity {
         fragment = new UsersFragment();
         loadFragment(fragment);
 
+        getAllUserData();
+
     }
 
     private void loadFragment(Fragment fragment) {
@@ -101,10 +103,14 @@ public class AdminActivity extends FragmentActivity {
                 .show();
     }
 
-    public ArrayList<UserStat> getFinalStats(){
-        getAllUserData();
-        calculateStats();
-        return this.finalStats;
+//    public ArrayList<UserStat> getFinalStats(){
+//        getAllUserData();
+//        calculateStats();
+//        return this.finalStats;
+//    }
+
+    public ArrayList<UserStat> getFinalStats() {
+        return finalStats;
     }
 
     private void getAllUserData() {
@@ -137,6 +143,7 @@ public class AdminActivity extends FragmentActivity {
 
                     data.add(userStats);
                 }
+                calculateStats();
             }
 
             @Override
@@ -164,7 +171,25 @@ public class AdminActivity extends FragmentActivity {
                 }
             }
 
-            finalStats.add(new UserStat((steps/stepsCount), (asleep/sleepCount), (wokeUp/sleepCount)));
+            int tmpSteps;
+            long tmpAsleep, tmpWokeUp;
+
+            if(stepsCount == 0) {
+                tmpSteps = -1;
+            }
+            else {
+                tmpSteps = steps/stepsCount;
+            }
+
+            if(sleepCount == 0) {
+                tmpAsleep = -1;
+                tmpWokeUp = -1;
+            }
+            else {
+                tmpAsleep = asleep/sleepCount;
+                tmpWokeUp = wokeUp/sleepCount;
+            }
+            finalStats.add(new UserStat((tmpSteps), (tmpAsleep), (tmpWokeUp)));
         }
     }
 
