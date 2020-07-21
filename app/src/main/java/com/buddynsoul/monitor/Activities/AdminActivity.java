@@ -8,19 +8,34 @@ import androidx.fragment.app.FragmentTransaction;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.buddynsoul.monitor.Objects.UserStat;
 import com.buddynsoul.monitor.R;
 import com.buddynsoul.monitor.Fragments.Admins.StatisticsFragment;
 import com.buddynsoul.monitor.Fragments.Admins.UsersFragment;
+import com.buddynsoul.monitor.Retrofit.IMyService;
+import com.buddynsoul.monitor.Retrofit.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminActivity extends FragmentActivity {
 
     private BottomNavigationView bottomNavigation;
     private Fragment fragment;
-    private int fragmentID;
+    private ArrayList<UserStat[]> data = new ArrayList<>();
+    private ArrayList<UserStat> finalStats = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +46,7 @@ public class AdminActivity extends FragmentActivity {
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         fragment = new UsersFragment();
         loadFragment(fragment);
+
     }
 
     private void loadFragment(Fragment fragment) {
@@ -83,6 +99,73 @@ public class AdminActivity extends FragmentActivity {
                     }
                 })
                 .show();
+    }
+
+    public ArrayList<UserStat> getFinalStats(){
+        getAllUserData();
+        calculateStats();
+        return this.finalStats;
+    }
+
+    private void getAllUserData() {
+        SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+        String refreshToken = sp.getString("refreshToken", "");
+
+        IMyService iMyService = RetrofitClient.getClient().create(IMyService.class);
+        Call<JsonElement> todoCall = iMyService.getAllUserData(refreshToken);
+        todoCall.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                JsonArray dataArray = response.body().getAsJsonArray();
+
+                for (int i = 0; i < dataArray.size(); i++) {
+                    JsonObject user = dataArray.get(i).getAsJsonObject();
+                    String userEmail = user.get("email").getAsString();
+
+                    JsonArray userData = user.get("data").getAsJsonArray();
+                    UserStat[] userStats = new UserStat[userData.size()];
+
+                    for (int j = 0; j < userData.size(); j++) {
+                        JsonObject data = userData.get(j).getAsJsonObject();
+                        int steps = data.get("steps").getAsInt();
+                        long asleep = data.get("asleep_time").getAsLong();
+                        long wokeUp = data.get("woke_up_time").getAsLong();
+                        long deepSleep = data.get("deep_sleep").getAsLong();
+
+                        userStats[j] = new UserStat(steps, asleep, wokeUp);
+                    }
+
+                    data.add(userStats);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Failed to get all users data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void calculateStats(){
+        for(UserStat[] stats : data){
+            int steps = 0, stepsCount = 0, sleepCount = 0;
+            long asleep = 0;
+            long wokeUp = 0;
+
+            for(UserStat user : stats){
+                if(user.getSteps() > 0){
+                    steps += user.getSteps();
+                    stepsCount ++;
+                }
+                if(user.getAsleepTime() > 0){
+                    asleep += user.getAsleepTime();
+                    wokeUp =+ user.getAsleepTime();
+                    sleepCount ++;
+                }
+            }
+
+            finalStats.add(new UserStat((steps/stepsCount), (asleep/sleepCount), (wokeUp/sleepCount)));
+        }
     }
 
     @Override

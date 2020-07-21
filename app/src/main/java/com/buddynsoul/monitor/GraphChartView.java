@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.buddynsoul.monitor.Objects.Database;
-import com.buddynsoul.monitor.Objects.MyObject;
+import com.buddynsoul.monitor.Objects.GraphObject;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class GraphChartView extends View {
     private int screenWidth, screenHeight;
     private int scrollPosition;
     private int type;
-    private ArrayList<MyObject> objects;
+    private ArrayList<GraphObject> objects;
     private int width, height, graphHeight, barWidth, space, radius, position;
     private boolean bars;
     private int goal;
@@ -65,7 +65,7 @@ public class GraphChartView extends View {
 
         int index = 0;
 
-        for(MyObject o : objects){
+        for(GraphObject o : objects){
             int tmp = Math.round((((float)o.getData()/goal)*graphHeight));
             if(tmp > graphHeight)
                 tmp = graphHeight;
@@ -117,18 +117,18 @@ public class GraphChartView extends View {
         if(this.type == PEDOMETER){
             dates = db.getStepsDates();
             for(int i=0; i<dates.length; i++)
-                objects.add(new MyObject(dates[i], (db.getSteps(dates[i]))));
+                objects.add(new GraphObject(dates[i], (db.getSteps(dates[i]))));
         }
         else{
             dates = db.getSleepingTimeDates();
             for(int i=0; i<dates.length; i++)
-                objects.add(new MyObject(dates[i], (db.getSleepDuration(dates[i]))));
+                objects.add(new GraphObject(dates[i], (db.getSleepDuration(dates[i]))));
         }
     }
 
 
     private void drawBars(Canvas canvas){
-        for(MyObject o: objects) {
+        for(GraphObject o: objects) {
 
             if (position == objects.indexOf(o)) {
                 canvas.drawRect(o.getPoint().x - barWidth, (canvasHeight/10) + (graphHeight - o.getPoint().y),
@@ -148,7 +148,7 @@ public class GraphChartView extends View {
     private void drawPoints(Canvas canvas){
         Point[] points = new Point[objects.size()];
 
-        for(MyObject o : objects){
+        for(GraphObject o : objects){
             points[objects.indexOf(o)] = new Point(o.getPoint().x, (canvasHeight/10) + (graphHeight - o.getPoint().y));
         }
 

@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.buddynsoul.monitor.Activities.AdminActivity;
+import com.buddynsoul.monitor.Objects.UserStat;
 import com.buddynsoul.monitor.R;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -15,6 +17,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class SleepStatsFragment extends Fragment {
@@ -43,6 +46,38 @@ public class SleepStatsFragment extends Fragment {
     }
 
     private void drawAsleepChart(){
+        AdminActivity activity = (AdminActivity)getActivity();
+        ArrayList<UserStat> users = activity.getFinalStats();
+
+        ArrayList hours = new ArrayList();
+
+        hours.add("20:00");
+        hours.add("21:00");
+        hours.add("22:00");
+        hours.add("23:00");
+        hours.add("00:00");
+        hours.add("01:00");
+        hours.add("02:00");
+
+        float[] results = new float[hours.size()];
+
+        for(int i=0; i<users.size(); i++){
+            int hour = getHour(users.get(i).getAsleepTime());
+            if(hour <= 2)
+                results[hour + 12 - 20]++;
+            else{
+                if(hour > 2 && hour < 20)
+                    results[results.length-1] ++;
+                else
+                    results[hour] ++;
+            }
+        }
+
+        ArrayList stats = new ArrayList();
+
+        for(int i=0; i<results.length; i++)
+            stats.add(new BarEntry(results[i], i));
+        /*
         ArrayList users = new ArrayList();
 
         users.add(new BarEntry(50f, 0));
@@ -52,18 +87,7 @@ public class SleepStatsFragment extends Fragment {
         users.add(new BarEntry(75f, 4));
         users.add(new BarEntry(35f, 5));
         users.add(new BarEntry(25f, 6));
-
-
-        ArrayList hour = new ArrayList();
-
-        hour.add("20:00");
-        hour.add("21:00");
-        hour.add("22:00");
-        hour.add("23:00");
-        hour.add("00:00");
-        hour.add("01:00");
-        hour.add("02:00");
-
+*/
 
 
         ArrayList colors = new ArrayList();
@@ -76,9 +100,9 @@ public class SleepStatsFragment extends Fragment {
         colors.add(getActivity().getResources().getColor(R.color.colorOrange));
 
 
-        BarDataSet bardataset = new BarDataSet(users, "Users");
+        BarDataSet bardataset = new BarDataSet(stats, "Users");
         asleepChart.animateY(5000);
-        BarData data = new BarData(hour, bardataset);
+        BarData data = new BarData(hours, bardataset);
 
         bardataset.setColors(colors);
         asleepChart.setData(data);
@@ -87,8 +111,35 @@ public class SleepStatsFragment extends Fragment {
 
 
     private void drawWokeupChart(){
+        AdminActivity activity = (AdminActivity)getActivity();
+        ArrayList<UserStat> users = activity.getFinalStats();
 
+        ArrayList hours = new ArrayList();
 
+        hours.add("04:00");
+        hours.add("05:00");
+        hours.add("06:00");
+        hours.add("07:00");
+        hours.add("08:00");
+        hours.add("09:00");
+        hours.add("10:00");
+
+        float[] results = new float[hours.size()];
+
+        for(int i=0; i<users.size(); i++){
+            int hour = getHour(users.get(i).getAsleepTime());
+            if(hour > 10)
+                results[results.length-1]++;
+            else
+                results[hour] ++;
+        }
+
+        ArrayList stats = new ArrayList();
+
+        for(int i=0; i<results.length; i++)
+            stats.add(new BarEntry(results[i], i));
+
+        /*
         ArrayList users = new ArrayList();
 
         users.add(new BarEntry(50f, 0));
@@ -98,18 +149,7 @@ public class SleepStatsFragment extends Fragment {
         users.add(new BarEntry(75f, 4));
         users.add(new BarEntry(35f, 5));
         users.add(new BarEntry(25f, 6));
-
-
-        ArrayList hour = new ArrayList();
-
-        hour.add("04:00");
-        hour.add("05:00");
-        hour.add("06:00");
-        hour.add("07:00");
-        hour.add("08:00");
-        hour.add("09:00");
-        hour.add("10:00");
-
+        */
 
 
         ArrayList colors = new ArrayList();
@@ -122,9 +162,9 @@ public class SleepStatsFragment extends Fragment {
         colors.add(getActivity().getResources().getColor(R.color.colorOrange));
 
 
-        BarDataSet bardataset = new BarDataSet(users, "Users");
+        BarDataSet bardataset = new BarDataSet(stats, "Users");
         wokeUpChart.animateY(5000);
-        BarData data = new BarData(hour, bardataset);
+        BarData data = new BarData(hours, bardataset);
 
         bardataset.setColors(colors);
         wokeUpChart.setData(data);
@@ -132,8 +172,34 @@ public class SleepStatsFragment extends Fragment {
     }
 
     private void drawDurationChart(){
+        AdminActivity activity = (AdminActivity)getActivity();
+        ArrayList<UserStat> users = activity.getFinalStats();
 
+        ArrayList hours = new ArrayList();
 
+        hours.add("05:00");
+        hours.add("06:00");
+        hours.add("07:00");
+        hours.add("08:00");
+        hours.add("09:00");
+        hours.add("10:00");
+
+        float[] results = new float[hours.size()];
+
+        for(int i=0; i<users.size(); i++){
+            int hour = getHour(users.get(i).getAsleepTime());
+            if(hour > 10)
+                results[results.length-1]++;
+            else
+                results[hour] ++;
+        }
+
+        ArrayList stats = new ArrayList();
+
+        for(int i=0; i<results.length; i++)
+            stats.add(new BarEntry(results[i], i));
+
+/*
         ArrayList users = new ArrayList();
 
         users.add(new BarEntry(25f, 0));
@@ -143,17 +209,7 @@ public class SleepStatsFragment extends Fragment {
         users.add(new BarEntry(50f, 4));
         users.add(new BarEntry(30f, 5));
 
-
-        ArrayList hour = new ArrayList();
-
-        hour.add("05:00");
-        hour.add("06:00");
-        hour.add("07:00");
-        hour.add("08:00");
-        hour.add("09:00");
-        hour.add("10:00");
-
-
+*/
 
         ArrayList colors = new ArrayList();
         colors.add(getActivity().getResources().getColor(R.color.colorOrange));
@@ -165,12 +221,32 @@ public class SleepStatsFragment extends Fragment {
         colors.add(getActivity().getResources().getColor(R.color.colorOrange));
 
 
-        BarDataSet bardataset = new BarDataSet(users, "Users");
+        BarDataSet bardataset = new BarDataSet(stats, "Users");
         duration.animateY(5000);
-        BarData data = new BarData(hour, bardataset);
+        BarData data = new BarData(hours, bardataset);
 
         bardataset.setColors(colors);
         duration.setData(data);
 
+    }
+
+    private int getHour(long date){
+        if(date == 0)
+            return 0;
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(date);
+
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        if(c.get(Calendar.AM_PM) == Calendar.PM)
+            hour += 12;
+
+        return hour;
+    }
+
+    private int dur(int time){
+        int hours = (int)time / 3600;
+
+        return hours;
     }
 }

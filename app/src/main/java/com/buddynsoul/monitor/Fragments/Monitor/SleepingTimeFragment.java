@@ -20,7 +20,6 @@ import com.buddynsoul.monitor.Adapters.ViewPagerAdapter;
 import com.buddynsoul.monitor.GraphChartView;
 import com.buddynsoul.monitor.Objects.Database;
 import com.buddynsoul.monitor.R;
-import com.buddynsoul.monitor.Fragments.Admins.SleepSummaryFragment;
 import com.buddynsoul.monitor.Utils.Util;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 

@@ -4,12 +4,12 @@ import android.graphics.Point;
 
 import java.util.Calendar;
 
-public class MyObject {
+public class GraphObject {
     private long date;
     private int data;
     private Point point;
 
-    public MyObject(long date, int data){
+    public GraphObject(long date, int data){
         this.date = date;
         this.data = data;
         this.point = new Point();

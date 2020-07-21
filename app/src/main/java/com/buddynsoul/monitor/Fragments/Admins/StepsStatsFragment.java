@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.buddynsoul.monitor.Activities.AdminActivity;
+import com.buddynsoul.monitor.Objects.UserStat;
 import com.buddynsoul.monitor.R;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -18,8 +20,8 @@ import java.util.ArrayList;
 
 
 public class StepsStatsFragment extends Fragment {
-    View v;
-    BarChart stepsChart;
+    private View v;
+    private BarChart stepsChart;
     public StepsStatsFragment() {
         // Required empty public constructor
     }
@@ -38,35 +40,50 @@ public class StepsStatsFragment extends Fragment {
     }
 
     private void drawAsleepChart(){
-        ArrayList users = new ArrayList();
+        AdminActivity activity = (AdminActivity)getActivity();
+        ArrayList<UserStat> users = activity.getFinalStats();
 
-        users.add(new BarEntry(30f, 0));
-        users.add(new BarEntry(60f, 1));
-        users.add(new BarEntry(110f, 2));
-        users.add(new BarEntry(90f, 3));
-        users.add(new BarEntry(75f, 4));
-        users.add(new BarEntry(185f, 5));
-        users.add(new BarEntry(100f, 6));
-        users.add(new BarEntry(90f, 7));
-        users.add(new BarEntry(130f, 8));
-        users.add(new BarEntry(35f, 9));
-        users.add(new BarEntry(25f, 10));
+        ArrayList steps = new ArrayList();
+
+        steps.add("0");
+        steps.add("1000");
+        steps.add("2000");
+        steps.add("3000");
+        steps.add("4000");
+        steps.add("5000");
+        steps.add("6000");
+        steps.add("7000");
+        steps.add("8000");
+        steps.add("9000");
+        steps.add("10000");
 
 
-        ArrayList hour = new ArrayList();
+        float[] results = new float[steps.size()];
 
-        hour.add("0");
-        hour.add("1000");
-        hour.add("2000");
-        hour.add("3000");
-        hour.add("4000");
-        hour.add("5000");
-        hour.add("6000");
-        hour.add("7000");
-        hour.add("8000");
-        hour.add("9000");
-        hour.add("10000");
+        for(int i=0; i<users.size(); i++){
+            if(users.get(i).getSteps() / 1000 >= 10)
+                results[11]++;
+            else
+                results[users.get(i).getSteps() / 1000] ++;
+        }
 
+        ArrayList stats = new ArrayList();
+
+        for(int i=0; i<results.length; i++)
+            stats.add(new BarEntry(results[i], i));
+
+
+//        stats.add(new BarEntry(30f, 0));
+//        stats.add(new BarEntry(60f, 1));
+//        stats.add(new BarEntry(110f, 2));
+//        stats.add(new BarEntry(90f, 3));
+//        stats.add(new BarEntry(75f, 4));
+//        stats.add(new BarEntry(185f, 5));
+//        stats.add(new BarEntry(100f, 6));
+//        stats.add(new BarEntry(90f, 7));
+//        stats.add(new BarEntry(130f, 8));
+//        stats.add(new BarEntry(35f, 9));
+//        stats.add(new BarEntry(25f, 10));
 
 
         ArrayList colors = new ArrayList();
@@ -82,9 +99,9 @@ public class StepsStatsFragment extends Fragment {
         colors.add(getActivity().getResources().getColor(R.color.colorGreen));
         colors.add(getActivity().getResources().getColor(R.color.colorOrange));
 
-        BarDataSet bardataset = new BarDataSet(users, "Users");
+        BarDataSet bardataset = new BarDataSet(stats, "Users");
         stepsChart.animateY(5000);
-        BarData data = new BarData(hour, bardataset);
+        BarData data = new BarData(steps, bardataset);
 
         bardataset.setColors(colors);
         stepsChart.setData(data);

@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.buddynsoul.monitor.Activities.AdminActivity;
 import com.buddynsoul.monitor.Activities.LoginActivity;
 import com.buddynsoul.monitor.Activities.MonitorActivity;
+import com.buddynsoul.monitor.Activities.ResetPasswordActivity;
 import com.buddynsoul.monitor.Dialogs.LoadingDialog;
 import com.buddynsoul.monitor.Objects.Database;
 import com.buddynsoul.monitor.R;
@@ -147,6 +148,18 @@ public class ProfileFragment extends Fragment {
                         .commit();
             }
         });
+
+        LinearLayout reset = (LinearLayout) v.findViewById(R.id.profile_resetPassword_layout_ID);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MonitorActivity activity = (MonitorActivity)getActivity();
+                activity.setResetPressed();
+                Intent i = new Intent(getActivity(), ResetPasswordActivity.class);
+                startActivity(i);
+            }
+        });
+
 
         LinearLayout delete = (LinearLayout) v.findViewById(R.id.profile_deleteAccount_layout_ID);
         delete.setOnClickListener(new View.OnClickListener() {

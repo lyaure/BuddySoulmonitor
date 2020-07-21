@@ -1,4 +1,4 @@
-package com.buddynsoul.monitor.Fragments.Admins;
+package com.buddynsoul.monitor.Fragments.Monitor;
 
 import android.os.Bundle;
 
